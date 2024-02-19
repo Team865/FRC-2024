@@ -178,4 +178,4 @@ logs/
 ctre_sim/
 
 # Automatic Git data
-src/main/java/ca/warp7/BuildConstants.java
+src/main/java/ca/warp7/frc2024/BuildConstants.java
