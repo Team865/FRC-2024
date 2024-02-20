@@ -4,16 +4,21 @@
 
 package ca.warp7.frc2024;
 
+import ca.warp7.frc2024.subsystems.arm.ArmIO;
+import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
+import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIO;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOSim;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
+    private final ArmSubsystem armSubsystem;
 
     private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -29,6 +34,7 @@ public class RobotContainer {
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim());
+                armSubsystem = new ArmSubsystem(new ArmIOSim());
                 break;
             default:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
@@ -37,6 +43,7 @@ public class RobotContainer {
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {});
+                armSubsystem = new ArmSubsystem(new ArmIO() {});
                 break;
         }
 
@@ -50,6 +57,13 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 driverController.rightBumper()));
+
+        driverController.a().onTrue(Commands.runOnce(() -> {
+            armSubsystem.setSetpoint(Rotation2d.fromDegrees(130));
+        }));
+        driverController.b().onTrue(Commands.runOnce(() -> {
+            armSubsystem.setSetpoint(Rotation2d.fromDegrees(200));
+        }));
     }
 
     public Command getAutonomousCommand() {
