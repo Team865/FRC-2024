@@ -1,9 +1,10 @@
-package ca.warp7.subsystems.shooter;
+package ca.warp7.frc2024.subsystems.shooter;
 
-import ca.warp7.subsystems.shooter.ShooterIO.ShooterIOInputs;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+
+import ca.warp7.frc2024.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final ShooterIO io;
@@ -11,10 +12,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public ShooterSubsystem(ShooterIO io) {
         this.io = io;
-    }
-
-    public Command setFeederRollersVoltage(double volts) {
-        return runOnce(() -> io.setFeederRollersVoltage(volts));
     }
 
     public Command setOutrunnersVoltage(double volts) {
@@ -26,8 +23,6 @@ public class ShooterSubsystem extends SubsystemBase {
         io.updateInputs(this.inputs);
         io.periodic();
 
-        Logger.processInputs("Shooter/topFeederRoller", inputs.topFeederRoller);
-        Logger.processInputs("Shooter/bottomFeederRoller", inputs.bottomFeederRoller);
         Logger.processInputs("Shooter/topRightOutrunner", inputs.topRightOutrunner);
         Logger.processInputs("Shooter/bottomRightOutrunner", inputs.bottomRightOutrunner);
         Logger.processInputs("Shooter/topLeftOutrunner", inputs.topLeftOutrunner);
