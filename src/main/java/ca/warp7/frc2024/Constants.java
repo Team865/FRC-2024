@@ -27,8 +27,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
         public static final Translation2d[] SWERVE_MODULE_TRANSLATIONS = new Translation2d[] {
-            new Translation2d(DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0),
             new Translation2d(DRIVE_BASE_X / 2.0, -DRIVE_BASE_Y / 2.0),
+            new Translation2d(DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0),
             new Translation2d(-DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0),
             new Translation2d(-DRIVE_BASE_X / 2.0, -DRIVE_BASE_Y / 2.0)
         };
