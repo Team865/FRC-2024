@@ -2,11 +2,8 @@ package ca.warp7.frc2024.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import ca.warp7.frc2024.subsystems.shooter.OutRunnerIOInputsAutoLogged;
-
 public interface ShooterIO {
     public static class ShooterIOInputs {
-        // TODO: Make a DCMotorIOInputs maybe
         @AutoLog
         public static class OutRunnerIOInputs {
             public double VelocityRad = 0.0;
@@ -26,14 +23,27 @@ public interface ShooterIO {
      */
     public void updateInputs(ShooterIOInputs inputs);
 
-    /** Run the outrunners at the specified voltage.
+    /** Run the top right outrunner at the specified voltage;
      *
      * @param volts
      */
-    public void setOutrunnersVoltage(double volts);
+    public void setTopRightVoltage(double volts);
 
-    /** Code that needs to be run periodically
+    /** Run the top left outrunner at the specified voltage;
      *
+     * @param volts
      */
-    public void periodic();
+    public void setTopLeftVoltage(double volts);
+
+    /** Run the bottom right outrunner at the specified voltage;
+     *
+     * @param volts
+     */
+    public void setbottomRightVoltage(double volts);
+
+    /** Run the bottom left outrunner at the specified voltage;
+     *
+     * @param volts
+     */
+    public void setbottomLeftVoltage(double volts);
 }
