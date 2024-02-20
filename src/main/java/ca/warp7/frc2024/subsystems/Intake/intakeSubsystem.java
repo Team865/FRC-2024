@@ -1,4 +1,4 @@
-package ca.warp7.subsystems.Intake;
+package ca.warp7.frc2024.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

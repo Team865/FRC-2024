@@ -1,4 +1,4 @@
-package ca.warp7.subsystems.Intake;
+package ca.warp7.frc2024.subsystems.Intake;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
