@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class intakeSIM  implements intakeIO{
     private double intakeAppliedVolts = 0.0;
-    private final DCMotorSim intakeMotorSim = new DCMotorSim(DCMotor.getNEO(1), 3,0.0001);
+    private final DCMotorSim intakeMotorSim = new DCMotorSim(DCMotor.getNEO(1), 4,0.0001);
     @Override
     public void updateInputs(intakeIOInputs inputs) {
         inputs.intakeAppliedVolts = intakeAppliedVolts;
