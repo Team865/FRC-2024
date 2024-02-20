@@ -1,8 +1,9 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.1.1"
+    id "edu.wpi.first.GradleRIO" version "2024.2.1"
     id "com.diffplug.spotless" version "6.23.3"
     id "com.peterabeles.gversion" version "1.10"
+    id "io.freefair.lombok" version "8.6"
 }
 
 java {
@@ -10,7 +11,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def ROBOT_MAIN_CLASS = "ca.warp7.Main"
+def ROBOT_MAIN_CLASS = "ca.warp7.frc2024.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -98,7 +99,7 @@ dependencies {
     project.compileJava.dependsOn(createVersionFile)
     gversion {
         srcDir       = "src/main/java/"
-        classPackage = "ca.warp7"
+        classPackage = "ca.warp7.frc2024"
         className    = "BuildConstants"
         dateFormat   = "yyyy-MM-dd HH:mm:ss z"
         timeZone     = "America/Toronto" // Use preferred time zone
@@ -148,7 +149,7 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/build/**', '**/build-*/**', '**/BuildConstants.java'
+            exclude '**/build/**', '**/build-*/**', '**/BuildConstants.java', '**/bin/**'
         }
         toggleOffOn()
         palantirJavaFormat()

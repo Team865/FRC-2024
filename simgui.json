@@ -1,0 +1,11 @@
+{
+  "NTProvider": {
+    "types": {
+      "/AdvantageKit/RealOutputs/Mechanism2d/ArmShooter": "Mechanism2d",
+      "/FMSInfo": "FMSInfo"
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}
