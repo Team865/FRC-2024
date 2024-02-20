@@ -1,5 +1,6 @@
 * text=auto
 
+gradlew text eol=lf
 *.gradle text eol=lf
 *.java text eol=lf
 *.json text eol=lf
