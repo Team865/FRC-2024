@@ -5,9 +5,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class ShooterIOSim implements ShooterIO {
-    // Moi center = 0.0008505 J
-    // for:
-    // 0.453592 kg and 15cm
     private DCMotorSim topRightOutrunnerSim = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.0001);
     private double topRightOutrunnerVoltsApplied = 0.0;
 
@@ -22,6 +19,12 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
+        this.topRightOutrunnerSim.update(0.2);
+        this.bottomRightOutrunnerSim.update(0.2);
+
+        this.topLeftOutrunnerSim.update(0.2);
+        this.bottomLeftOutrunnerSim.update(0.2);
+
         inputs.topRightOutrunner.VelocityRad = this.topRightOutrunnerSim.getAngularVelocityRadPerSec();
         inputs.topRightOutrunner.CurrentDraw = this.topRightOutrunnerSim.getCurrentDrawAmps();
         inputs.topRightOutrunner.VoltageApplied = this.topRightOutrunnerVoltsApplied;
@@ -40,26 +43,26 @@ public class ShooterIOSim implements ShooterIO {
     }
 
     @Override
-    public void setOutrunnersVoltage(double volts) {
+    public void setTopRightVoltage(double volts) {
         this.topRightOutrunnerVoltsApplied = MathUtil.clamp(volts, -12, 12);
-        this.topRightOutrunnerSim.setInputVoltage(volts);
-
-        this.bottomRightOutrunnerVoltsApplied = MathUtil.clamp(-volts, -12, 12);
-        this.bottomRightOutrunnerSim.setInputVoltage(this.bottomRightOutrunnerVoltsApplied);
-
-        this.topLeftOutrunnerVoltsApplied = MathUtil.clamp(-volts, -12, 12);
-        this.topLeftOutrunnerSim.setInputVoltage(this.topLeftOutrunnerVoltsApplied);
-
-        this.bottomLeftOutrunnerVoltsApplied = MathUtil.clamp(volts, -12, 12);
-        this.bottomLeftOutrunnerSim.setInputVoltage(this.bottomLeftOutrunnerVoltsApplied);
+        this.topRightOutrunnerSim.setInputVoltage(this.topRightOutrunnerVoltsApplied);
     }
 
     @Override
-    public void periodic() {
-        this.topRightOutrunnerSim.update(0.2);
-        this.bottomRightOutrunnerSim.update(0.2);
+    public void setTopLeftVoltage(double volts) {
+        this.topLeftOutrunnerVoltsApplied = MathUtil.clamp(-volts, -12, 12);
+        this.topLeftOutrunnerSim.setInputVoltage(this.topLeftOutrunnerVoltsApplied);
+    }
 
-        this.topLeftOutrunnerSim.update(0.2);
-        this.bottomLeftOutrunnerSim.update(0.2);
+    @Override
+    public void setbottomRightVoltage(double volts) {
+        this.bottomRightOutrunnerVoltsApplied = MathUtil.clamp(-volts, -12, 12);
+        this.bottomRightOutrunnerSim.setInputVoltage(this.bottomRightOutrunnerVoltsApplied);
+    }
+
+    @Override
+    public void setbottomLeftVoltage(double volts) {
+        this.bottomLeftOutrunnerVoltsApplied = MathUtil.clamp(volts, -12, 12);
+        this.bottomLeftOutrunnerSim.setInputVoltage(this.bottomLeftOutrunnerVoltsApplied);
     }
 }
