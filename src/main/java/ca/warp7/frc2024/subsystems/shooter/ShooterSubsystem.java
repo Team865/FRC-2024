@@ -1,12 +1,11 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
+import ca.warp7.frc2024.Constants;
+import ca.warp7.frc2024.subsystems.shooter.ShooterIO.ShooterIOInputs;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
-
-import ca.warp7.frc2024.Constants;
-import ca.warp7.frc2024.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final ShooterIO io;
@@ -23,9 +22,9 @@ public class ShooterSubsystem extends SubsystemBase {
             case REAL:
             case SIM:
                 topRightFeedback = new PIDController(0.002375, 0.0, 0.0);
-                topLeftFeedback = new PIDController(0.001, 0.0, 0.0);
-                bottomRightFeedback = new PIDController(0.001, 0.0, 0.0);
-                bottomLeftFeedback = new PIDController(0.001, 0.0, 0.0);
+                topLeftFeedback = new PIDController(0.002375, 0.0, 0.0);
+                bottomRightFeedback = new PIDController(0.002375, 0.0, 0.0);
+                bottomLeftFeedback = new PIDController(0.002375, 0.0, 0.0);
                 break;
             default:
                 topRightFeedback = new PIDController(0.0, 0.0, 0.0);
@@ -49,14 +48,14 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         io.updateInputs(this.inputs);
 
-        Logger.processInputs("Shooter/topRightOutrunner", inputs.topRightOutrunner);
-        Logger.processInputs("Shooter/topLeftOutrunner", inputs.topLeftOutrunner);
-        Logger.processInputs("Shooter/bottomRightOutrunner", inputs.bottomRightOutrunner);
-        Logger.processInputs("Shooter/bottomLeftOutrunner", inputs.bottomLeftOutrunner);
+        Logger.processInputs("Shooter/topRight", inputs.topRight);
+        Logger.processInputs("Shooter/topLeft", inputs.topLeft);
+        Logger.processInputs("Shooter/bottomRight", inputs.bottomRight);
+        Logger.processInputs("Shooter/bottomLeft", inputs.bottomLeft);
 
-        io.setTopRightVoltage(this.topRightFeedback.calculate(inputs.topRightOutrunner.VelocityRad));
-        io.setTopLeftVoltage(this.topLeftFeedback.calculate(inputs.topLeftOutrunner.VelocityRad));
-        io.setbottomRightVoltage(this.bottomRightFeedback.calculate(inputs.topRightOutrunner.VelocityRad));
-        io.setbottomLeftVoltage(this.bottomLeftFeedback.calculate(inputs.topLeftOutrunner.VelocityRad));
+        io.setTopRightVoltage(this.topRightFeedback.calculate(inputs.topRight.VelocityRPM));
+        io.setTopLeftVoltage(this.topLeftFeedback.calculate(inputs.topLeft.VelocityRPM));
+        io.setBottomRightVoltage(this.bottomRightFeedback.calculate(inputs.bottomRight.VelocityRPM));
+        io.setBottomLeftVoltage(this.bottomLeftFeedback.calculate(inputs.bottomLeft.VelocityRPM));
     }
 }

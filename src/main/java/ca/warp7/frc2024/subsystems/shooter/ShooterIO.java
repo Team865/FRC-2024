@@ -6,15 +6,15 @@ public interface ShooterIO {
     public static class ShooterIOInputs {
         @AutoLog
         public static class OutRunnerIOInputs {
-            public double VelocityRad = 0.0;
-            public double VoltageApplied = 0.0;
+            public double VelocityRPM = 0.0;
+            public double VoltsApplied = 0.0;
             public double CurrentDraw = 0.0;
         }
 
-        public OutRunnerIOInputsAutoLogged topRightOutrunner = new OutRunnerIOInputsAutoLogged();
-        public OutRunnerIOInputsAutoLogged bottomRightOutrunner = new OutRunnerIOInputsAutoLogged();
-        public OutRunnerIOInputsAutoLogged topLeftOutrunner = new OutRunnerIOInputsAutoLogged();
-        public OutRunnerIOInputsAutoLogged bottomLeftOutrunner = new OutRunnerIOInputsAutoLogged();
+        public OutRunnerIOInputsAutoLogged topRight = new OutRunnerIOInputsAutoLogged();
+        public OutRunnerIOInputsAutoLogged bottomRight = new OutRunnerIOInputsAutoLogged();
+        public OutRunnerIOInputsAutoLogged topLeft = new OutRunnerIOInputsAutoLogged();
+        public OutRunnerIOInputsAutoLogged bottomLeft = new OutRunnerIOInputsAutoLogged();
     }
 
     /** Updates the set of loggable inputs.
@@ -39,11 +39,11 @@ public interface ShooterIO {
      *
      * @param volts
      */
-    public void setbottomRightVoltage(double volts);
+    public void setBottomRightVoltage(double volts);
 
     /** Run the bottom left outrunner at the specified voltage;
      *
      * @param volts
      */
-    public void setbottomLeftVoltage(double volts);
+    public void setBottomLeftVoltage(double volts);
 }
