@@ -3,7 +3,7 @@ package ca.warp7.frc2024.subsystems.Intake;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
-public class IntakeIOSparkMax implements IntakeIO{
+public class IntakeIOSparkMax implements IntakeIO {
     private final CANSparkMax intakeSparkmax;
 
     public IntakeIOSparkMax(int intakeNeoID) {
@@ -13,5 +13,4 @@ public class IntakeIOSparkMax implements IntakeIO{
         intakeSparkmax.setCANTimeout(0);
         intakeSparkmax.setSmartCurrentLimit(20);
     }
-
 }

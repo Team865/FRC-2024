@@ -4,12 +4,12 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
     @AutoLog
-    public static class intakeIOInputs {
+    public static class IntakeIOInputs {
         public double intakeAppliedVolts = 0.0;
         public double[] intakeCurrentAmps = new double[] {};
     }
     /*Updates the set of loggable inputs*/
-    public default void updateInputs(intakeIOInputs inputs) {}
+    public default void updateInputs(IntakeIOInputs inputs) {}
     ;
     /*Set the intake voltage */
     public default void setIntakeVoltage(double volts) {}
