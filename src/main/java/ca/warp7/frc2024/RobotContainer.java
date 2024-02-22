@@ -4,6 +4,9 @@
 
 package ca.warp7.frc2024;
 
+import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
+import ca.warp7.frc2024.subsystems.Intake.IntakeIOSIM;
+import ca.warp7.frc2024.subsystems.Intake.IntakeSubsystem;
 import ca.warp7.frc2024.subsystems.arm.ArmIO;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
 import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
@@ -19,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
     private final ArmSubsystem armSubsystem;
-
+    private final IntakeSubsystem intakeSubsystem;
     private final CommandXboxController driverController = new CommandXboxController(0);
 
     // private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
@@ -35,6 +38,9 @@ public class RobotContainer {
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim());
                 armSubsystem = new ArmSubsystem(new ArmIOSim());
+                intakeSubsystem = new IntakeSubsystem(new IntakeIOSIM() {
+                });
+
                 break;
             default:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
@@ -44,7 +50,9 @@ public class RobotContainer {
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {});
                 armSubsystem = new ArmSubsystem(new ArmIO() {});
-                break;
+                intakeSubsystem = new IntakeSubsystem(new IntakeIO() {
+                });
+
         }
 
         configureBindings();
@@ -63,6 +71,9 @@ public class RobotContainer {
         }));
         driverController.b().onTrue(Commands.runOnce(() -> {
             armSubsystem.setSetpoint(Rotation2d.fromDegrees(200));
+        }));
+        driverController.x().onTrue(Commands.runOnce(() ->{
+            intakeSubsystem.setIntakeVoltage(5);
         }));
     }
 

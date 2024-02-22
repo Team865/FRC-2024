@@ -5,6 +5,25 @@
       "/FMSInfo": "FMSInfo"
     }
   },
+  "NetworkTables": {
+    "AdvantageKit": {
+      "open": true
+    },
+    "Retained Values": {
+      "open": false
+    },
+    "combined": true,
+    "transitory": {
+      "AdvantageKit": {
+        "Arm": {
+          "double[]##v_/AdvantageKit/Arm/ArmCurrentAmps": {
+            "open": true
+          }
+        },
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   }

@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class intakeSIM implements intakeIO {
+public class IntakeIOSIM implements IntakeIO {
     private double intakeAppliedVolts = 0.0;
     private final DCMotorSim intakeMotorSim = new DCMotorSim(DCMotor.getNEO(1), 4, 0.0001);
 
