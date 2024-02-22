@@ -38,8 +38,7 @@ public class RobotContainer {
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim());
                 armSubsystem = new ArmSubsystem(new ArmIOSim());
-                intakeSubsystem = new IntakeSubsystem(new IntakeIOSIM() {
-                });
+                intakeSubsystem = new IntakeSubsystem(new IntakeIOSIM() {});
 
                 break;
             default:
@@ -50,9 +49,7 @@ public class RobotContainer {
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {});
                 armSubsystem = new ArmSubsystem(new ArmIO() {});
-                intakeSubsystem = new IntakeSubsystem(new IntakeIO() {
-                });
-
+                intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
         }
 
         configureBindings();
@@ -72,7 +69,7 @@ public class RobotContainer {
         driverController.b().onTrue(Commands.runOnce(() -> {
             armSubsystem.setSetpoint(Rotation2d.fromDegrees(200));
         }));
-        driverController.x().onTrue(Commands.runOnce(() ->{
+        driverController.x().onTrue(Commands.runOnce(() -> {
             intakeSubsystem.setIntakeVoltage(5);
         }));
     }
