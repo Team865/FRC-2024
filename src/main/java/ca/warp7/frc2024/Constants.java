@@ -37,4 +37,7 @@ public final class Constants {
     public class OI {
         public static final double DEADBAND = 0.1;
     }
+    public class Intake{
+        
+    }
 }
