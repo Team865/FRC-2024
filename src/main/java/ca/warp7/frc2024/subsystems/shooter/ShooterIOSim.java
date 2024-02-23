@@ -19,11 +19,11 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        this.topRightSim.update(0.2);
-        this.bottomRightSim.update(0.2);
+        this.topRightSim.update(0.02);
+        this.bottomRightSim.update(0.02);
 
-        this.topLeftSim.update(0.2);
-        this.bottomLeftSim.update(0.2);
+        this.topLeftSim.update(0.02);
+        this.bottomLeftSim.update(0.02);
 
         inputs.topRight.VelocityRPM = this.topRightSim.getAngularVelocityRPM();
         inputs.topRight.CurrentDraw = this.topRightSim.getCurrentDrawAmps();
