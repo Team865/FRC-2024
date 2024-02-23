@@ -2,19 +2,17 @@ package ca.warp7.frc2024.subsystems.feeder;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import ca.warp7.frc2024.subsystems.feeder.FeederRollerIOInputsAutoLogged;
-
 public interface FeederIO {
     public static class FeederIOInputs {
         @AutoLog
         public static class FeederRollerIOInputs {
-            public double VelocityRad = 0.0;
-            public double VoltageApplied = 0.0;
+            public double VelocityRPM = 0.0;
+            public double VoltsApplied = 0.0;
             public double CurrentDraw = 0.0;
         }
 
-        public FeederRollerIOInputsAutoLogged topFeederRoller = new FeederRollerIOInputsAutoLogged();
-        public FeederRollerIOInputsAutoLogged bottomFeederRoller = new FeederRollerIOInputsAutoLogged();
+        public FeederRollerIOInputsAutoLogged topRoller = new FeederRollerIOInputsAutoLogged();
+        public FeederRollerIOInputsAutoLogged bottomRoller = new FeederRollerIOInputsAutoLogged();
     }
 
     /** Updates the set of loggable inputs.
@@ -23,14 +21,15 @@ public interface FeederIO {
      */
     public void updateInputs(FeederIOInputs inputs);
 
-    /** Run the feeder rollers at the specified voltage.
+    /** Run the top feeder roller at the specified voltage.
      *
      * @param volts
      */
-    public void setFeederRollersVoltage(double volts);
+    public void setTopVoltage(double volts);
 
-    /** Code that needs to be run periodically
+    /** Run the bottom feeder roller at the specified voltage.
      *
+     * @param volts
      */
-    public void periodic();
+    public void setBottomVoltage(double volts);
 }
