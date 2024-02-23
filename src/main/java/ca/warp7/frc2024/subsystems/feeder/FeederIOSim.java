@@ -12,8 +12,8 @@ public class FeederIOSim implements FeederIO {
 
     @Override
     public void updateInputs(FeederIOInputs inputs) {
-        this.topRollerSim.update(0.2);
-        this.bottomRollerSim.update(0.2);
+        this.topRollerSim.update(0.02);
+        this.bottomRollerSim.update(0.02);
 
         inputs.topRoller.VelocityRPM = this.topRollerSim.getAngularVelocityRadPerSec();
         inputs.topRoller.CurrentDraw = this.topRollerSim.getCurrentDrawAmps();
