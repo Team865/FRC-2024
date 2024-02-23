@@ -37,7 +37,12 @@ public final class Constants {
     public class OI {
         public static final double DEADBAND = 0.1;
     }
-    public class Intake{
-        
+    public static final class kIntake{
+        public static final double kIntakeSpeed = 0;
+        public static final double kOutakeSpeed = 0;
+        public static final int kIntakeMotorID = 0;
+
+
+
     }
 }
