@@ -1,10 +1,9 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 
 public class ShooterIOSparkmax implements ShooterIO {
@@ -40,6 +39,11 @@ public class ShooterIOSparkmax implements ShooterIO {
     }
 
     private void setupMotorControllers() {
+        topRightSparkMax.restoreFactoryDefaults();
+        topLeftSparkMax.restoreFactoryDefaults();
+        bottomRightSparkMax.restoreFactoryDefaults();
+        bottomLeftSparkMax.restoreFactoryDefaults();
+
         topRightSparkMax.setSmartCurrentLimit(20);
         topLeftSparkMax.setSmartCurrentLimit(20);
         bottomRightSparkMax.setSmartCurrentLimit(20);
@@ -49,11 +53,6 @@ public class ShooterIOSparkmax implements ShooterIO {
         topLeftSparkMax.setCANTimeout(0);
         bottomRightSparkMax.setCANTimeout(0);
         bottomLeftSparkMax.setCANTimeout(0);
-
-        topRightSparkMax.restoreFactoryDefaults();
-        topLeftSparkMax.restoreFactoryDefaults();
-        bottomRightSparkMax.restoreFactoryDefaults();
-        bottomLeftSparkMax.restoreFactoryDefaults();
 
         topRightSparkMax.setIdleMode(IdleMode.kCoast);
         topLeftSparkMax.setIdleMode(IdleMode.kCoast);
