@@ -69,9 +69,8 @@ public class RobotContainer {
         driverController.b().onTrue(Commands.runOnce(() -> {
             armSubsystem.setSetpoint(Rotation2d.fromDegrees(200));
         }));
-        driverController.x().onTrue(Commands.runOnce(() -> {
-            intakeSubsystem.setIntakeVoltage(5);
-        }));
+        driverController.x().onTrue(intakeSubsystem.setIntakeVoltage(5));
+        driverController.x().onFalse(intakeSubsystem.setIntakeVoltage(0));
     }
 
     public Command getAutonomousCommand() {

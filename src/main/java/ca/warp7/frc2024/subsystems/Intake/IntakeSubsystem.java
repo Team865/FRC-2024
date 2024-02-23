@@ -14,7 +14,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command setIntakeVoltage(double volts) {
         return runOnce(() -> intakeIO.setIntakeVoltage(volts));
-}
+    }
 
     @Override
     public void periodic() {

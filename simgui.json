@@ -7,6 +7,12 @@
   },
   "NetworkTables": {
     "AdvantageKit": {
+      "Intake": {
+        "inputs": {
+          "open": true
+        },
+        "open": true
+      },
       "open": true
     },
     "Retained Values": {
