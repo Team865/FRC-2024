@@ -6,11 +6,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ClimberIO {
     @AutoLog
     public static class ClimberIOInputs {
-        public Rotation2d climberInternalPosition;
-        public Rotation2d climberExternalPosition;
+        public double climberInternalPositionRad;
+        public Rotation2d climberExternalPositionRad;
         public double climberVelocityRadPerSec;
         public double climberAppliedVolts = 0.0;
-        public double[] climberCurrentAmps = new double[] {};
+        public double climberCurrentAmps = 0.0;
     }
 
     public default void updateInputs(ClimberIOInputs inputs) {}
