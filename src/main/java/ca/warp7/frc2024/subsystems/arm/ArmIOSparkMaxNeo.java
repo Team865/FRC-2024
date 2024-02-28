@@ -5,14 +5,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 
-public class ArmIONeo implements ArmIO {
+public class ArmIOSparkMaxNeo implements ArmIO {
     private final CANSparkMax armLeftSparkMax; // Secondary motor
     private final CANSparkMax armRightSparkMax; // Primary motor
 
     private final RelativeEncoder armRightEncoder;
     private final SparkAbsoluteEncoder armAbsoluteEncoder;
 
-    public ArmIONeo(int armLeftNeoID, int armRightNeoID) {
+    public ArmIOSparkMaxNeo(int armLeftNeoID, int armRightNeoID) {
         // Create neo objects
         armLeftSparkMax = new CANSparkMax(armLeftNeoID, MotorType.kBrushless);
         armRightSparkMax = new CANSparkMax(armRightNeoID, MotorType.kBrushless);
