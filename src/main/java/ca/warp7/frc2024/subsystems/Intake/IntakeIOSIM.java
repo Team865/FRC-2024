@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class IntakeIOSIM implements IntakeIO {
+public class IntakeIOSim implements IntakeIO {
 
     private double intakeAppliedVolts = 0.0;
     private final double LOOP_PERIOD_SECS = 0.02;
