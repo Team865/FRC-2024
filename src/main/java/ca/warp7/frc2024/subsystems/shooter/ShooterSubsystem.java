@@ -33,7 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setShooterVolts(double volts, int shooterModule) {
         this.shooterModules[shooterModule].setVolts(volts);
 
-        // TODO: Temporarily don't from varargs
+        // TODO: Temporarily don't use varargs
         // for (var shooterModule : shooterModules) {
         //     this.shooterModules[shooterModule].setVolts(volts);
         // }
@@ -42,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setShooterRPM(double RPM, int shooterModule) {
         this.shooterModules[shooterModule].setTargetVelocity(RPM);
 
-        // TODO: Temporarily don't from varargs
+        // TODO: Temporarily don't use varargs
         // for (var shooterModule : shooterModules) {
         //     this.shooterModules[shooterModule].setTargetVelocity(RPM);
         // }
