@@ -1,49 +1,54 @@
 package ca.warp7.frc2024.subsystems.feeder;
 
 import ca.warp7.frc2024.Constants;
-import ca.warp7.frc2024.subsystems.feeder.FeederIO.FeederIOInputs;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class FeederSubsystem extends SubsystemBase {
     private final FeederIO io;
-    private final FeederIOInputs inputs = new FeederIOInputs();
-    private final PIDController topFeedback;
-    private final PIDController bottomFeedback;
+    private final FeederIOInputsAutoLogged inputs = new FeederIOInputsAutoLogged();
+    private final SimpleMotorFeedforward feedforward;
+    private final PIDController feedback;
+
+    private Double velocity;
 
     public FeederSubsystem(FeederIO io) {
         this.io = io;
 
         switch (Constants.CURRENT_MODE) {
             case REAL:
+                feedforward = new SimpleMotorFeedforward(0, 0, 0);
+                feedback = new PIDController(0.0, 0.0, 0.0);
+                break;
             case SIM:
-                topFeedback = new PIDController(0.0, 0.0, 0.0);
-                bottomFeedback = new PIDController(0.0, 0.0, 0.0);
+                feedforward = new SimpleMotorFeedforward(1, 0, 0);
+                feedback = new PIDController(0.0, 0.0, 0.0);
                 break;
             default:
-                topFeedback = new PIDController(0.0, 0.0, 0.0);
-                bottomFeedback = new PIDController(0.0, 0.0, 0.0);
+                feedforward = new SimpleMotorFeedforward(0, 0, 0);
+                feedback = new PIDController(0.0, 0.0, 0.0);
                 break;
         }
     }
 
-    public Command setRollersVelocity(double velocity) {
-        return runOnce(() -> {
-            topFeedback.setSetpoint(velocity);
-            bottomFeedback.setSetpoint(velocity);
-        });
+    public void setRPM(double RPM) {
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(RPM);
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
 
-        Logger.processInputs("Feeder/topFeederRoller", inputs.topRoller);
-        Logger.processInputs("Feeder/bottomFeederRoller", inputs.bottomRoller);
+        Logger.processInputs("Feeder/Feeder", inputs);
 
-        io.setTopVoltage(topFeedback.calculate(inputs.topRoller.VelocityRPM));
-        io.setTopVoltage(bottomFeedback.calculate(inputs.bottomRoller.VelocityRPM));
+        if (velocity != null) {
+            double voltage = feedback.calculate(inputs.feederVelocityRadPerSec, velocity);
+            io.setFeederVoltage(voltage);
+        } else {
+            io.setFeederVoltage(0);
+        }
     }
 }
