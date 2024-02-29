@@ -10,7 +10,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final MODE CURRENT_MODE = MODE.SIM;
+    public static final MODE CURRENT_MODE = MODE.REAL;
 
     public static final boolean COMPETITION_DEPLOYMENT = false;
 

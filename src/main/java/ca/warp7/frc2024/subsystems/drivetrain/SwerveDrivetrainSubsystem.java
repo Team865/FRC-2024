@@ -47,10 +47,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         this.gyroIO = gyroIO;
 
         swerveModules = new SwerveModule[] {
-            new SwerveModule(frontRightSwerveModuleIO, 0, "Front right"),
-            new SwerveModule(frontLeftSwerveModuleIO, 1, "Front left"),
-            new SwerveModule(backLeftSwerveModuleIO, 2, "Back left"),
-            new SwerveModule(backRightSwerveModuleIO, 3, "Back right")
+            new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight"),
+            new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft"),
+            new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft"),
+            new SwerveModule(backRightSwerveModuleIO, 3, "BackRight")
         };
     }
 

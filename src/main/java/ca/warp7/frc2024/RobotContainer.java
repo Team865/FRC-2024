@@ -15,8 +15,10 @@ import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMaxNeo;
 import ca.warp7.frc2024.subsystems.climber.ClimberSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
+import ca.warp7.frc2024.subsystems.drivetrain.GyroIONavX;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIO;
+import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOFalcon500;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOSim;
 import ca.warp7.frc2024.subsystems.feeder.FeederIO;
 import ca.warp7.frc2024.subsystems.feeder.FeederIOSim;
@@ -26,6 +28,7 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIO;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSim;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
 import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,11 +54,11 @@ public class RobotContainer {
         switch (Constants.CURRENT_MODE) {
             case REAL:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
-                        new GyroIO() {},
-                        new SwerveModuleIO() {},
-                        new SwerveModuleIO() {},
-                        new SwerveModuleIO() {},
-                        new SwerveModuleIO() {});
+                        new GyroIONavX() {},
+                        new SwerveModuleIOFalcon500(12, 11, 10, new Rotation2d(-0.1)),
+                        new SwerveModuleIOFalcon500(22, 21, 20, new Rotation2d(-1.379)),
+                        new SwerveModuleIOFalcon500(32, 31, 30, new Rotation2d(-3.102)),
+                        new SwerveModuleIOFalcon500(42, 41, 40, new Rotation2d(-1.379)));
                 armSubsystem = new ArmSubsystem(new ArmIO() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
                 shooterSubsystem = new ShooterSubsystem(
@@ -122,15 +125,15 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        climberSubsystem.setDefaultCommand(
-                ClimberSubsystem.climberCommand(climberSubsystem, () -> driverController.getLeftY()));
+        // climberSubsystem.setDefaultCommand(
+        //         ClimberSubsystem.climberCommand(climberSubsystem, () -> driverController.getLeftY()));
 
-        // swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
-        //         swerveDrivetrainSubsystem,
-        //         () -> -driverController.getLeftY(),
-        //         () -> -driverController.getLeftX(),
-        //         () -> -driverController.getRightX(),
-        //         driverController.rightBumper()));
+        swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
+                swerveDrivetrainSubsystem,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                driverController.rightBumper()));
 
         // driverController.a().onTrue(Commands.runOnce(() -> {
         //     armSubsystem.setSetpoint(Rotation2d.fromDegrees(130));
@@ -143,6 +146,10 @@ public class RobotContainer {
 
         driverController.a().onTrue(Commands.runOnce(() -> {
             shooterSubsystem.setShooterRPM(shooterSpeed.get(), 0);
+            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 1);
+
+            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 3);
+
             shooterSubsystem.setShooterRPM(shooterSpeed.get(), 2);
         }));
 
@@ -151,14 +158,19 @@ public class RobotContainer {
             shooterSubsystem.setShooterRPM(0, 1);
             shooterSubsystem.setShooterRPM(0, 2);
             shooterSubsystem.setShooterRPM(0, 3);
+            shooterSubsystem.stopShooter();
+        }));
+
+        driverController.leftTrigger().onTrue(Commands.runOnce(() -> {
+            feederSubsystem.setVolts(-6);
         }));
 
         driverController.rightBumper().onTrue(Commands.runOnce(() -> {
-            feederSubsystem.setRPM(200);
+            feederSubsystem.setVolts(6);
         }));
 
         driverController.leftBumper().onTrue(Commands.runOnce(() -> {
-            feederSubsystem.setRPM(0);
+            feederSubsystem.setVolts(0);
         }));
     }
 

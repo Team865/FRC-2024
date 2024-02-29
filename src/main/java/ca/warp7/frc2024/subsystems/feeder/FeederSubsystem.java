@@ -14,6 +14,7 @@ public class FeederSubsystem extends SubsystemBase {
     private final PIDController feedback;
 
     private Double velocity;
+    private double volts;
 
     public FeederSubsystem(FeederIO io) {
         this.io = io;
@@ -24,7 +25,7 @@ public class FeederSubsystem extends SubsystemBase {
                 feedback = new PIDController(0.0, 0.0, 0.0);
                 break;
             case SIM:
-                feedforward = new SimpleMotorFeedforward(1, 0, 0);
+                feedforward = new SimpleMotorFeedforward(0, 0, 0);
                 feedback = new PIDController(0.0, 0.0, 0.0);
                 break;
             default:
@@ -35,7 +36,13 @@ public class FeederSubsystem extends SubsystemBase {
     }
 
     public void setRPM(double RPM) {
+        volts = 0;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(RPM);
+    }
+
+    public void setVolts(double volts) {
+        velocity = null;
+        this.volts = volts;
     }
 
     @Override
@@ -48,7 +55,7 @@ public class FeederSubsystem extends SubsystemBase {
             double voltage = feedback.calculate(inputs.feederVelocityRadPerSec, velocity);
             io.setFeederVoltage(voltage);
         } else {
-            io.setFeederVoltage(0);
+            io.setFeederVoltage(volts);
         }
     }
 }

@@ -31,8 +31,8 @@ public class FeederIOSparkMax550 implements FeederIO {
         topRollerSparkMax.enableVoltageCompensation(12.0);
         bottomRollerSparkMax.enableVoltageCompensation(12.0);
 
-        topRollerSparkMax.setSmartCurrentLimit(20);
-        bottomRollerSparkMax.setSmartCurrentLimit(20);
+        topRollerSparkMax.setSmartCurrentLimit(15);
+        bottomRollerSparkMax.setSmartCurrentLimit(15);
 
         topRollerSparkMax.setIdleMode(IdleMode.kBrake);
         bottomRollerSparkMax.setIdleMode(IdleMode.kBrake);

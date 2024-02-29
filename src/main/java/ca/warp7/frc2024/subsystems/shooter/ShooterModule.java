@@ -24,7 +24,7 @@ public class ShooterModule {
             case REAL:
                 // TODO: values currently unused while testing
                 feedforward = new SimpleMotorFeedforward(0.023286, 0.010337, 0.00187);
-                shooterModuleIO.configureShooterPID(0.001, 0, 0);
+                shooterModuleIO.configureShooterPID(0.0, 0.0, 0.0);
                 break;
             case SIM:
                 feedforward = new SimpleMotorFeedforward(0, 0.0);

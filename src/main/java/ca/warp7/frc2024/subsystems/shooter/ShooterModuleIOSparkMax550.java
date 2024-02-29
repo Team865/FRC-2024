@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.util.Units;
 
 public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
@@ -20,7 +19,7 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
 
         // TODO: Might want to implement some type of SparkMax manager:
         // https://www.chiefdelphi.com/t/revlib-2024-burnflash-spark-max-unreliabilty/446192?u=dangosaurus
-        shooterSparkMax.restoreFactoryDefaults();
+        // shooterSparkMax.restoreFactoryDefaults();
         shooterSparkMax.setCANTimeout(250);
         shooterSparkMax.enableVoltageCompensation(12.0);
         shooterSparkMax.setSmartCurrentLimit(15);
@@ -31,8 +30,11 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
         shooterSparkMax.burnFlash();
 
         // Specify encoder type: https://www.chiefdelphi.com/t/psa-new-crash-bug-in-revlib-2024-2-2/456242
-        shooterInternalEncoder = shooterSparkMax.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+        shooterInternalEncoder = shooterSparkMax.getEncoder();
         internalFeedback = shooterSparkMax.getPIDController();
+        shooterInternalEncoder.setAverageDepth(8);
+        shooterInternalEncoder.setMeasurementPeriod(8);
+        internalFeedback.setFeedbackDevice(shooterInternalEncoder);
     }
 
     @Override
@@ -47,10 +49,12 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
     // TODO: Using hardcoded values instead of arguments for tuning
     @Override
     public void configureShooterPID(double kP, double kI, double kD) {
-        internalFeedback.setP(0, 0);
+        internalFeedback.setP(0.00055, 0);
         internalFeedback.setI(0, 0);
-        internalFeedback.setD(0, 0);
-        internalFeedback.setFF(0.0001, 0);
+        internalFeedback.setD(0.008, 0);
+        internalFeedback.setFF(0.000090, 0);
+
+        // shooterSparkMax.burnFlash();
     }
 
     @Override

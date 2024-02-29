@@ -33,6 +33,10 @@ public class SwerveModule {
 
         switch (Constants.CURRENT_MODE) {
             case REAL:
+                driveFeedforward = new SimpleMotorFeedforward(0.21964, 2.1732, 0.5249);
+                driveFeedback = new PIDController(0.1, 0.0, 0.0);
+                steerFeedback = new PIDController(1, 0.0, 0.00);
+                break;
             case SIM:
                 driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
@@ -80,7 +84,7 @@ public class SwerveModule {
 
     public void periodic() {
         moduleIO.updateInputs(moduleInputs);
-        Logger.processInputs("Drivetrain/Module" + Integer.toString(moduleID), moduleInputs);
+        Logger.processInputs("Drivetrain/" + moduleName + "Module", moduleInputs);
 
         if (finalSteerOffset == null && moduleInputs.steerAbsolutePosition.getRadians() != 0.0) {
             finalSteerOffset = moduleInputs.steerAbsolutePosition.minus(moduleInputs.steerPosition);

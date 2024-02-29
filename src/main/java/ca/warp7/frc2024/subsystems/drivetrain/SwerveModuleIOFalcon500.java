@@ -30,9 +30,9 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
-        driveTalonFX = new TalonFX(driveTalonID);
-        steerTalonFX = new TalonFX(steerTalonID);
-        cancoder = new CANcoder(cancoderID);
+        driveTalonFX = new TalonFX(driveTalonID, "CANivore");
+        steerTalonFX = new TalonFX(steerTalonID, "CANivore");
+        cancoder = new CANcoder(cancoderID, "CANivore");
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         var driveConfig = new TalonFXConfiguration();
