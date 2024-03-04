@@ -10,8 +10,9 @@ import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMaxNeo;
 import ca.warp7.frc2024.subsystems.Intake.IntakeSubsystem;
 import ca.warp7.frc2024.subsystems.arm.ArmIO;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
-import ca.warp7.frc2024.subsystems.arm.ArmIOSparkMaxNeo;
+import ca.warp7.frc2024.subsystems.arm.ArmIOSparkMax;
 import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
+import ca.warp7.frc2024.subsystems.arm.ArmSubsystem.SETPOINT;
 import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMaxNeo;
@@ -79,7 +80,7 @@ public class RobotContainer {
                         new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
-                armSubsystem = new ArmSubsystem(new ArmIOSparkMaxNeo(10, 11));
+                armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, Rotation2d.fromRotations(0)));
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMaxNeo(31));
                 shooterSubsystem = new ShooterSubsystem(
                         new ShooterModuleIOSparkMax550(22, true),
@@ -96,7 +97,7 @@ public class RobotContainer {
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim());
-                armSubsystem = new ArmSubsystem(new ArmIOSim());
+                armSubsystem = new ArmSubsystem(new ArmIOSim() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSim() {});
                 shooterSubsystem = new ShooterSubsystem(
                         new ShooterModuleIOSim(),
@@ -127,7 +128,7 @@ public class RobotContainer {
 
         autonomousRoutineChooser = new LoggedDashboardChooser<>("Autonomous Routine Chooser");
 
-        if (!Constants.COMPETITION_DEPLOYMENT) {
+        if (!Constants.TUNING_MODE) {
             autonomousRoutineChooser.addOption(
                     "Shooter quasistatic forward", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
@@ -173,10 +174,10 @@ public class RobotContainer {
         }));
 
         secondaryController.x().onTrue(Commands.runOnce(() -> {
-            armSubsystem.runSetpoint(Rotation2d.fromDegrees(lowPoint.get()));
+            armSubsystem.setSetpoint(SETPOINT.HANDOFF_INTAKE);
         }));
         secondaryController.y().onTrue(Commands.runOnce(() -> {
-            armSubsystem.runSetpoint(Rotation2d.fromDegrees(highPoint.get()));
+            armSubsystem.setSetpoint(SETPOINT.AMP);
         }));
 
         secondaryController

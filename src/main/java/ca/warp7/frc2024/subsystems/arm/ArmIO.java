@@ -11,15 +11,18 @@ public interface ArmIO {
         public Rotation2d armExternalAbsolutePosition = new Rotation2d();
         public double armInternalVelocityRadPerSec = 0.0;
         public double armExternalVelocityRadPerSec = 0.0;
-        public double armAppliedVolts = 0.0;
+        public double[] armAppliedVolts = new double[] {};
         public double[] armCurrentAmps = new double[] {};
+        public double[] armTempCelsius = new double[] {};
     }
 
     public default void updateInputs(ArmIOInputs inputs) {}
 
-    public default void setArmVoltage(double volts) {}
+    public default void setVoltage(double volts) {}
 
-    public default void setArmSetpoint(double setpointRads, double feedforward) {}
+    public default void setSetpoint(double setpointRads, double feedforward) {}
 
     public default void configurePID(double kP, double kI, double kD) {}
+
+    public default void stopArm() {}
 }

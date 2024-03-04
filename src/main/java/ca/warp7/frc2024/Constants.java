@@ -1,5 +1,7 @@
 package ca.warp7.frc2024;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -10,9 +12,22 @@ public final class Constants {
         REPLAY
     }
 
-    public static final MODE CURRENT_MODE = MODE.REAL;
+    public static final MODE CURRENT_MODE = MODE.SIM;
+    public static final boolean TUNING_MODE = true;
 
-    public static final boolean COMPETITION_DEPLOYMENT = false;
+    public final class ARM {
+        public record Gains(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
+
+        public static final ARM.Gains GAINS =
+                switch (CURRENT_MODE) {
+                    case REAL -> new ARM.Gains(0.3, 0.01, 0, 0, 0, 0, 0);
+                    case SIM -> new ARM.Gains(1, 0, 0, 0, 0, 0, 0);
+                    default -> new ARM.Gains(0, 0, 0, 0, 0, 0, 0);
+                };
+
+        public static final double MAX_VELOCITY_DEG = 572;
+        public static final double MAX_ACCELERATION_DEG = 1000;
+    }
 
     public class DRIVETRAIN {
         public static final double DRIVE_BASE_X = Units.inchesToMeters(24.750);

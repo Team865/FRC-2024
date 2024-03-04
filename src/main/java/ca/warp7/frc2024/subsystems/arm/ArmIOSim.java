@@ -2,10 +2,10 @@ package ca.warp7.frc2024.subsystems.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class ArmIOSim implements ArmIO {
@@ -15,18 +15,19 @@ public class ArmIOSim implements ArmIO {
 
     private double armAppliedVolts = 0.0;
 
+    private final Rotation2d randomInitialPosition =
+            Rotation2d.fromDegrees(Math.random() * 80); // Initialize to random value
+
     private final SingleJointedArmSim armSim = new SingleJointedArmSim(
             DCMotor.getNEO(2),
             20 * (74 / 22),
             SingleJointedArmSim.estimateMOI(Units.inchesToMeters(ARM_LENGTH), Units.lbsToKilograms(ARM_MASS)),
             ARM_LENGTH,
-            Units.degreesToRadians(130),
+            Units.degreesToRadians(120),
             Units.degreesToRadians(200),
             false,
-            Units.degreesToRadians(200),
+            Units.degreesToRadians(120 + randomInitialPosition.getDegrees()),
             VecBuilder.fill(2 * Math.PI / 4096));
-
-    private final EncoderSim encoderSim = EncoderSim.createForChannel(0);
 
     @Override
     public void updateInputs(ArmIOInputs inputs) {
@@ -34,15 +35,17 @@ public class ArmIOSim implements ArmIO {
 
         armSim.update(LOOP_PERIOD_SECS);
 
-        // inputs.armInternalIncrementalPosition = Rotation2d.fromRadians(armSim.getAngleRads());
-        // inputs.armExternalAbsolutePosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        inputs.armInternalIncrementalPosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        inputs.armExternalIncrementalPosition =
+                Rotation2d.fromRadians(armSim.getAngleRads()).minus(Rotation2d.fromDegrees(120));
+        inputs.armExternalAbsolutePosition = Rotation2d.fromRadians(armSim.getAngleRads());
         inputs.armInternalVelocityRadPerSec = armSim.getVelocityRadPerSec();
-        inputs.armAppliedVolts = armAppliedVolts;
+        inputs.armAppliedVolts = new double[] {armAppliedVolts};
         inputs.armCurrentAmps = new double[] {armSim.getCurrentDrawAmps()};
     }
 
     @Override
-    public void setArmVoltage(double volts) {
+    public void setVoltage(double volts) {
         armAppliedVolts = MathUtil.clamp(volts, -12, 12);
         armSim.setInputVoltage(armAppliedVolts);
     }

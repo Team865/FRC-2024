@@ -1,6 +1,9 @@
 package ca.warp7.frc2024.subsystems.arm;
 
-import ca.warp7.frc2024.Constants;
+import static ca.warp7.frc2024.Constants.ARM.*;
+
+import ca.warp7.frc2024.util.LoggedTunableNumber;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,83 +14,135 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmSubsystem extends SubsystemBase {
-    private final ArmIO armIO;
-    private final ArmIOInputsAutoLogged armInputs = new ArmIOInputsAutoLogged();
+    /* AdvantageKit */
+    private final ArmIO io;
+    private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
-    private final ProfiledPIDController armFeedback;
-    private final ArmFeedforward armFeedforward;
+    /* Controllers */
+    private ProfiledPIDController feedback;
+    private ArmFeedforward feedforward;
 
-    private Rotation2d armSetpoint = null;
-
+    /* Mechanism Visualization */
     private Mechanism2d mechanism;
     private MechanismRoot2d mechanismRoot;
     private MechanismLigament2d mechanismLigament;
 
-    public ArmSubsystem(ArmIO armIO) {
-        this.armIO = armIO;
+    /* Gains */
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Arm/Gains/kP", GAINS.kP());
+    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Arm/Gains/kI", GAINS.kI());
+    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Arm/Gains/kD", GAINS.kD());
+    private static final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/Gains/kD", GAINS.kS());
+    private static final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/Gains/kD", GAINS.kV());
+    private static final LoggedTunableNumber kA = new LoggedTunableNumber("Arm/Gains/kD", GAINS.kA());
+    private static final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/Gains/kD", GAINS.kG());
+    private static final LoggedTunableNumber maxVelocity = new LoggedTunableNumber("Arm/Constraint", MAX_VELOCITY_DEG);
+    private static final LoggedTunableNumber maxAcceleration =
+            new LoggedTunableNumber("Arm/Constraint", MAX_ACCELERATION_DEG);
 
-        switch (Constants.CURRENT_MODE) {
-            case REAL:
-                armFeedforward = new ArmFeedforward(0, 0, 1.27, 0.02);
-                armFeedback = new ProfiledPIDController(.3, 0.01, 0, new TrapezoidProfile.Constraints(572, 1000));
-                armFeedback.setTolerance(0.1);
-                break;
-            case SIM:
-                armFeedforward = new ArmFeedforward(0, 0, 1.27, 0.02);
-                armFeedback =
-                        new ProfiledPIDController(10, 0, 0, new TrapezoidProfile.Constraints(6.2591118, 6.2591118));
-                break;
-            default:
-                armFeedforward = new ArmFeedforward(0, 0, 0);
-                armFeedback = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(10, 10));
-                break;
+    /* Setpoints */
+    @RequiredArgsConstructor
+    public enum SETPOINT {
+        HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 80)),
+        STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 80)),
+        AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 60)),
+        TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 80)),
+        IDLE(() -> 0);
+
+        private final DoubleSupplier armSetpointSupplier;
+
+        private double getDegrees() {
+            return armSetpointSupplier.getAsDouble();
         }
+    }
+
+    @Setter
+    @Getter
+    private SETPOINT setpoint = SETPOINT.IDLE;
+
+    private Rotation2d armOffset = null;
+
+    public ArmSubsystem(ArmIO armIO) {
+        this.io = armIO;
+
+        feedback = new ProfiledPIDController(
+                kP.get(),
+                kI.get(),
+                kD.get(),
+                new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
+
+        feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
 
         mechanism = new Mechanism2d(1, 1);
-
         mechanismRoot = mechanism.getRoot("Superstructure", 0.585, 0.595);
-        mechanismLigament =
-                mechanismRoot.append(new MechanismLigament2d("ArmShooter", 0.5, 200, 2, new Color8Bit(Color.kAqua)));
+        mechanismLigament = mechanismRoot.append(
+                new MechanismLigament2d("ArmShooter", 0.5, getIdealIncrementalAngle(), 2, new Color8Bit(Color.kAqua)));
     }
 
-    public Rotation2d getExternalIncrementalPosition() {
-        return armInputs.armExternalIncrementalPosition;
-    }
-
-    public Rotation2d getExternalAbsolutePosition() {
-        return armInputs.armExternalAbsolutePosition;
-    }
-
-    public Rotation2d getInternalIncrementalPosition() {
-        return armInputs.armInternalIncrementalPosition;
-    }
-
-    public void runSetpoint(Rotation2d setpoint) {
-        armSetpoint = setpoint;
+    private double getIdealIncrementalAngle() {
+        return armOffset == null ? 0.0 : inputs.armExternalIncrementalPosition.getDegrees() + armOffset.getDegrees();
     }
 
     @Override
     public void periodic() {
-        armIO.updateInputs(armInputs);
-        Logger.processInputs("Arm", armInputs);
+        // Update and process inputs
+        io.updateInputs(inputs);
+        Logger.processInputs("Arm", inputs);
 
-        Logger.recordOutput("Arm/ExternalIncrementalAngleDegs", armInputs.armExternalIncrementalPosition.getDegrees());
-        Logger.recordOutput("Arm/InternalIncrementalAngleDegs", armInputs.armInternalIncrementalPosition.getDegrees());
+        if (armOffset == null && inputs.armExternalAbsolutePosition.getRadians() != 0.0) {
+            armOffset = inputs.armExternalAbsolutePosition.minus(inputs.armExternalIncrementalPosition);
+        }
 
-        mechanismLigament.setAngle(getInternalIncrementalPosition());
-        Logger.recordOutput("Mechanism2d/ArmShooter", mechanism);
+        Logger.recordOutput("Arm/Offset", armOffset.getDegrees());
 
-        if (armSetpoint != null) {
-            Logger.recordOutput("Arm/Setpoint Deg", armSetpoint.getDegrees());
+        // Detect if PID gains have changed
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    feedback = new ProfiledPIDController(
+                            kP.get(),
+                            kI.get(),
+                            kD.get(),
+                            new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
+                    feedback.enableContinuousInput(-180, 180);
+                },
+                kP,
+                kI,
+                kD,
+                maxVelocity,
+                maxAcceleration);
 
-            double armVoltage =
-                    armFeedback.calculate(getExternalIncrementalPosition().getDegrees(), armSetpoint.getDegrees());
-            armIO.setArmVoltage(armVoltage);
+        // Detect if feedforward gains have changed
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get()),
+                kS,
+                kG,
+                kV,
+                kA);
 
-            Logger.recordOutput("Arm/Voltage", armVoltage);
+        Logger.recordOutput("Arm/ExternalIncrementalAngleDegrees", inputs.armExternalIncrementalPosition.getDegrees());
+        Logger.recordOutput("Arm/InternalIncrementalAngleDegrees", inputs.armInternalIncrementalPosition.getDegrees());
+        Logger.recordOutput("Arm/IdealIncrementalAngleDegrees", getIdealIncrementalAngle());
+
+        mechanismLigament.setAngle(getIdealIncrementalAngle());
+        Logger.recordOutput("Arm/Mechanism2d/ArmPivot", mechanism);
+
+        Logger.recordOutput("Arm/SetpointDegrees", setpoint.getDegrees());
+
+        // Calculate voltage if setpoint is not idle
+        if (setpoint != SETPOINT.IDLE) {
+            double setpointVoltage =
+                    MathUtil.clamp(feedback.calculate(getIdealIncrementalAngle(), setpoint.getDegrees()), -12, 12);
+            io.setVoltage(setpointVoltage);
+        } else {
+            io.stopArm();
         }
     }
 }
