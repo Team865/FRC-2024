@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 
 public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
@@ -46,26 +47,26 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
         inputs.shooterCurrentAmps = shooterSparkMax.getOutputCurrent();
     }
 
-    // TODO: Using hardcoded values instead of arguments for tuning
     @Override
     public void configureShooterPID(double kP, double kI, double kD) {
-        internalFeedback.setP(0.00055, 0);
-        internalFeedback.setI(0, 0);
-        internalFeedback.setD(0.008, 0);
-        internalFeedback.setFF(0.000090, 0);
-
-        // shooterSparkMax.burnFlash();
+        internalFeedback.setP(kP, 0);
+        internalFeedback.setI(kI, 0);
+        internalFeedback.setD(kD, 0);
+        internalFeedback.setFF(0, 0); // 0.000090
     }
 
     @Override
-    public void setShooterVelocity(double velocityRadPerSec, double arbFfVolts) {
-        // TODO: Revert to using offboard feedforward after fixing sporadic SparkMax behavior
+    public void runShooterVelocity(double velocityRadPerSec, double arbFfVolts) {
         internalFeedback.setReference(
-                Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), ControlType.kVelocity, 0);
+                Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec),
+                ControlType.kVelocity,
+                0,
+                arbFfVolts,
+                ArbFFUnits.kVoltage);
     }
 
     @Override
-    public void setShooterVoltage(double volts) {
+    public void runShooterVolts(double volts) {
         shooterSparkMax.setVoltage(volts);
     }
 

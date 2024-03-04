@@ -33,16 +33,14 @@ public class SwerveModule {
 
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                driveFeedforward = new SimpleMotorFeedforward(0.21964, 2.1732, 0.5249);
+                driveFeedforward = new SimpleMotorFeedforward(0.23466, 0.12025);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
-                steerFeedback = new PIDController(1, 0.0, 0.00);
+                steerFeedback = new PIDController(6.5, 0.0, 0);
                 break;
             case SIM:
                 driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
                 steerFeedback = new PIDController(10.0, 0.0, 0.0);
-                // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
-                steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
                 break;
             default:
                 driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
@@ -50,6 +48,8 @@ public class SwerveModule {
                 steerFeedback = new PIDController(0.0, 0.0, 0.0);
                 break;
         }
+        // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
+        steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public double getDistanceMeters() {

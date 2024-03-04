@@ -6,9 +6,11 @@ package ca.warp7.frc2024;
 
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
+import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMaxNeo;
 import ca.warp7.frc2024.subsystems.Intake.IntakeSubsystem;
 import ca.warp7.frc2024.subsystems.arm.ArmIO;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
+import ca.warp7.frc2024.subsystems.arm.ArmIOSparkMaxNeo;
 import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
 import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
@@ -29,6 +31,7 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSim;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
 import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -44,9 +47,26 @@ public class RobotContainer {
     private final FeederSubsystem feederSubsystem;
     private final ClimberSubsystem climberSubsystem;
 
-    private final CommandXboxController driverController = new CommandXboxController(0);
+    private final CommandXboxController primaryController = new CommandXboxController(0);
+    private final CommandXboxController secondaryController = new CommandXboxController(1);
+    private final CommandXboxController technicianController = new CommandXboxController(2);
 
-    private final LoggedDashboardNumber shooterSpeed = new LoggedDashboardNumber("Shooter Speed", 1500.0);
+    private final LoggedDashboardNumber topRightShooterSpeed =
+            new LoggedDashboardNumber("Top Right Shooter Speed", 1500.0);
+    private final LoggedDashboardNumber topLeftShooterSpeed =
+            new LoggedDashboardNumber("Top Left Shooter Speed", 1500.0);
+    private final LoggedDashboardNumber bottomLeftShooterSpeed =
+            new LoggedDashboardNumber("Bottom Left Shooter Speed", 1500.0);
+    private final LoggedDashboardNumber bottomRightShooterSpeed =
+            new LoggedDashboardNumber("Bottom Right Shooter Speed", 1500.0);
+
+    private final LoggedDashboardNumber feederVolts = new LoggedDashboardNumber("Feeder Volts", -6);
+    private final LoggedDashboardNumber reverseFeederVolts = new LoggedDashboardNumber("Reverse Feeder Volts", 6);
+
+    private final LoggedDashboardNumber intakeVolts = new LoggedDashboardNumber("Intake Volts", -6);
+
+    private final LoggedDashboardNumber highPoint = new LoggedDashboardNumber("High Point", 35);
+    private final LoggedDashboardNumber lowPoint = new LoggedDashboardNumber("Low Point", 78);
 
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
@@ -55,12 +75,12 @@ public class RobotContainer {
             case REAL:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
                         new GyroIONavX() {},
-                        new SwerveModuleIOFalcon500(12, 11, 10, new Rotation2d(-0.1)),
-                        new SwerveModuleIOFalcon500(22, 21, 20, new Rotation2d(-1.379)),
-                        new SwerveModuleIOFalcon500(32, 31, 30, new Rotation2d(-3.102)),
-                        new SwerveModuleIOFalcon500(42, 41, 40, new Rotation2d(-1.379)));
-                armSubsystem = new ArmSubsystem(new ArmIO() {});
-                intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
+                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0.488)),
+                        new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
+                        new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
+                        new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
+                armSubsystem = new ArmSubsystem(new ArmIOSparkMaxNeo(10, 11));
+                intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMaxNeo(31));
                 shooterSubsystem = new ShooterSubsystem(
                         new ShooterModuleIOSparkMax550(22, true),
                         new ShooterModuleIOSparkMax550(23, false),
@@ -107,76 +127,87 @@ public class RobotContainer {
 
         autonomousRoutineChooser = new LoggedDashboardChooser<>("Autonomous Routine Chooser");
 
-        autonomousRoutineChooser.addOption("Zero shooter", Commands.runOnce(() -> shooterSubsystem.zeroEncoder()));
+        if (!Constants.COMPETITION_DEPLOYMENT) {
+            autonomousRoutineChooser.addOption(
+                    "Shooter quasistatic forward", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
-        autonomousRoutineChooser.addOption(
-                "Shooter quasistatic forward", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            autonomousRoutineChooser.addOption(
+                    "Shooter quasistatic reverse", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
-        autonomousRoutineChooser.addOption(
-                "Shooter quasistatic reverse", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            autonomousRoutineChooser.addOption(
+                    "Shooter dynamic forward", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
 
-        autonomousRoutineChooser.addOption(
-                "Shooter dynamic forward", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-
-        autonomousRoutineChooser.addOption(
-                "Shooter dynamic reverse", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            autonomousRoutineChooser.addOption(
+                    "Shooter dynamic reverse", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            autonomousRoutineChooser.addOption("Zero shooter", Commands.runOnce(() -> {
+                shooterSubsystem.zeroEncoder();
+            }));
+        }
 
         configureBindings();
+
+        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     private void configureBindings() {
-        // climberSubsystem.setDefaultCommand(
-        //         ClimberSubsystem.climberCommand(climberSubsystem, () -> driverController.getLeftY()));
+        climberSubsystem.setDefaultCommand(
+                ClimberSubsystem.climberCommand(climberSubsystem, () -> secondaryController.getLeftY()));
 
         swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
                 swerveDrivetrainSubsystem,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX(),
-                driverController.rightBumper()));
+                () -> -primaryController.getLeftY(),
+                () -> -primaryController.getLeftX(),
+                () -> -primaryController.getRightX(),
+                primaryController.rightBumper()));
 
-        // driverController.a().onTrue(Commands.runOnce(() -> {
-        //     armSubsystem.setSetpoint(Rotation2d.fromDegrees(130));
-        // }));
-        // driverController.b().onTrue(Commands.runOnce(() -> {
-        //     armSubsystem.setSetpoint(Rotation2d.fromDegrees(200));
-        // }));
-        // driverController.x().onTrue(intakeSubsystem.setIntakeVoltage(5));
-        // driverController.x().onFalse(intakeSubsystem.setIntakeVoltage(0));
-
-        driverController.a().onTrue(Commands.runOnce(() -> {
-            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 0);
-            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 1);
-
-            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 3);
-
-            shooterSubsystem.setShooterRPM(shooterSpeed.get(), 2);
+        secondaryController.a().onTrue(Commands.runOnce(() -> {
+            shooterSubsystem.runShooterRPM(topRightShooterSpeed.get(), 0);
+            shooterSubsystem.runShooterRPM(topLeftShooterSpeed.get(), 1);
+            shooterSubsystem.runShooterRPM(bottomLeftShooterSpeed.get(), 2);
+            shooterSubsystem.runShooterRPM(bottomRightShooterSpeed.get(), 3);
         }));
 
-        driverController.b().onTrue(Commands.runOnce(() -> {
-            shooterSubsystem.setShooterRPM(0, 0);
-            shooterSubsystem.setShooterRPM(0, 1);
-            shooterSubsystem.setShooterRPM(0, 2);
-            shooterSubsystem.setShooterRPM(0, 3);
+        secondaryController.b().onTrue(Commands.runOnce(() -> {
+            shooterSubsystem.runShooterRPM(0, 0, 1, 2, 3);
             shooterSubsystem.stopShooter();
         }));
 
-        driverController.leftTrigger().onTrue(Commands.runOnce(() -> {
-            feederSubsystem.setVolts(-6);
+        secondaryController.x().onTrue(Commands.runOnce(() -> {
+            armSubsystem.runSetpoint(Rotation2d.fromDegrees(lowPoint.get()));
+        }));
+        secondaryController.y().onTrue(Commands.runOnce(() -> {
+            armSubsystem.runSetpoint(Rotation2d.fromDegrees(highPoint.get()));
         }));
 
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> {
-            feederSubsystem.setVolts(6);
-        }));
+        secondaryController
+                .rightBumper()
+                .onTrue(Commands.runOnce(() -> {
+                    feederSubsystem.setVolts(feederVolts.get());
+                }))
+                .onFalse(Commands.runOnce(() -> {
+                    feederSubsystem.setVolts(0);
+                }));
 
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> {
-            feederSubsystem.setVolts(0);
-        }));
+        secondaryController
+                .leftBumper()
+                .onTrue(Commands.runOnce(() -> {
+                    intakeSubsystem.runVolts(intakeVolts.get());
+                }))
+                .onFalse(Commands.runOnce(() -> {
+                    intakeSubsystem.runVolts(0);
+                }));
+
+        secondaryController
+                .rightTrigger()
+                .onTrue(Commands.runOnce(() -> {
+                    feederSubsystem.setVolts(reverseFeederVolts.get());
+                }))
+                .onFalse(Commands.runOnce(() -> {
+                    feederSubsystem.setVolts(0);
+                }));
     }
 
     public Command getAutonomousCommand() {
-
-        // return Commands.runOnce(() -> System.out.println("Auto"));
         return autonomousRoutineChooser.get();
     }
 }

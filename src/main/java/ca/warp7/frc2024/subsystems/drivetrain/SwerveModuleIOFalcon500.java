@@ -7,6 +7,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -28,6 +30,9 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     private final Rotation2d absoluteEncoderOffset;
 
+    private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+    private final double STEER_GEAR_RATIO = 150.0 / 7.0;
+
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
@@ -43,7 +48,11 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         var steerConfig = new TalonFXConfiguration();
         steerConfig.CurrentLimits.StatorCurrentLimit = 30.0;
         steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        steerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         steerTalonFX.getConfigurator().apply(steerConfig);
+
+        var encoderConfig = new CANcoderConfiguration();
+        encoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
@@ -79,20 +88,21 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 driveVelocity,
                 driveAppliedVolts,
                 driveCurrent,
+                steerPosition,
                 steerAbsolutePosition,
                 steerAbsolutePosition,
                 steerAppliedVolts,
                 steerCurrent);
 
-        inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble()) / 15;
-        inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / 15;
+        inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
+        inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / DRIVE_GEAR_RATIO;
         inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
         inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
 
         inputs.steerAbsolutePosition = Rotation2d.fromRotations(steerAbsolutePosition.getValueAsDouble())
                 .minus(absoluteEncoderOffset);
-        inputs.steerPosition = Rotation2d.fromRotations(steerPosition.getValueAsDouble() / 15);
-        inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble()) / 15;
+        inputs.steerPosition = Rotation2d.fromRotations(steerPosition.getValueAsDouble() / STEER_GEAR_RATIO);
+        inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble()) / STEER_GEAR_RATIO;
         inputs.steerAppliedVolts = steerAppliedVolts.getValueAsDouble();
         inputs.steerCurrentAmps = new double[] {steerCurrent.getValueAsDouble()};
     }

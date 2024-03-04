@@ -6,9 +6,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
     @AutoLog
     public static class ArmIOInputs {
-        public Rotation2d armPosition = new Rotation2d();
-        public Rotation2d armAbsolutePosition = new Rotation2d();
-        public double armVelocityRadPerSec = 0.0;
+        public Rotation2d armInternalIncrementalPosition = new Rotation2d();
+        public Rotation2d armExternalIncrementalPosition = new Rotation2d();
+        public Rotation2d armExternalAbsolutePosition = new Rotation2d();
+        public double armInternalVelocityRadPerSec = 0.0;
+        public double armExternalVelocityRadPerSec = 0.0;
         public double armAppliedVolts = 0.0;
         public double[] armCurrentAmps = new double[] {};
     }
@@ -16,4 +18,8 @@ public interface ArmIO {
     public default void updateInputs(ArmIOInputs inputs) {}
 
     public default void setArmVoltage(double volts) {}
+
+    public default void setArmSetpoint(double setpointRads, double feedforward) {}
+
+    public default void configurePID(double kP, double kI, double kD) {}
 }

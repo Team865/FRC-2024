@@ -21,7 +21,7 @@ public class ShooterModuleIOSim implements ShooterModuleIO {
     }
 
     @Override
-    public void setShooterVoltage(double volts) {
+    public void runShooterVolts(double volts) {
         shooterAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
         shooterSim.setInputVoltage(shooterAppliedVolts);
     }

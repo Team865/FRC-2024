@@ -27,25 +27,26 @@ public class ShooterSubsystem extends SubsystemBase {
                 new SysIdRoutine.Config(
                         null, null, null, (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
-                        (voltage) -> setShooterVolts(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
+                        (voltage) -> runShooterVolts(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
     }
 
-    public void setShooterVolts(double volts, int shooterModule) {
-        this.shooterModules[shooterModule].setVolts(volts);
-
-        // TODO: Temporarily don't use varargs
-        // for (var shooterModule : shooterModules) {
-        //     this.shooterModules[shooterModule].setVolts(volts);
-        // }
+    @Override
+    public void periodic() {
+        for (var shooterModule : shooterModules) {
+            shooterModule.periodic();
+        }
     }
 
-    public void setShooterRPM(double RPM, int shooterModule) {
-        this.shooterModules[shooterModule].setTargetVelocity(RPM);
+    public void runShooterVolts(double volts, int... shooterModules) {
+        for (var shooterModule : shooterModules) {
+            this.shooterModules[shooterModule].runShooterVolts(volts);
+        }
+    }
 
-        // TODO: Temporarily don't use varargs
-        // for (var shooterModule : shooterModules) {
-        //     this.shooterModules[shooterModule].setTargetVelocity(RPM);
-        // }
+    public void runShooterRPM(double RPM, int... shooterModules) {
+        for (var shooterModule : shooterModules) {
+            this.shooterModules[shooterModule].runShooterTargetVelocity(RPM);
+        }
     }
 
     public double getShooterVelocityRPM(int shooterModule) {
@@ -61,13 +62,6 @@ public class ShooterSubsystem extends SubsystemBase {
     public void zeroEncoder() {
         for (var shooterModule : shooterModules) {
             shooterModule.zeroEncoder();
-        }
-    }
-
-    @Override
-    public void periodic() {
-        for (var shooterModule : shooterModules) {
-            shooterModule.periodic();
         }
     }
 

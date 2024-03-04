@@ -32,13 +32,13 @@ public interface ShooterModuleIO {
      * @param velocityRadPerSec
      * @param arbFfVolts
      */
-    public default void setShooterVelocity(double velocityRadPerSec, double arbFfVolts) {}
+    public default void runShooterVelocity(double velocityRadPerSec, double arbFfVolts) {}
 
     /** Run the shooter module at the specified voltage;
      *
      * @param volts
      */
-    public default void setShooterVoltage(double volts) {}
+    public default void runShooterVolts(double volts) {}
 
     /**
      * Stop the shooter

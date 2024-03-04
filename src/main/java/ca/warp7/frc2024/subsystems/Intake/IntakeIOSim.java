@@ -12,9 +12,6 @@ public class IntakeIOSim implements IntakeIO {
 
     public void updateInputs(IntakeIOInputs inputs) {
         intakeSim.update(LOOP_PERIOD_SECS);
-
-        inputs.intakeAppliedVolts = intakeAppliedVolts;
-        inputs.intakeCurrentAmps = new double[] {intakeSim.getCurrentDrawAmps()};
     }
 
     @Override

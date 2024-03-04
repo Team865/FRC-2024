@@ -2,10 +2,10 @@ package ca.warp7.frc2024.subsystems.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class ArmIOSim implements ArmIO {
@@ -26,15 +26,17 @@ public class ArmIOSim implements ArmIO {
             Units.degreesToRadians(200),
             VecBuilder.fill(2 * Math.PI / 4096));
 
+    private final EncoderSim encoderSim = EncoderSim.createForChannel(0);
+
     @Override
     public void updateInputs(ArmIOInputs inputs) {
         if (DriverStation.isDisabled()) {}
 
         armSim.update(LOOP_PERIOD_SECS);
 
-        inputs.armPosition = new Rotation2d(armSim.getAngleRads());
-        inputs.armAbsolutePosition = new Rotation2d(armSim.getAngleRads());
-        inputs.armVelocityRadPerSec = armSim.getVelocityRadPerSec();
+        // inputs.armInternalIncrementalPosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        // inputs.armExternalAbsolutePosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        inputs.armInternalVelocityRadPerSec = armSim.getVelocityRadPerSec();
         inputs.armAppliedVolts = armAppliedVolts;
         inputs.armCurrentAmps = new double[] {armSim.getCurrentDrawAmps()};
     }
