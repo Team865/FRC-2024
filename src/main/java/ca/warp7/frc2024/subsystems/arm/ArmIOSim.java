@@ -15,8 +15,7 @@ public class ArmIOSim implements ArmIO {
 
     private double armAppliedVolts = 0.0;
 
-    private final Rotation2d randomInitialPosition =
-            Rotation2d.fromDegrees(Math.random() * 80); // Initialize to random value
+    private final double randomInitialPosition = 79.0; // Initialize to random value
 
     private final SingleJointedArmSim armSim = new SingleJointedArmSim(
             DCMotor.getNEO(2),
@@ -26,7 +25,7 @@ public class ArmIOSim implements ArmIO {
             Units.degreesToRadians(120),
             Units.degreesToRadians(200),
             false,
-            Units.degreesToRadians(120 + randomInitialPosition.getDegrees()),
+            Units.degreesToRadians(120 + randomInitialPosition),
             VecBuilder.fill(2 * Math.PI / 4096));
 
     @Override

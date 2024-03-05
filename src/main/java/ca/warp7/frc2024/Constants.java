@@ -12,7 +12,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final MODE CURRENT_MODE = MODE.SIM;
+    public static final MODE CURRENT_MODE = MODE.REAL;
     public static final boolean TUNING_MODE = true;
 
     public final class ARM {
@@ -20,13 +20,13 @@ public final class Constants {
 
         public static final ARM.Gains GAINS =
                 switch (CURRENT_MODE) {
-                    case REAL -> new ARM.Gains(0.3, 0.01, 0, 0, 0, 0, 0);
+                    case REAL -> new ARM.Gains(0.33, 0.02, 0.003, 0, 0, 0, 0);
                     case SIM -> new ARM.Gains(1, 0, 0, 0, 0, 0, 0);
                     default -> new ARM.Gains(0, 0, 0, 0, 0, 0, 0);
                 };
 
-        public static final double MAX_VELOCITY_DEG = 572;
-        public static final double MAX_ACCELERATION_DEG = 1000;
+        public static final double MAX_VELOCITY_DEG = 4000;
+        public static final double MAX_ACCELERATION_DEG = 2000;
     }
 
     public class DRIVETRAIN {

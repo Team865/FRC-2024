@@ -51,7 +51,7 @@ public class ArmIOSparkMax implements ArmIO {
         leftMotor.restoreFactoryDefaults();
 
         /* Configure motor invert and follows */
-        rightMotor.setInverted(true);
+        rightMotor.setInverted(false);
         leftMotor.follow(rightMotor, true); // Set the left motor to follow the right motor
 
         /* Configure electrical */
@@ -72,6 +72,7 @@ public class ArmIOSparkMax implements ArmIO {
         intIncEncoder.setPosition(0.0);
         extIncEncoder.reset();
         extAbsEncoder.reset();
+
         this.dutyCycleEncOffset = dutyCycleEncOffset;
 
         /* Save configuration */
@@ -83,9 +84,9 @@ public class ArmIOSparkMax implements ArmIO {
     public void updateInputs(ArmIOInputs inputs) {
         inputs.armInternalIncrementalPosition = Rotation2d.fromRotations(intIncEncoder.getPosition() * ARM_RATIO);
         inputs.armExternalIncrementalPosition =
-                Rotation2d.fromRotations(extIncEncoder.getDistance() / EXTERNAL_ENCODER_CPR * ENCODER_RATIO);
-        inputs.armExternalAbsolutePosition = Rotation2d.fromRotations(extAbsEncoder.getDistance() * ENCODER_RATIO)
-                .minus(dutyCycleEncOffset);
+                Rotation2d.fromRotations(-1.0 * (extIncEncoder.getDistance() / EXTERNAL_ENCODER_CPR * ENCODER_RATIO));
+        inputs.armExternalAbsolutePosition = Rotation2d.fromRotations(
+                -1.0 * ((extAbsEncoder.getDistance() * ENCODER_RATIO) - dutyCycleEncOffset.getRotations()));
 
         inputs.armInternalVelocityRadPerSec = intIncEncoder.getVelocity() * ARM_RATIO;
         inputs.armExternalVelocityRadPerSec = extIncEncoder.getRate() / EXTERNAL_ENCODER_CPR * ENCODER_RATIO;

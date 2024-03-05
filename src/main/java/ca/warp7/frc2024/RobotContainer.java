@@ -6,7 +6,7 @@ package ca.warp7.frc2024;
 
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
-import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMaxNeo;
+import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMax;
 import ca.warp7.frc2024.subsystems.Intake.IntakeSubsystem;
 import ca.warp7.frc2024.subsystems.arm.ArmIO;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
@@ -25,7 +25,7 @@ import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOFalcon500;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOSim;
 import ca.warp7.frc2024.subsystems.feeder.FeederIO;
 import ca.warp7.frc2024.subsystems.feeder.FeederIOSim;
-import ca.warp7.frc2024.subsystems.feeder.FeederIOSparkMax550;
+import ca.warp7.frc2024.subsystems.feeder.FeederIOSparkMax;
 import ca.warp7.frc2024.subsystems.feeder.FeederSubsystem;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIO;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSim;
@@ -36,10 +36,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+// USe absolute encoder if greater than x degrees
 public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
     private final ArmSubsystem armSubsystem;
@@ -48,9 +50,10 @@ public class RobotContainer {
     private final FeederSubsystem feederSubsystem;
     private final ClimberSubsystem climberSubsystem;
 
-    private final CommandXboxController primaryController = new CommandXboxController(0);
-    private final CommandXboxController secondaryController = new CommandXboxController(1);
-    private final CommandXboxController technicianController = new CommandXboxController(2);
+    /* OI Controllers */
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
+    private final CommandXboxController technician = new CommandXboxController(2);
 
     private final LoggedDashboardNumber topRightShooterSpeed =
             new LoggedDashboardNumber("Top Right Shooter Speed", 1500.0);
@@ -66,9 +69,6 @@ public class RobotContainer {
 
     private final LoggedDashboardNumber intakeVolts = new LoggedDashboardNumber("Intake Volts", -6);
 
-    private final LoggedDashboardNumber highPoint = new LoggedDashboardNumber("High Point", 35);
-    private final LoggedDashboardNumber lowPoint = new LoggedDashboardNumber("Low Point", 78);
-
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
     public RobotContainer() {
@@ -80,14 +80,14 @@ public class RobotContainer {
                         new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
-                armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, Rotation2d.fromRotations(0)));
-                intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMaxNeo(31));
+                armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
+                intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31));
                 shooterSubsystem = new ShooterSubsystem(
                         new ShooterModuleIOSparkMax550(22, true),
                         new ShooterModuleIOSparkMax550(23, false),
                         new ShooterModuleIOSparkMax550(21, true),
                         new ShooterModuleIOSparkMax550(20, false));
-                feederSubsystem = new FeederSubsystem(new FeederIOSparkMax550(24, 25));
+                feederSubsystem = new FeederSubsystem(new FeederIOSparkMax(24, 25, 3));
                 climberSubsystem = new ClimberSubsystem(new ClimberIOSparkMaxNeo(30));
                 break;
             case SIM:
@@ -152,60 +152,45 @@ public class RobotContainer {
 
     private void configureBindings() {
         climberSubsystem.setDefaultCommand(
-                ClimberSubsystem.climberCommand(climberSubsystem, () -> secondaryController.getLeftY()));
+                ClimberSubsystem.climberCommand(climberSubsystem, () -> operator.getLeftY()));
 
         swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
                 swerveDrivetrainSubsystem,
-                () -> -primaryController.getLeftY(),
-                () -> -primaryController.getLeftX(),
-                () -> -primaryController.getRightX(),
-                primaryController.rightBumper()));
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> -driver.getRightX(),
+                driver.rightBumper()));
 
-        secondaryController.a().onTrue(Commands.runOnce(() -> {
+        operator.a().onTrue(Commands.runOnce(() -> {
             shooterSubsystem.runShooterRPM(topRightShooterSpeed.get(), 0);
             shooterSubsystem.runShooterRPM(topLeftShooterSpeed.get(), 1);
             shooterSubsystem.runShooterRPM(bottomLeftShooterSpeed.get(), 2);
             shooterSubsystem.runShooterRPM(bottomRightShooterSpeed.get(), 3);
         }));
 
-        secondaryController.b().onTrue(Commands.runOnce(() -> {
+        operator.b().onTrue(Commands.runOnce(() -> {
             shooterSubsystem.runShooterRPM(0, 0, 1, 2, 3);
             shooterSubsystem.stopShooter();
         }));
 
-        secondaryController.x().onTrue(Commands.runOnce(() -> {
+        operator.x().onTrue(Commands.runOnce(() -> {
             armSubsystem.setSetpoint(SETPOINT.HANDOFF_INTAKE);
         }));
-        secondaryController.y().onTrue(Commands.runOnce(() -> {
+        operator.y().onTrue(Commands.runOnce(() -> {
             armSubsystem.setSetpoint(SETPOINT.AMP);
         }));
 
-        secondaryController
-                .rightBumper()
-                .onTrue(Commands.runOnce(() -> {
-                    feederSubsystem.setVolts(feederVolts.get());
-                }))
-                .onFalse(Commands.runOnce(() -> {
-                    feederSubsystem.setVolts(0);
-                }));
+        /* Intake */
+        Trigger armSetpointTrigger = new Trigger(() -> armSubsystem.atSetpoint(SETPOINT.HANDOFF_INTAKE));
+        Trigger intakeTrigger = new Trigger(() -> intakeSubsystem.getSensor());
 
-        secondaryController
-                .leftBumper()
-                .onTrue(Commands.runOnce(() -> {
-                    intakeSubsystem.runVolts(intakeVolts.get());
-                }))
-                .onFalse(Commands.runOnce(() -> {
-                    intakeSubsystem.runVolts(0);
-                }));
+        operator.rightTrigger()
+                .and(armSetpointTrigger)
+                .whileTrue(intakeSubsystem.runVolts(-10).until(() -> intakeTrigger.getAsBoolean()));
 
-        secondaryController
-                .rightTrigger()
-                .onTrue(Commands.runOnce(() -> {
-                    feederSubsystem.setVolts(reverseFeederVolts.get());
-                }))
-                .onFalse(Commands.runOnce(() -> {
-                    feederSubsystem.setVolts(0);
-                }));
+        intakeTrigger
+                .onTrue(feederSubsystem.runVolts(3).until(() -> feederSubsystem.getSensor()))
+                .onTrue(intakeSubsystem.runVolts(-4).until(() -> feederSubsystem.getSensor()));
     }
 
     public Command getAutonomousCommand() {
