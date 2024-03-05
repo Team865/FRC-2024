@@ -76,8 +76,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         }
 
         // Use real inputs if gyro exists, otherwise generate from kinematics
-        if (gyroInputs.connected) {
-            rawGyroRotation = gyroInputs.yaw;
+        if (gyroInputs.gyroConnected) {
+            rawGyroRotation = gyroInputs.gyroYaw;
         } else {
             Twist2d twist = swerveDriveKinematics.toTwist2d(moduleDeltas);
             rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
@@ -107,6 +107,25 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         Logger.recordOutput("SwerveStates/States", swerveModuleStates);
         Logger.recordOutput("SwerveStates/StatesOptimized", optimizedStates);
     }
+
+    // public void setTargetChassisSpeeds(ChassisSpeeds speeds, Translation2d point) {
+
+    //     P
+
+    //     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    //     SwerveModuleState[] swerveModuleStates = swerveDriveKinematics.toSwerveModuleStates(discreteSpeeds);
+    //     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_LINEAR_SPEED);
+
+    //     // Set individual modules target state
+    //     SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
+    //     for (int i = 0; i <= 3; i++) {
+    //         optimizedStates[i] = swerveModules[i].setTargetState(swerveModuleStates[i]);
+    //     }
+
+    //     // Log states
+    //     Logger.recordOutput("SwerveStates/States", swerveModuleStates);
+    //     Logger.recordOutput("SwerveStates/StatesOptimized", optimizedStates);
+    // }
 
     /**
      * @return Current pose from pose estimator
@@ -146,6 +165,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         }
         return states;
     }
+
+    // public static Command aimAtPointCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier
+    // omegaSupplier, Supplier<Translation2d> pointSupplier) {
+    //     return runEnd(() -> )
+    // }
 
     /**
      * Drive command for teleoperated control. Defaults to field oriented

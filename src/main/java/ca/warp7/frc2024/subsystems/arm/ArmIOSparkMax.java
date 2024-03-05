@@ -2,7 +2,6 @@ package ca.warp7.frc2024.subsystems.arm;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,8 +64,8 @@ public class ArmIOSparkMax implements ArmIO {
         /* Configure status frames */
         // While we are using an external encoder, we rely on the internal encoder as a fallback if the external encoder
         // fails thus we do not want to reduce that frame
-        rightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
-        leftMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // No positional telemetry from follower motor
+        // rightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
+        // leftMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // No positional telemetry from follower motor
 
         /* Configure encoders */
         intIncEncoder.setPosition(0.0);
@@ -105,7 +104,7 @@ public class ArmIOSparkMax implements ArmIO {
     }
 
     @Override
-    public void stopArm() {
+    public void stop() {
         rightMotor.stopMotor();
     }
 }

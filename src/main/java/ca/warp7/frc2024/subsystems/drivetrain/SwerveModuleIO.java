@@ -9,13 +9,13 @@ public interface SwerveModuleIO {
         public double drivePositionRad = 0.0;
         public double driveVelocityRadPerSec = 0.0;
         public double driveAppliedVolts = 0.0;
-        public double[] driveCurrentAmps = new double[] {};
+        public double driveCurrentAmps = 0.0;
 
         public Rotation2d steerAbsolutePosition = new Rotation2d();
         public Rotation2d steerPosition = new Rotation2d();
         public double steerVelocityRadPerSec = 0.0;
         public double steerAppliedVolts = 0.0;
-        public double[] steerCurrentAmps = new double[] {};
+        public double steerCurrentAmps = 0.0;
     }
 
     public default void updateInputs(SwerveModuleIOInputs inputs) {}

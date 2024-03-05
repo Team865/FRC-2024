@@ -35,6 +35,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -81,7 +82,7 @@ public class RobotContainer {
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
                 armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
-                intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31));
+                intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31, 4));
                 shooterSubsystem = new ShooterSubsystem(
                         new ShooterModuleIOSparkMax550(22, true),
                         new ShooterModuleIOSparkMax550(23, false),
@@ -161,12 +162,12 @@ public class RobotContainer {
                 () -> -driver.getRightX(),
                 driver.rightBumper()));
 
-        operator.a().onTrue(Commands.runOnce(() -> {
-            shooterSubsystem.runShooterRPM(topRightShooterSpeed.get(), 0);
-            shooterSubsystem.runShooterRPM(topLeftShooterSpeed.get(), 1);
-            shooterSubsystem.runShooterRPM(bottomLeftShooterSpeed.get(), 2);
-            shooterSubsystem.runShooterRPM(bottomRightShooterSpeed.get(), 3);
-        }));
+        // operator.a().onTrue(Commands.runOnce(() -> {
+        //     shooterSubsystem.runShooterRPM(topRightShooterSpeed.get(), 0);
+        //     shooterSubsystem.runShooterRPM(topLeftShooterSpeed.get(), 1);
+        //     shooterSubsystem.runShooterRPM(bottomLeftShooterSpeed.get(), 2);
+        //     shooterSubsystem.runShooterRPM(bottomRightShooterSpeed.get(), 3);
+        // }));
 
         operator.b().onTrue(Commands.runOnce(() -> {
             shooterSubsystem.runShooterRPM(0, 0, 1, 2, 3);
@@ -182,15 +183,33 @@ public class RobotContainer {
 
         /* Intake */
         Trigger armSetpointTrigger = new Trigger(() -> armSubsystem.atSetpoint(SETPOINT.HANDOFF_INTAKE));
-        Trigger intakeTrigger = new Trigger(() -> intakeSubsystem.getSensor());
+        Trigger intakeTrigger = new Trigger(() -> intakeSubsystem.getSensor()).debounce(0.075);
 
         operator.rightTrigger()
                 .and(armSetpointTrigger)
-                .whileTrue(intakeSubsystem.runVolts(-10).until(() -> intakeTrigger.getAsBoolean()));
+                .onTrue(intakeSubsystem.runVolts(10).until(() -> intakeTrigger.getAsBoolean()));
 
         intakeTrigger
                 .onTrue(feederSubsystem.runVolts(3).until(() -> feederSubsystem.getSensor()))
-                .onTrue(intakeSubsystem.runVolts(-4).until(() -> feederSubsystem.getSensor()));
+                .onTrue(intakeSubsystem.runVolts(6).until(() -> feederSubsystem.getSensor()));
+
+        Command shooter = Commands.runOnce(() -> {
+            shooterSubsystem.runShooterRPM(topRightShooterSpeed.get(), 0);
+            shooterSubsystem.runShooterRPM(topLeftShooterSpeed.get(), 1);
+            shooterSubsystem.runShooterRPM(bottomLeftShooterSpeed.get(), 2);
+            shooterSubsystem.runShooterRPM(bottomRightShooterSpeed.get(), 3);
+        });
+
+        operator.leftBumper().onTrue(Commands.runOnce(() -> shooterSubsystem.runShooterRPM(7000, 0, 1, 2, 3)));
+
+        operator.a()
+                .onTrue(Commands.sequence(
+                        feederSubsystem.runVolts(-2).withTimeout(0.125),
+                        shooter,
+                        new WaitCommand(2.5),
+                        feederSubsystem.runVolts(11).withTimeout(1),
+                        new WaitCommand(1),
+                        Commands.runOnce(() -> shooterSubsystem.stopShooter())));
     }
 
     public Command getAutonomousCommand() {

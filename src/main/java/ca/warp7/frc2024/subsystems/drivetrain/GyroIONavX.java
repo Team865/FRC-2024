@@ -10,7 +10,12 @@ public class GyroIONavX implements GyroIO {
     public GyroIONavX() {}
 
     public void updateInputs(GyroIOInputs inputs) {
-        inputs.connected = navx.isConnected();
-        inputs.yaw = navx.getRotation2d();
+        inputs.gyroConnected = navx.isConnected();
+        inputs.gyroYaw = navx.getRotation2d();
+    }
+
+    @Override
+    public void zeroYaw() {
+        navx.zeroYaw();
     }
 }

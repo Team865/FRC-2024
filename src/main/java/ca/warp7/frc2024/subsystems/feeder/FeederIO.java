@@ -8,8 +8,9 @@ public interface FeederIO {
     public static class FeederIOInputs {
         public Rotation2d feederPosition = new Rotation2d();
         public double feederVelocityRadPerSec = 0.0;
-        public double feederAppliedVolts = 0.0;
+        public double[] feederAppliedVolts = new double[] {};
         public double[] feederCurrentAmps = new double[] {};
+        public double[] feederTempCelsius = new double[] {};
 
         public boolean feederSensorTriggered = false;
     }
@@ -24,5 +25,5 @@ public interface FeederIO {
      *
      * @param volts
      */
-    public default void setFeederVoltage(double volts) {}
+    public default void setVoltage(double volts) {}
 }

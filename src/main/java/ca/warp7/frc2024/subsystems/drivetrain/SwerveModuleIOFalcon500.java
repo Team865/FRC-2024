@@ -97,14 +97,14 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
         inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / DRIVE_GEAR_RATIO;
         inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
-        inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
+        inputs.driveCurrentAmps = driveCurrent.getValueAsDouble();
 
         inputs.steerAbsolutePosition = Rotation2d.fromRotations(steerAbsolutePosition.getValueAsDouble())
                 .minus(absoluteEncoderOffset);
         inputs.steerPosition = Rotation2d.fromRotations(steerPosition.getValueAsDouble() / STEER_GEAR_RATIO);
         inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble()) / STEER_GEAR_RATIO;
         inputs.steerAppliedVolts = steerAppliedVolts.getValueAsDouble();
-        inputs.steerCurrentAmps = new double[] {steerCurrent.getValueAsDouble()};
+        inputs.steerCurrentAmps = steerCurrent.getValueAsDouble();
     }
 
     @Override

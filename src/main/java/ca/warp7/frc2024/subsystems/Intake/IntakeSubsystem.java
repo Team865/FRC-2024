@@ -25,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean getSensor() {
-        return intakeInputs.intakeSensor;
+        return intakeInputs.intakeSensorTriggered;
     }
 
     @Override
@@ -33,6 +33,6 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeIO.updateInputs(intakeInputs);
         Logger.processInputs("Intake", intakeInputs);
 
-        intakeIO.setIntakeVoltage(volts);
+        intakeIO.setVoltage(volts);
     }
 }

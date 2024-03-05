@@ -21,8 +21,8 @@ public class ClimberSubsystem extends SubsystemBase {
         Logger.processInputs("Climber", climberInputs);
     }
 
-    public void setClimberVoltage(double volts) {
-        climberIO.setClimberVoltage(volts);
+    public void runVoltage(double volts) {
+        climberIO.setVoltage(volts);
     }
 
     public static Command climberCommand(ClimberSubsystem climberSubsystem, DoubleSupplier input) {
@@ -30,7 +30,7 @@ public class ClimberSubsystem extends SubsystemBase {
                 () -> {
                     double voltage =
                             MathUtil.clamp(Math.abs(MathUtil.applyDeadband(input.getAsDouble(), 0.1) * 12), -12, 12);
-                    climberSubsystem.setClimberVoltage(voltage);
+                    climberSubsystem.runVoltage(voltage);
                 },
                 climberSubsystem);
     }

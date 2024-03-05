@@ -47,13 +47,17 @@ public class FeederIOSparkMax implements FeederIO {
     public void updateInputs(FeederIOInputs inputs) {
         inputs.feederPosition = Rotation2d.fromRotations(encoder.getPosition());
         inputs.feederVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
-        inputs.feederAppliedVolts = topMotor.getAppliedOutput() * topMotor.getBusVoltage();
+        inputs.feederAppliedVolts = new double[] {
+            topMotor.getAppliedOutput() * topMotor.getBusVoltage(),
+            bottomMotor.getAppliedOutput() * bottomMotor.getBusVoltage()
+        };
         inputs.feederCurrentAmps = new double[] {topMotor.getOutputCurrent(), bottomMotor.getOutputCurrent()};
+        inputs.feederTempCelsius = new double[] {topMotor.getMotorTemperature(), bottomMotor.getMotorTemperature()};
         inputs.feederSensorTriggered = sensor.get();
     }
 
     @Override
-    public void setFeederVoltage(double volts) {
+    public void setVoltage(double volts) {
         topMotor.setVoltage(volts);
     }
 }

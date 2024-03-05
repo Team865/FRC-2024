@@ -24,5 +24,5 @@ public interface ArmIO {
 
     public default void configurePID(double kP, double kI, double kD) {}
 
-    public default void stopArm() {}
+    public default void stop() {}
 }

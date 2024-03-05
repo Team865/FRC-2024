@@ -14,19 +14,19 @@ public class IntakeIOSparkMax implements IntakeIO {
     private final RelativeEncoder encoder;
     private final DigitalInput sensor;
 
-    public IntakeIOSparkMax(int kIntakeNeoID) {
+    public IntakeIOSparkMax(int kIntakeNeoID, int sensorID) {
         /* Create hardware object */
         motor = new CANSparkMax(kIntakeNeoID, MotorType.kBrushless);
         encoder = motor.getEncoder();
-        sensor = new DigitalInput(4);
-
-        
+        sensor = new DigitalInput(sensorID);
 
         motor.restoreFactoryDefaults();
+        motor.setInverted(true);
 
         motor.setSmartCurrentLimit(45);
         motor.enableVoltageCompensation(12.0);
         motor.setIdleMode(IdleMode.kBrake);
+        motor.burnFlash();
     }
 
     @Override
@@ -35,12 +35,13 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.intakeVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
         inputs.intakeAppliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
         inputs.intakeCurrentAmps = motor.getOutputCurrent();
+        inputs.intakeTempCelsius = motor.getMotorTemperature();
 
-        inputs.intakeSensor = sensor.get();
+        inputs.intakeSensorTriggered = sensor.get();
     }
 
     @Override
-    public void setIntakeVoltage(double volts) {
+    public void setVoltage(double volts) {
         motor.setVoltage(volts);
     }
 }

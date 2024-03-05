@@ -63,9 +63,9 @@ public class FeederSubsystem extends SubsystemBase {
 
         if (velocity != null) {
             double voltage = feedback.calculate(inputs.feederVelocityRadPerSec, velocity);
-            io.setFeederVoltage(voltage);
+            io.setVoltage(voltage);
         } else {
-            io.setFeederVoltage(volts);
+            io.setVoltage(volts);
         }
     }
 }

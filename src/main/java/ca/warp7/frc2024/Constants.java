@@ -20,7 +20,7 @@ public final class Constants {
 
         public static final ARM.Gains GAINS =
                 switch (CURRENT_MODE) {
-                    case REAL -> new ARM.Gains(0.33, 0.02, 0.003, 0, 0, 0, 0);
+                    case REAL -> new ARM.Gains(0.33, 0.02, 0.003, 0, 1.27, 0.02, 0.52);
                     case SIM -> new ARM.Gains(1, 0, 0, 0, 0, 0, 0);
                     default -> new ARM.Gains(0, 0, 0, 0, 0, 0, 0);
                 };

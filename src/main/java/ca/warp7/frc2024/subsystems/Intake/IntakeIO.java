@@ -10,13 +10,14 @@ public interface IntakeIO {
         public double intakeVelocityRadPerSec = 0.0;
         public double intakeAppliedVolts = 0.0;
         public double intakeCurrentAmps = 0.0;
+        public double intakeTempCelsius = 0.0;
 
-        public boolean intakeSensor = false;
+        public boolean intakeSensorTriggered = false;
     }
+
     /*Updates the set of loggable inputs*/
     public default void updateInputs(IntakeIOInputs inputs) {}
-    ;
+
     /*Set the intake voltage */
-    public default void setIntakeVoltage(double volts) {}
-    ;
+    public default void setVoltage(double volts) {}
 }

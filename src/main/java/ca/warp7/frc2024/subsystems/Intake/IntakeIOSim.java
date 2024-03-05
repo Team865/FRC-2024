@@ -15,7 +15,7 @@ public class IntakeIOSim implements IntakeIO {
     }
 
     @Override
-    public void setIntakeVoltage(double volts) {
+    public void setVoltage(double volts) {
         intakeAppliedVolts = MathUtil.clamp(volts, -12, 12);
         intakeSim.setInputVoltage(intakeAppliedVolts);
     }

@@ -8,34 +8,34 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public class ClimberIOSparkMaxNeo implements ClimberIO {
-    private final CANSparkMax climberSparkMax;
-    private final RelativeEncoder climberInternalEncoder;
+    private final CANSparkMax motor;
+    private final RelativeEncoder intEncoder;
 
     public ClimberIOSparkMaxNeo(int climberSparkMaxId) {
-        climberSparkMax = new CANSparkMax(climberSparkMaxId, MotorType.kBrushless);
+        motor = new CANSparkMax(climberSparkMaxId, MotorType.kBrushless);
 
-        climberSparkMax.restoreFactoryDefaults();
-        climberSparkMax.setCANTimeout(250);
-        climberSparkMax.enableVoltageCompensation(12);
-        climberSparkMax.setSmartCurrentLimit(40);
-        climberSparkMax.setInverted(false);
-        climberSparkMax.burnFlash();
+        motor.restoreFactoryDefaults();
+        motor.setCANTimeout(250);
+        motor.enableVoltageCompensation(12);
+        motor.setSmartCurrentLimit(40);
+        motor.setInverted(false);
+        motor.burnFlash();
 
-        climberInternalEncoder = climberSparkMax.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+        intEncoder = motor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
     }
 
     @Override
     public void updateInputs(ClimberIOInputs inputs) {
-        inputs.climberInternalPositionRad = Units.rotationsToRadians(climberInternalEncoder.getPosition());
-        inputs.climberVelocityRadPerSec =
-                Units.rotationsPerMinuteToRadiansPerSecond(climberInternalEncoder.getVelocity());
-        inputs.climberExternalPositionRad = new Rotation2d();
-        inputs.climberAppliedVolts = climberSparkMax.getAppliedOutput() * climberSparkMax.getBusVoltage();
-        inputs.climberCurrentAmps = climberSparkMax.getOutputCurrent();
+        inputs.climberInternalPosition = Rotation2d.fromRotations(intEncoder.getPosition());
+        inputs.climberExternalPosition = new Rotation2d();
+        inputs.climberInternalVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(intEncoder.getVelocity());
+        inputs.climberAppliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
+        inputs.climberCurrentAmps = motor.getOutputCurrent();
+        inputs.climberTempCelsius = motor.getMotorTemperature();
     }
 
     @Override
-    public void setClimberVoltage(double volts) {
-        climberSparkMax.setVoltage(volts);
+    public void setVoltage(double volts) {
+        motor.setVoltage(volts);
     }
 }
