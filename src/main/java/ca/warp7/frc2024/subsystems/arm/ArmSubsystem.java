@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     /* Setpoints */
     @RequiredArgsConstructor
-    public enum SETPOINT {
+    public enum Setpoint {
         HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 1)),
         STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 30)),
         AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 30)),
@@ -69,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Setter
     @Getter
-    private SETPOINT setpoint = SETPOINT.IDLE;
+    private Setpoint setpoint = Setpoint.IDLE;
 
     private Rotation2d armOffset = null;
 
@@ -81,7 +82,7 @@ public class ArmSubsystem extends SubsystemBase {
                 kI.get(),
                 kD.get(),
                 new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
-        feedback.setTolerance(1);
+        feedback.setTolerance(1.5);
 
         feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
 
@@ -96,7 +97,7 @@ public class ArmSubsystem extends SubsystemBase {
         // Don't use absolute encoder bc it changes every time we start up
         // Rotation2d.fromRadians(inputs.armExternalIncrementalPosition.getRadians()+ armOffset.getRadians());
         // When adding Rotation2d objects the values wrap at -180, +180;
-        // No clue how to fix, converting to degrees is a
+        // No clue how to fix, converting to degrees is a workaround
     }
 
     @Override
@@ -147,8 +148,8 @@ public class ArmSubsystem extends SubsystemBase {
         mechanismLigament.setAngle(getIdealIncrementalAngle().getDegrees());
         Logger.recordOutput("Arm/Mechanism2d/ArmPivot", mechanism);
 
-        // Calculate voltage if setpoint is not idle
-        if (setpoint != SETPOINT.IDLE) {
+        // Calculate and  voltage if setpoint is not idle
+        if (setpoint != Setpoint.IDLE) {
             double setpointVoltage =
                     feedback.calculate(getIdealIncrementalAngle().getDegrees(), setpoint.getDegrees());
 
@@ -158,7 +159,11 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    public boolean atSetpoint(SETPOINT setpoint) {
+    public boolean atSetpoint(Setpoint setpoint) {
         return this.setpoint == setpoint && feedback.atGoal() ? true : false;
+    }
+
+    public Trigger atSetpointTrigger(Setpoint setpoint) {
+        return new Trigger(() -> atSetpoint(setpoint)).debounce(0.1);
     }
 }
