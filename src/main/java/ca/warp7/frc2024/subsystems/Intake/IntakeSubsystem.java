@@ -1,38 +1,39 @@
 package ca.warp7.frc2024.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final IntakeIO intakeIO;
-    private final IntakeIOInputsAutoLogged intakeInputs = new IntakeIOInputsAutoLogged();
-
-    private boolean hasGamepiece;
+    private final IntakeIO io;
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     @Setter
-    private double volts;
+    private double volts = 0;
 
-    /** Creates a new intake */
     public IntakeSubsystem(IntakeIO intakeIO) {
-        this.intakeIO = intakeIO;
+        this.io = intakeIO;
     }
 
-    public Command runVolts(double volts) {
-        return Commands.startEnd(() -> setVolts(volts), () -> this.volts = 0, this);
+    private boolean getSensor() {
+        return inputs.intakeSensorTriggered;
     }
 
-    public boolean getSensor() {
-        return intakeInputs.intakeSensorTriggered;
+    public Command runVoltage(double volts) {
+        return this.startEnd(() -> setVolts(volts), () -> setVolts(0));
+    }
+
+    public Trigger sensorTrigger() {
+        return new Trigger(() -> getSensor()).debounce(0.075);
     }
 
     @Override
     public void periodic() {
-        intakeIO.updateInputs(intakeInputs);
-        Logger.processInputs("Intake", intakeInputs);
+        io.updateInputs(inputs);
+        Logger.processInputs("Intake", inputs);
 
-        intakeIO.setVoltage(volts);
+        io.setVoltage(volts);
     }
 }
