@@ -1,12 +1,11 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterModuleIO {
     @AutoLog
     public static class ShooterModuleIOInputs {
-        public Rotation2d shooterPositionRad = new Rotation2d();
+        public double shooterPositionRad = 0.0;
         public double shooterVelocityRadPerSec = 0.0;
         public double shooterAppliedVolts = 0.0;
         public double shooterCurrentAmps = 0.0;

@@ -1,5 +1,6 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
+import ca.warp7.frc2024.util.LoggedTunableNumber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -10,6 +11,10 @@ public class ShooterSubsystem extends SubsystemBase {
     private final ShooterModule[] shooterModules;
 
     private final SysIdRoutine sysId;
+
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/Gains/kP", 0.00065);
+    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Shooter/Gains/kI", 0);
+    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/Gains/kD", 0.01);
 
     public ShooterSubsystem(
             ShooterModuleIO topRightShooterModuleIO,
@@ -32,6 +37,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    shooterModules[0].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[1].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[2].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[3].configurePID(kP.get(), kI.get(), kD.get());
+                },
+                kP,
+                kI,
+                kD);
+
         for (var shooterModule : shooterModules) {
             shooterModule.periodic();
         }
@@ -43,7 +60,7 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    public void runShooterRPM(double RPM, int... shooterModules) {
+    public void setRPM(double RPM, int... shooterModules) {
         for (var shooterModule : shooterModules) {
             this.shooterModules[shooterModule].runShooterTargetVelocity(RPM);
         }
@@ -63,6 +80,14 @@ public class ShooterSubsystem extends SubsystemBase {
         for (var shooterModule : shooterModules) {
             shooterModule.zeroEncoder();
         }
+    }
+
+    public Command runRPMCommand(double RPM, int... shooterModules) {
+        return this.runOnce(() -> setRPM(RPM, shooterModules));
+    }
+
+    public Command stopShooterCommand() {
+        return this.runOnce(() -> stopShooter());
     }
 
     /**

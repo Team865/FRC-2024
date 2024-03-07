@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
@@ -19,8 +18,6 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
     public ShooterModuleIOSparkMax550(int shooterSparkMaxId, boolean invert) {
         motor = new CANSparkMax(shooterSparkMaxId, MotorType.kBrushless);
 
-        motor.restoreFactoryDefaults();
-
         // TODO: FIX config
         motor.enableVoltageCompensation(12.0);
         motor.setSmartCurrentLimit(15);
@@ -28,7 +25,6 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
         if (invert) {
             motor.setInverted(true);
         }
-        motor.burnFlash();
 
         // Specify encoder type: https://www.chiefdelphi.com/t/psa-new-crash-bug-in-revlib-2024-2-2/456242
         encoder = motor.getEncoder();
@@ -40,7 +36,7 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
 
     @Override
     public void updateInputs(ShooterModuleIOInputs inputs) {
-        inputs.shooterPositionRad = Rotation2d.fromRotations(encoder.getPosition());
+        inputs.shooterPositionRad = encoder.getPosition();
         inputs.shooterVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
         inputs.shooterAppliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
         inputs.shooterCurrentAmps = motor.getOutputCurrent();
@@ -52,7 +48,6 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
         feedback.setP(kP, 0);
         feedback.setI(kI, 0);
         feedback.setD(kD, 0);
-        feedback.setFF(0, 0); // 0.000090
     }
 
     @Override

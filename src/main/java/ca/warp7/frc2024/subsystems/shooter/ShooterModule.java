@@ -22,8 +22,8 @@ public class ShooterModule {
 
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                feedforward = new SimpleMotorFeedforward(0.045574, 0.010104, 0.0012135);
-                shooterModuleIO.configurePID(0.00045, 0.0, 0.004);
+                feedforward = new SimpleMotorFeedforward(0.021949, 0.010201, 0.0010146);
+                shooterModuleIO.configurePID(0.00065, 0.0, 0.01);
                 break;
             case SIM:
                 feedforward = new SimpleMotorFeedforward(0, 0.0);
@@ -53,9 +53,13 @@ public class ShooterModule {
      */
     public void runShooterTargetVelocity(double velocityRPM) {
         double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-        shooterModuleIO.setVelocity(velocityRadPerSec, 0);
+        shooterModuleIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
         Logger.recordOutput("Shooter/" + shooterModuleName + "/TargetRPM", velocityRPM);
+    }
+
+    public void configurePID(double kP, double kI, double kD) {
+        shooterModuleIO.configurePID(kP, kI, kD);
     }
 
     /**
