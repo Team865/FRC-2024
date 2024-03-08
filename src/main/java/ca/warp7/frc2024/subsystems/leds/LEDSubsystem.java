@@ -70,7 +70,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     private void blinkColor(SparkColor color, double interval) {
         boolean on = ((Timer.getFPGATimestamp() % interval) / interval) > 0.5;
-        solidColor(on ? color : defaultColor);
+        solidColor(on ? color : SparkColor.BLACK);
     }
 
     public Command solidColorCommand(SparkColor color) {
