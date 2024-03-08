@@ -42,7 +42,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -161,6 +160,28 @@ public class RobotContainer {
                                         intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
                                         feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
                                 shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3)));
+        NamedCommands.registerCommand(
+                "armSubwoofer",
+                armSubsystem
+                        .setSetpointCommand(Setpoint.SUBWOOFER)
+                        .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)));
+        NamedCommands.registerCommand(
+                "armStow",
+                armSubsystem
+                        .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
+                        .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE)));
+        NamedCommands.registerCommand(
+                "shoot",
+                Commands.sequence(
+                        shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3).withTimeout(0.25),
+                        feederSubsystem.runVoltage(-12).withTimeout(0.0625),
+                        shooterSubsystem.runRPMCommand(topRightShooterSpeed.get(), 0),
+                        shooterSubsystem.runRPMCommand(topLeftShooterSpeed.get(), 1),
+                        shooterSubsystem.runRPMCommand(bottomLeftShooterSpeed.get(), 2),
+                        shooterSubsystem.runRPMCommand(bottomRightShooterSpeed.get(), 3),
+                        Commands.waitSeconds(1),
+                        feederSubsystem.runVoltage(12).withTimeout(1),
+                        shooterSubsystem.stopShooterCommand()));
 
         Command shoot = Commands.sequence(
                         shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3).withTimeout(0.25),
