@@ -1,7 +1,5 @@
 package ca.warp7.frc2024.subsystems.leds;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,9 +47,9 @@ public class LEDSubsystem extends SubsystemBase {
     public LEDSubsystem(int port) {
         blinkin = new Spark(port);
 
-        defaultColor = DriverStation.getAlliance()
-                .map(alliance -> alliance == Alliance.Blue ? SparkColor.BLUE : SparkColor.RED)
-                .orElse(SparkColor.WHITE);
+        // defaultColor = DriverStation.getAlliance()
+        //         .map(alliance -> alliance == Alliance.Blue ? SparkColor.BLUE : SparkColor.RED)
+        //         .orElse(SparkColor.WHITE);
 
         color = defaultColor;
     }

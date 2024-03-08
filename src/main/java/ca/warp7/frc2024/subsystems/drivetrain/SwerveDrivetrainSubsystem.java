@@ -5,6 +5,7 @@ import static ca.warp7.frc2024.Constants.OI.*;
 
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOInputsAutoLogged;
+import ca.warp7.frc2024.util.LoggedTunableNumber;
 import ca.warp7.frc2024.util.SensitivityGainAdjustment;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -36,6 +37,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrivetrainSubsystem extends SubsystemBase {
+    /* AdvantageKit */
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
@@ -45,22 +47,37 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final VisionIO rearVisionIO;
     private final VisionIOInputsAutoLogged rearVisionInputs = new VisionIOInputsAutoLogged();
 
+    /* Drivetrain */
     private final SwerveModule[] swerveModules;
-
     private final SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(SWERVE_MODULE_TRANSLATIONS);
     private Rotation2d rawGyroRotation = new Rotation2d();
-    private final PIDController aimController;
-
-    @Getter
-    @Setter
-    private Translation2d pointAt;
-
     private SwerveModulePosition[] lastModulePositions = new SwerveModulePosition[] {
         new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()
     };
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+            swerveDriveKinematics,
+            rawGyroRotation,
+            lastModulePositions,
+            new Pose2d(),
+            VecBuilder.fill(0.05, 0.05, 0.05),
+            VecBuilder.fill(0.5, 0.5, 999999999));
 
-    private SwerveDrivePoseEstimator poseEstimator =
-            new SwerveDrivePoseEstimator(swerveDriveKinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+    /* Controllers */
+    private final PIDController aimAtFeedback;
+
+    /* Gains */
+    private final LoggedTunableNumber aimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
+    private final LoggedTunableNumber aimAtkI = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kI", 0);
+    private final LoggedTunableNumber aimAtkD = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kD", 0);
+
+    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
+    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
+    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
+
+    /* Setpoints */
+    @Getter
+    @Setter
+    private Translation2d pointAt;
 
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
@@ -74,8 +91,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         this.frontVisionIO = frontVisionIO;
         this.rearVisionIO = rearVisionIO;
 
-        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
-
         swerveModules = new SwerveModule[] {
             new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight"),
             new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft"),
@@ -83,11 +98,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             new SwerveModule(backRightSwerveModuleIO, 3, "BackRight")
         };
 
-        aimController = new PIDController(0.04, 0, 0);
-        aimController.enableContinuousInput(-180, 180);
+        // Create and configure feedback controller
+        aimAtFeedback = new PIDController(aimAtkP.get(), aimAtkI.get(), aimAtkD.get());
+        aimAtFeedback.enableContinuousInput(-180, 180);
 
-        setPose(new Pose2d(0, 0, new Rotation2d()));
-
+        // Configure PathPlanner
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::setPose,
@@ -97,32 +112,30 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);
-
         PathPlannerLogging.setLogActivePathCallback((activePath) -> {
-            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+            Logger.recordOutput("Drivetrain/Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
         });
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
-            Logger.recordOutput("Odometry/TrajectoryTarget", targetPose);
+            Logger.recordOutput("Drivetrain/Odometry/TrajectoryTarget", targetPose);
         });
     }
 
     @Override
     public void periodic() {
-        /* Update and process inputs */
+        // Update and process inputs
         gyroIO.updateInputs(gyroInputs);
-        Logger.processInputs("Gyro", gyroInputs);
+        Logger.processInputs("Drivetrain/Gyro", gyroInputs);
 
         frontVisionIO.updateInputs(frontVisionInputs);
-        Logger.processInputs("Vision/Front", frontVisionInputs);
+        Logger.processInputs("Drivetrain/Vision/Front", frontVisionInputs);
 
         rearVisionIO.updateInputs(rearVisionInputs);
-        Logger.processInputs("Vision/Front", rearVisionInputs);
+        Logger.processInputs("Drivetrain/Vision/rear", rearVisionInputs);
 
+        // Run swerve module periodic routines
         for (var module : swerveModules) {
             module.periodic();
         }
-
-        if (DriverStation.isDisabled()) {}
 
         // Calculate last module position
         SwerveModulePosition[] modulePositions = getModulePositions();
@@ -145,17 +158,40 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
 
-        // if (visionInputs[1].tagCount > 1) {
-        //     poseEstimator.addVisionMeasurement(visionInputs[1].blueOriginRobotPose, visionInputs[1].timestamp);
-        // }
-
         // Update pose estimator using vision
-        // for (VisionIOInputsAutoLogged io : visionInputs) {
-        //     // Only update if more than 1 tag is seen per limelight and we're close
-        //     if (io.tagCount > 1 && io.avgTagDist < 5.0) {
-        //         poseEstimator.addVisionMeasurement(io.blueOriginRobotPose, io.timestamp);
-        //     }
-        // }
+        if (frontVisionInputs.tagCount >= 2 && frontVisionInputs.avgTagDist < 3.5) {
+            poseEstimator.addVisionMeasurement(
+                    frontVisionInputs.blueOriginRobotPose,
+                    frontVisionInputs.timestamp,
+                    VecBuilder.fill(0.5, 0.5, 999999999));
+        } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist < 3.5) {
+            poseEstimator.addVisionMeasurement(
+                    rearVisionInputs.blueOriginRobotPose,
+                    rearVisionInputs.timestamp,
+                    VecBuilder.fill(0.5, 0.5, 999999999));
+        } else if (frontVisionInputs.tagCount >= 1 && frontVisionInputs.avgTagDist < rearVisionInputs.avgTagDist) {
+            poseEstimator.addVisionMeasurement(
+                    frontVisionInputs.blueOriginRobotPose,
+                    frontVisionInputs.timestamp,
+                    VecBuilder.fill(0.7 * frontVisionInputs.avgTagDist, 0.7 * frontVisionInputs.avgTagDist, 999999999));
+        } else if (rearVisionInputs.tagCount >= 1) {
+            poseEstimator.addVisionMeasurement(
+                    rearVisionInputs.blueOriginRobotPose,
+                    rearVisionInputs.timestamp,
+                    VecBuilder.fill(0.7 * rearVisionInputs.avgTagDist, 0.7 * rearVisionInputs.avgTagDist, 999999999));
+        }
+
+        // Update if PID gains have changed
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    aimAtFeedback.setP(aimAtkP.get());
+                    aimAtFeedback.setI(aimAtkI.get());
+                    aimAtFeedback.setD(aimAtkD.get());
+                },
+                aimAtkP,
+                aimAtkI,
+                aimAtkD);
     }
 
     /**
@@ -175,14 +211,14 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         }
 
         // Log states
-        Logger.recordOutput("SwerveStates/States", swerveModuleStates);
-        Logger.recordOutput("SwerveStates/StatesOptimized", optimizedStates);
+        Logger.recordOutput("Drivetrain/Swerve/TargetStates", swerveModuleStates);
+        Logger.recordOutput("Drivetrain/Swerve/TargetStatesOptimized", optimizedStates);
     }
 
     /**
      * @return Current pose from pose estimator
      */
-    @AutoLogOutput(key = "Odometry/Robot")
+    @AutoLogOutput(key = "Drivetrain/Odometry/Robot")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
@@ -194,6 +230,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         return getPose().getRotation();
     }
 
+    /**
+     * Resets pose estimator to provided pose
+     * @param pose
+     */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
@@ -201,7 +241,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     /**
      * @return An array of module positions
      */
-    @AutoLogOutput(key = "Swerve/Positions")
+    @AutoLogOutput(key = "Drivetrain/Swerve/Positions")
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
@@ -213,7 +253,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     /**
      * @return An array of module states
      */
-    @AutoLogOutput(key = "Swerve/States")
+    @AutoLogOutput(key = "Drivetrain/Swerve/States")
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
@@ -222,29 +262,50 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         return states;
     }
 
-    public void stop() {
+    /**
+     * Stop the drivetrain by setting empty chassis speed
+     */
+    private void stop() {
         setTargetChassisSpeeds(new ChassisSpeeds());
     }
 
-    public void stopWithX() {
+    /**
+     * @return Command for stop
+     */
+    public Command stopCommand() {
+        return this.runOnce(this::stopCommand);
+    }
+
+    /**
+     * Puts swerve wheels in an x pattern to prevent movement
+     */
+    private void stopWithX() {
         swerveModules[0].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         swerveModules[1].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
         swerveModules[2].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
         swerveModules[3].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
     }
 
+    /**
+     * @return Command for stopWithX
+     */
+    public Command stopWithXCommand() {
+        return this.runOnce(this::stopWithX);
+    }
+
+    /**
+     * Zeroes encoder on a hardware level
+     */
     private void zeroGyro() {
         gyroIO.zeroYaw();
     }
 
+    /**
+     * @return Command for zeroGyro
+     */
     public Command zeroGyroCommand() {
         return this.runOnce(this::zeroGyro);
     }
-
-    // public static Command aimAtPointCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier
-    // omegaSupplier, Supplier<Translation2d> pointSupplier) {
-    //     return runEnd(() -> )
-    // }
 
     /**
      * Drive command for teleoperated control. Defaults to field oriented
@@ -323,7 +384,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                         Rotation2d adjustedAngle = new Rotation2d(
                                 adjustedPoint.getX() - currentPose.getX(), adjustedPoint.getY() - currentPose.getY());
 
-                        double rotateOutput = swerveDrivetrainSubsystem.aimController.calculate(
+                        double rotateOutput = swerveDrivetrainSubsystem.aimAtFeedback.calculate(
                                 currentPose.getRotation().getDegrees() + 180, adjustedAngle.getDegrees());
                         swerveDrivetrainSubsystem.setTargetChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
                                 velocityOutput * Math.cos(moveDirection),
