@@ -160,7 +160,6 @@ public class RobotContainer {
                                         intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
                                         feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
                                 shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3)));
-
         NamedCommands.registerCommand(
                 "armSubwoofer",
                 armSubsystem
@@ -173,16 +172,16 @@ public class RobotContainer {
                         .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE)));
         NamedCommands.registerCommand(
                 "shoot",
-                Commands.parallel(Commands.parallel(
-                                intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
-                                feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
-                        .andThen(
-                                Commands.parallel(
-                                        shooterSubsystem.runRPMCommand(-1500, 0, 1, 2, 3),
-                                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                        intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
-                                        feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
-                                shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3))));
+                Commands.sequence(
+                        shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3).withTimeout(0.25),
+                        feederSubsystem.runVoltage(-12).withTimeout(0.0625),
+                        shooterSubsystem.runRPMCommand(topRightShooterSpeed.get(), 0),
+                        shooterSubsystem.runRPMCommand(topLeftShooterSpeed.get(), 1),
+                        shooterSubsystem.runRPMCommand(bottomLeftShooterSpeed.get(), 2),
+                        shooterSubsystem.runRPMCommand(bottomRightShooterSpeed.get(), 3),
+                        Commands.waitSeconds(1),
+                        feederSubsystem.runVoltage(12).withTimeout(1),
+                        shooterSubsystem.stopShooterCommand()));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
