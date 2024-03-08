@@ -12,39 +12,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "ToCenterNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FromCenterNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToSourceNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FromSourceNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToAmpNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FromAmpNote"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToCenterNote"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoIntake"
+                }
+              }
+            ]
           }
         }
       ]
