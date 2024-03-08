@@ -39,6 +39,9 @@ public class FeederIOSparkMax implements FeederIO {
 
         encoder.setPosition(0);
 
+        topMotor.setInverted(true);
+        bottomMotor.follow(topMotor, false);
+
         topMotor.burnFlash();
         bottomMotor.burnFlash();
     }
