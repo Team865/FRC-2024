@@ -353,7 +353,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
                     Translation2d pointAt = swerveDrivetrainSubsystem.getPointAt();
 
-                    // Aim at code courtesy of FRC 418
+                    /* Aim at code courtesy of FRC 418 */
                     if (pointAt != null) {
                         double velocityOutput = Math.hypot(xVelocity, yVelocity);
                         double moveDirection = Math.atan2(yVelocity, xVelocity);
@@ -376,7 +376,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                         Vector2D parallelRobotVector = targetVector.scalarMultiply(
                                 robotVector.dotProduct(targetVector) / targetVector.getNormSq());
                         // Perpendicular component of robot's motion to target vector
-                        Vector2D perpendicularRobotVector = robotVector.subtract(parallelRobotVector);
+                        Vector2D perpendicularRobotVector =
+                                robotVector.subtract(parallelRobotVector).scalarMultiply(0.1);
                         // Adjust aim point using calculated vector
                         Translation2d adjustedPoint = pointAt.minus(
                                 new Translation2d(perpendicularRobotVector.getX(), perpendicularRobotVector.getY()));
