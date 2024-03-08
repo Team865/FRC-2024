@@ -79,12 +79,10 @@ public class RobotContainer {
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                VisionIO[] visionArray = {
-                    new VisionIOLimelight("limelight-forward"), new VisionIOLimelight("limelight-reverse")
-                };
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
                         new GyroIONavX() {},
-                        visionArray,
+                        new VisionIOLimelight("limelight-front"),
+                        new VisionIOLimelight("limelight-rear"),
                         new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0.488)),
                         new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
@@ -103,7 +101,8 @@ public class RobotContainer {
             case SIM:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
                         new GyroIO() {},
-                        new VisionIO[] {},
+                        new VisionIO() {},
+                        new VisionIO() {},
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim(),
@@ -123,7 +122,8 @@ public class RobotContainer {
             default:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
                         new GyroIO() {},
-                        new VisionIO[] {},
+                        new VisionIO() {},
+                        new VisionIO() {},
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {},

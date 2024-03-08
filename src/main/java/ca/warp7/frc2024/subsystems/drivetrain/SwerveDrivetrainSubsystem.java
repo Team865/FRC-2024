@@ -39,8 +39,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-    private final VisionIO[] visionIO;
-    private final VisionIOInputsAutoLogged[] visionInputs;
+    private final VisionIO frontVisionIO;
+    private final VisionIOInputsAutoLogged frontVisionInputs = new VisionIOInputsAutoLogged();
+
+    private final VisionIO rearVisionIO;
+    private final VisionIOInputsAutoLogged rearVisionInputs = new VisionIOInputsAutoLogged();
 
     private final SwerveModule[] swerveModules;
 
@@ -61,19 +64,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
-            VisionIO[] visionIO,
+            VisionIO frontVisionIO,
+            VisionIO rearVisionIO,
             SwerveModuleIO frontRightSwerveModuleIO,
             SwerveModuleIO frontLeftSwerveModuleIO,
             SwerveModuleIO backLeftSwerveModuleIO,
             SwerveModuleIO backRightSwerveModuleIO) {
         this.gyroIO = gyroIO;
-        this.visionIO = visionIO;
-
-        visionInputs = new VisionIOInputsAutoLogged[visionIO.length];
-
-        for (int i = 0; i < visionIO.length; i++) {
-            visionInputs[i] = new VisionIOInputsAutoLogged();
-        }
+        this.frontVisionIO = frontVisionIO;
+        this.rearVisionIO = rearVisionIO;
 
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
 
@@ -109,13 +108,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /* Update and process inputs */
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Gyro", gyroInputs);
 
-        for (int i = 0; i < visionIO.length; i++) {
-            visionIO[i].updateInputs(visionInputs[i]);
-            Logger.processInputs("Vision", visionInputs[i]);
-        }
+        frontVisionIO.updateInputs(frontVisionInputs);
+        Logger.processInputs("Vision/Front", frontVisionInputs);
+
+        rearVisionIO.updateInputs(rearVisionInputs);
+        Logger.processInputs("Vision/Front", rearVisionInputs);
 
         for (var module : swerveModules) {
             module.periodic();
@@ -144,9 +145,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
 
-        if (visionInputs[1].tagCount > 1) {
-            poseEstimator.addVisionMeasurement(visionInputs[1].blueOriginRobotPose, visionInputs[1].timestamp);
-        }
+        // if (visionInputs[1].tagCount > 1) {
+        //     poseEstimator.addVisionMeasurement(visionInputs[1].blueOriginRobotPose, visionInputs[1].timestamp);
+        // }
 
         // Update pose estimator using vision
         // for (VisionIOInputsAutoLogged io : visionInputs) {
