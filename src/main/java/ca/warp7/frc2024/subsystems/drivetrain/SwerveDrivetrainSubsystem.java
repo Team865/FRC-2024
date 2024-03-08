@@ -2,6 +2,7 @@ package ca.warp7.frc2024.subsystems.drivetrain;
 
 import static ca.warp7.frc2024.Constants.DRIVETRAIN.*;
 import static ca.warp7.frc2024.Constants.OI.*;
+import static edu.wpi.first.units.Units.Volts;
 
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOInputsAutoLogged;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import lombok.Getter;
@@ -69,6 +71,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final LoggedTunableNumber aimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
     private final LoggedTunableNumber aimAtkI = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kI", 0);
     private final LoggedTunableNumber aimAtkD = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kD", 0);
+
+    private final SysIdRoutine sysId;
 
     // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
     // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
@@ -118,6 +122,19 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             Logger.recordOutput("Drivetrain/Odometry/TrajectoryTarget", targetPose);
         });
+
+        // Configure SysID Routine
+        sysId = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        null, null, null, (state) -> Logger.recordOutput("Drivetrain/SysIdState", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        (voltage) -> {
+                            for (int i = 0; i < 4; i++) {
+                                swerveModules[i].runCharacterization(voltage.in(Volts));
+                            }
+                        },
+                        null,
+                        this));
     }
 
     @Override
@@ -305,6 +322,14 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      */
     public Command zeroGyroCommand() {
         return this.runOnce(this::zeroGyro);
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
     }
 
     /**

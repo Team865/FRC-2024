@@ -82,6 +82,13 @@ public class SwerveModule {
         return optimizedState;
     }
 
+    public void runCharacterization(double volts) {
+        angleSetpoint = new Rotation2d();
+
+        moduleIO.setDriveVoltage(volts);
+        speedSetpoint = null;
+    }
+
     public void periodic() {
         moduleIO.updateInputs(moduleInputs);
         Logger.processInputs("Drivetrain/" + moduleName + "Module", moduleInputs);
