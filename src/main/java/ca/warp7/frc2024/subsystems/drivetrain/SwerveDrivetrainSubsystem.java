@@ -177,28 +177,39 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
 
-        // Update pose estimator using vision
-        if (frontVisionInputs.tagCount >= 2 && frontVisionInputs.avgTagDist < 3.5) {
-            poseEstimator.addVisionMeasurement(
-                    frontVisionInputs.blueOriginRobotPose,
-                    frontVisionInputs.timestamp,
-                    VecBuilder.fill(0.5, 0.5, 999999999));
-        } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist < 3.5) {
+        if (rearVisionInputs.tagCount >= 2) {
             poseEstimator.addVisionMeasurement(
                     rearVisionInputs.blueOriginRobotPose,
                     rearVisionInputs.timestamp,
-                    VecBuilder.fill(0.5, 0.5, 999999999));
-        } else if (frontVisionInputs.tagCount >= 1 && frontVisionInputs.avgTagDist < rearVisionInputs.avgTagDist) {
-            poseEstimator.addVisionMeasurement(
-                    frontVisionInputs.blueOriginRobotPose,
-                    frontVisionInputs.timestamp,
-                    VecBuilder.fill(0.7 * frontVisionInputs.avgTagDist, 0.7 * frontVisionInputs.avgTagDist, 999999999));
-        } else if (rearVisionInputs.tagCount >= 1) {
-            poseEstimator.addVisionMeasurement(
-                    rearVisionInputs.blueOriginRobotPose,
-                    rearVisionInputs.timestamp,
-                    VecBuilder.fill(0.7 * rearVisionInputs.avgTagDist, 0.7 * rearVisionInputs.avgTagDist, 999999999));
+                    VecBuilder.fill(0.7, 0.7, 999999999));
         }
+
+        // poseEstimator.addVisionMeasurement(, DEADBAND);
+
+        // Update pose estimator using vision
+        // if (frontVisionInputs.tagCount >= 2 && frontVisionInputs.avgTagDist < 3.5) {
+        //     poseEstimator.addVisionMeasurement(
+        //             frontVisionInputs.blueOriginRobotPose,
+        //             frontVisionInputs.timestamp,
+        //             VecBuilder.fill(0.5, 0.5, 999999999));
+        // } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist < 3.5) {
+        //     poseEstimator.addVisionMeasurement(
+        //             rearVisionInputs.blueOriginRobotPose,
+        //             rearVisionInputs.timestamp,
+        //             VecBuilder.fill(0.5, 0.5, 999999999));
+        // } else if (frontVisionInputs.tagCount >= 1 && frontVisionInputs.avgTagDist < rearVisionInputs.avgTagDist) {
+        //     poseEstimator.addVisionMeasurement(
+        //             frontVisionInputs.blueOriginRobotPose,
+        //             frontVisionInputs.timestamp,
+        //             VecBuilder.fill(0.7 * frontVisionInputs.avgTagDist, 0.7 * frontVisionInputs.avgTagDist,
+        // 999999999));
+        // } else if (rearVisionInputs.tagCount >= 1) {
+        //     poseEstimator.addVisionMeasurement(
+        //             rearVisionInputs.blueOriginRobotPose,
+        //             rearVisionInputs.timestamp,
+        //             VecBuilder.fill(0.7 * rearVisionInputs.avgTagDist, 0.7 * rearVisionInputs.avgTagDist,
+        // 999999999));
+        // }
 
         // Update if PID gains have changed
         LoggedTunableNumber.ifChanged(
