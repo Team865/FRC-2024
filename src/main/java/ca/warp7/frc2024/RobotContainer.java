@@ -161,6 +161,29 @@ public class RobotContainer {
                                         feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
                                 shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3)));
 
+        NamedCommands.registerCommand(
+                "armSubwoofer",
+                armSubsystem
+                        .setSetpointCommand(Setpoint.SUBWOOFER)
+                        .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)));
+        NamedCommands.registerCommand(
+                "armStow",
+                armSubsystem
+                        .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
+                        .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE)));
+        NamedCommands.registerCommand(
+                "shoot",
+                Commands.parallel(Commands.parallel(
+                                intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
+                                feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
+                        .andThen(
+                                Commands.parallel(
+                                        shooterSubsystem.runRPMCommand(-1500, 0, 1, 2, 3),
+                                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+                                        intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
+                                        feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
+                                shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3))));
+
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
 
