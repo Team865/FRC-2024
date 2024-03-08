@@ -36,6 +36,7 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -135,6 +136,30 @@ public class RobotContainer {
                 climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
                 ledSubsystem = new LEDSubsystem(0);
         }
+        // //.onTrue(Commands.parallel(
+        //         intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
+        //         feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger())
+        // )
+        // .andThen(Commands.parallel(
+        //         shooterSubsystem.runRPMCommand(-1500, 0,1,2,3),
+        //         ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+        //         intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
+        //         feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
+        // shooterSubsystem.runRPMCommand(0, 0,1,2,3)
+        // )
+
+        NamedCommands.registerCommand(
+                "autoIntake",
+                Commands.parallel(
+                                intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
+                                feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
+                        .andThen(
+                                Commands.parallel(
+                                        shooterSubsystem.runRPMCommand(-1500, 0, 1, 2, 3),
+                                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+                                        intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
+                                        feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
+                                shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3)));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
@@ -163,8 +188,6 @@ public class RobotContainer {
     }
 
     private void configureDriverBindings() {
-        climberSubsystem.setDefaultCommand(
-                ClimberSubsystem.climberCommand(climberSubsystem, () -> operator.getLeftY()));
 
         swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
                 swerveDrivetrainSubsystem,
@@ -235,6 +258,14 @@ public class RobotContainer {
         ));
 
         operator.b().onTrue(shooterSubsystem.stopShooterCommand().alongWith(feederSubsystem.runVoltage(0), intakeSubsystem.runVoltage(0)));
+
+        /* Climbing */
+        climberSubsystem.setDefaultCommand(
+                ClimberSubsystem.climberCommand(climberSubsystem, () -> operator.getLeftY()));
+
+        operator.leftStick().onTrue(climberSubsystem.toggleClimberLockout());
+
+        climberSubsystem.climberLockoutDisabledTrigger().onTrue(ledSubsystem.solidColorCommand(SparkColor.RED));
         // spotless:on
     }
 

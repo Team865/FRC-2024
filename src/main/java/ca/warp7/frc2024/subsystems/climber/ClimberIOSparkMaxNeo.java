@@ -1,5 +1,7 @@
 package ca.warp7.frc2024.subsystems.climber;
 
+import ca.warp7.frc2024.Constants.CLIMBER.STATE;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -20,6 +22,7 @@ public class ClimberIOSparkMaxNeo implements ClimberIO {
         motor.setSmartCurrentLimit(40);
         motor.setInverted(false);
         motor.burnFlash();
+        motor.setSoftLimit(SoftLimitDirection.kForward, STATE.CLIMBER_END.getStatePosition());
 
         intEncoder = motor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
     }

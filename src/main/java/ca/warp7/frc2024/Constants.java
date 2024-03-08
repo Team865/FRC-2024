@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import lombok.RequiredArgsConstructor;
 
 public final class Constants {
     public static enum MODE {
@@ -27,6 +28,22 @@ public final class Constants {
 
         public static final double MAX_VELOCITY_DEG = 4000;
         public static final double MAX_ACCELERATION_DEG = 2000;
+    }
+
+    public final class CLIMBER {
+        @RequiredArgsConstructor
+        public static enum STATE {
+            CLIMBER_START(0),
+            CLIMBER_START_HIGHEST(450),
+            CLIMBER_END_HIGHEST(750),
+            CLIMBER_END(1250);
+
+            private final float position;
+
+            public float getStatePosition() {
+                return position;
+            }
+        }
     }
 
     public class DRIVETRAIN {

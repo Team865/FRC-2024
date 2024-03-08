@@ -44,6 +44,14 @@ public class LEDSubsystem extends SubsystemBase {
         public final double sparkOutput;
     }
 
+    public enum LEDState {
+        INTAKING,
+        SHOOTING,
+        CLIMBING
+    }
+
+    private LEDState currentLEDState = LEDState.INTAKING;
+
     public LEDSubsystem(int port) {
         blinkin = new Spark(port);
 
@@ -56,7 +64,9 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (color != null) {
+        if (currentLEDState == LEDState.CLIMBING) {
+            
+        } else if (currentLEDState == LEDState.INTAKING) {
             blinkin.set(color.sparkOutput);
             Logger.recordOutput("LEDColor", color);
         }
@@ -79,5 +89,9 @@ public class LEDSubsystem extends SubsystemBase {
         return this.run(() -> blinkColor(color, interval))
                 .withTimeout(duration)
                 .finallyDo(() -> solidColor(defaultColor));
+    }
+
+    public Command setLEDState(LEDState state) {
+        return this.runOnce(() -> currentLEDState = state);
     }
 }

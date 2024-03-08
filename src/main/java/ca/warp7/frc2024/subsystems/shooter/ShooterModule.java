@@ -47,6 +47,7 @@ public class ShooterModule {
         return Units.radiansPerSecondToRotationsPerMinute(shooterModuleInputs.shooterVelocityRadPerSec);
     }
 
+
     /**
      * Set closed loop control target velocity
      * @param velocityRPM
