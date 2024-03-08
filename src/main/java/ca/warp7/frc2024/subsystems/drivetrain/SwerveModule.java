@@ -50,6 +50,8 @@ public class SwerveModule {
         }
         // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
         steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
+
+        
     }
 
     public double getDistanceMeters() {

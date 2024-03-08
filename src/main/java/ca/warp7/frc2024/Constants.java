@@ -33,7 +33,7 @@ public final class Constants {
         public static final double DRIVE_BASE_X = Units.inchesToMeters(24.750);
         public static final double DRIVE_BASE_Y = Units.inchesToMeters(24.750);
 
-        private static final double DRIVE_BASE_RADIUS = Math.hypot(DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0);
+        public static final double DRIVE_BASE_RADIUS = Math.hypot(DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0);
 
         public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
         public static final double WHEEL_RADIUS = WHEEL_DIAMETER / 2;

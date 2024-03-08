@@ -28,8 +28,8 @@ public class FeederIOSparkMax implements FeederIO {
         topMotor.setInverted(true);
         bottomMotor.follow(topMotor, false);
 
-        topMotor.setSmartCurrentLimit(15);
-        bottomMotor.setSmartCurrentLimit(15);
+        topMotor.setSmartCurrentLimit(20);
+        bottomMotor.setSmartCurrentLimit(20);
         topMotor.enableVoltageCompensation(12);
         bottomMotor.enableVoltageCompensation(12);
         topMotor.setIdleMode(IdleMode.kBrake);

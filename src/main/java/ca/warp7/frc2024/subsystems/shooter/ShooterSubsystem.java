@@ -86,6 +86,10 @@ public class ShooterSubsystem extends SubsystemBase {
         return this.runOnce(() -> setRPM(RPM, shooterModules));
     }
 
+    public Command runVoltageCommand(double volts, int... shooterModules) {
+        return this.runOnce(() -> runShooterVolts(volts, shooterModules));
+    }
+
     public Command stopShooterCommand() {
         return this.runOnce(() -> stopShooter());
     }

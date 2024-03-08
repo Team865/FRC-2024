@@ -26,7 +26,7 @@ public class FeederSubsystem extends SubsystemBase {
     }
 
     public Trigger sensorTrigger() {
-        return new Trigger(() -> getSensor()).debounce(0.075);
+        return new Trigger(() -> getSensor()).debounce(0.0);
     }
 
     @Override

@@ -13,12 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -51,10 +50,12 @@ public class ArmSubsystem extends SubsystemBase {
     /* Setpoints */
     @RequiredArgsConstructor
     public enum Setpoint {
-        HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 1)),
+        HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 0)),
         STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 30)),
         AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 30)),
         TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 30)),
+        PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 65)),
+        SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 30)),
         IDLE(() -> 0);
 
         private final DoubleSupplier armSetpointSupplier;
@@ -68,8 +69,6 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    @Setter
-    @Getter
     private Setpoint setpoint = Setpoint.IDLE;
 
     private Rotation2d armOffset = null;
@@ -90,6 +89,8 @@ public class ArmSubsystem extends SubsystemBase {
         mechanismRoot = mechanism.getRoot("Superstructure", 0.585, 0.595);
         mechanismLigament = mechanismRoot.append(new MechanismLigament2d(
                 "ArmShooter", 0.5, getIdealIncrementalAngle().getDegrees(), 2, new Color8Bit(Color.kAqua)));
+
+        setpoint = Setpoint.HANDOFF_INTAKE;
     }
 
     private Rotation2d getIdealIncrementalAngle() {
@@ -159,11 +160,15 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    public boolean atSetpoint(Setpoint setpoint) {
+    private boolean atSetpoint(Setpoint setpoint) {
         return this.setpoint == setpoint && feedback.atGoal() ? true : false;
     }
 
     public Trigger atSetpointTrigger(Setpoint setpoint) {
         return new Trigger(() -> atSetpoint(setpoint)).debounce(0.1);
+    }
+
+    public Command setSetpointCommand(Setpoint setpoint) {
+        return this.runOnce(() -> this.setpoint = setpoint);
     }
 }

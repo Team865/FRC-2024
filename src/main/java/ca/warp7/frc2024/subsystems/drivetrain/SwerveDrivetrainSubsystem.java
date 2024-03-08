@@ -3,22 +3,35 @@ package ca.warp7.frc2024.subsystems.drivetrain;
 import static ca.warp7.frc2024.Constants.DRIVETRAIN.*;
 import static ca.warp7.frc2024.Constants.OI.*;
 
+import ca.warp7.frc2024.subsystems.vision.VisionIO;
+import ca.warp7.frc2024.subsystems.vision.VisionIOInputsAutoLogged;
 import ca.warp7.frc2024.util.SensitivityGainAdjustment;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -26,10 +39,18 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
+    private final VisionIO[] visionIO;
+    private final VisionIOInputsAutoLogged[] visionInputs;
+
     private final SwerveModule[] swerveModules;
 
     private final SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(SWERVE_MODULE_TRANSLATIONS);
     private Rotation2d rawGyroRotation = new Rotation2d();
+    private final PIDController aimController;
+
+    @Getter
+    @Setter
+    private Translation2d pointAt;
 
     private SwerveModulePosition[] lastModulePositions = new SwerveModulePosition[] {
         new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()
@@ -40,11 +61,21 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
+            VisionIO[] visionIO,
             SwerveModuleIO frontRightSwerveModuleIO,
             SwerveModuleIO frontLeftSwerveModuleIO,
             SwerveModuleIO backLeftSwerveModuleIO,
             SwerveModuleIO backRightSwerveModuleIO) {
         this.gyroIO = gyroIO;
+        this.visionIO = visionIO;
+
+        visionInputs = new VisionIOInputsAutoLogged[visionIO.length];
+
+        for (int i = 0; i < visionIO.length; i++) {
+            visionInputs[i] = new VisionIOInputsAutoLogged();
+        }
+
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
 
         swerveModules = new SwerveModule[] {
             new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight"),
@@ -52,15 +83,42 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft"),
             new SwerveModule(backRightSwerveModuleIO, 3, "BackRight")
         };
+
+        aimController = new PIDController(0.04, 0, 0);
+        aimController.enableContinuousInput(-180, 180);
+
+        setPose(new Pose2d(0, 0, new Rotation2d()));
+
+        AutoBuilder.configureHolonomic(
+                this::getPose,
+                this::setPose,
+                () -> swerveDriveKinematics.toChassisSpeeds(getModuleStates()),
+                this::setTargetChassisSpeeds,
+                new HolonomicPathFollowerConfig(MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+                () -> DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get() == Alliance.Red,
+                this);
+
+        PathPlannerLogging.setLogActivePathCallback((activePath) -> {
+            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+        });
+        PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
+            Logger.recordOutput("Odometry/TrajectoryTarget", targetPose);
+        });
     }
 
     @Override
     public void periodic() {
         gyroIO.updateInputs(gyroInputs);
-        Logger.processInputs("Drivetrain/Gyro", gyroInputs);
+        Logger.processInputs("Gyro", gyroInputs);
 
-        for (var SwerveModule : swerveModules) {
-            SwerveModule.periodic();
+        for (int i = 0; i < visionIO.length; i++) {
+            visionIO[i].updateInputs(visionInputs[i]);
+            Logger.processInputs("Vision", visionInputs[i]);
+        }
+
+        for (var module : swerveModules) {
+            module.periodic();
         }
 
         if (DriverStation.isDisabled()) {}
@@ -85,6 +143,18 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
+
+        if (visionInputs[1].tagCount > 1) {
+            poseEstimator.addVisionMeasurement(visionInputs[1].blueOriginRobotPose, visionInputs[1].timestamp);
+        }
+
+        // Update pose estimator using vision
+        // for (VisionIOInputsAutoLogged io : visionInputs) {
+        //     // Only update if more than 1 tag is seen per limelight and we're close
+        //     if (io.tagCount > 1 && io.avgTagDist < 5.0) {
+        //         poseEstimator.addVisionMeasurement(io.blueOriginRobotPose, io.timestamp);
+        //     }
+        // }
     }
 
     /**
@@ -108,25 +178,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         Logger.recordOutput("SwerveStates/StatesOptimized", optimizedStates);
     }
 
-    // public void setTargetChassisSpeeds(ChassisSpeeds speeds, Translation2d point) {
-
-    //     P
-
-    //     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    //     SwerveModuleState[] swerveModuleStates = swerveDriveKinematics.toSwerveModuleStates(discreteSpeeds);
-    //     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, MAX_LINEAR_SPEED);
-
-    //     // Set individual modules target state
-    //     SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
-    //     for (int i = 0; i <= 3; i++) {
-    //         optimizedStates[i] = swerveModules[i].setTargetState(swerveModuleStates[i]);
-    //     }
-
-    //     // Log states
-    //     Logger.recordOutput("SwerveStates/States", swerveModuleStates);
-    //     Logger.recordOutput("SwerveStates/StatesOptimized", optimizedStates);
-    // }
-
     /**
      * @return Current pose from pose estimator
      */
@@ -140,6 +191,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      */
     public Rotation2d getRobotRotation() {
         return getPose().getRotation();
+    }
+
+    public void setPose(Pose2d pose) {
+        poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
     /**
@@ -164,6 +219,25 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             states[i] = swerveModules[i].getState();
         }
         return states;
+    }
+
+    public void stop() {
+        setTargetChassisSpeeds(new ChassisSpeeds());
+    }
+
+    public void stopWithX() {
+        swerveModules[0].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        swerveModules[1].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+        swerveModules[2].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        swerveModules[3].setTargetState(new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+    }
+
+    private void zeroGyro() {
+        gyroIO.zeroYaw();
+    }
+
+    public Command zeroGyroCommand() {
+        return this.runOnce(this::zeroGyro);
     }
 
     // public static Command aimAtPointCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier
@@ -215,12 +289,54 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                     Logger.recordOutput("OI/y Velocity", yVelocity);
                     Logger.recordOutput("OI/Omega", omega);
 
-                    if (robotOrientedSupplier.getAsBoolean()) {
-                        swerveDrivetrainSubsystem.setTargetChassisSpeeds(
-                                new ChassisSpeeds(xVelocity, yVelocity, omega));
-                    } else {
+                    Translation2d pointAt = swerveDrivetrainSubsystem.getPointAt();
+
+                    // Aim at code courtesy of FRC 418
+                    if (pointAt != null) {
+                        double velocityOutput = Math.hypot(xVelocity, yVelocity);
+                        double moveDirection = Math.atan2(yVelocity, xVelocity);
+
+                        Pose2d currentPose = swerveDrivetrainSubsystem.getPose();
+                        Rotation2d targetAngle = new Rotation2d(
+                                pointAt.getX() - currentPose.getX(), pointAt.getY() - currentPose.getY());
+
+                        Vector2D robotVector = new Vector2D(
+                                velocityOutput * currentPose.getRotation().getCos(),
+                                velocityOutput * currentPose.getRotation().getSin());
+                        // Aim point
+                        Translation2d aimPoint =
+                                pointAt.minus(new Translation2d(robotVector.getX(), robotVector.getY()));
+                        // Vector from robot to target
+                        Vector2D targetVector = new Vector2D(
+                                currentPose.getTranslation().getDistance(pointAt) * targetAngle.getCos(),
+                                currentPose.getTranslation().getDistance(pointAt) * targetAngle.getSin());
+                        // Parallel component of robot's motion to target vector
+                        Vector2D parallelRobotVector = targetVector.scalarMultiply(
+                                robotVector.dotProduct(targetVector) / targetVector.getNormSq());
+                        // Perpendicular component of robot's motion to target vector
+                        Vector2D perpendicularRobotVector = robotVector.subtract(parallelRobotVector);
+                        // Adjust aim point using calculated vector
+                        Translation2d adjustedPoint = pointAt.minus(
+                                new Translation2d(perpendicularRobotVector.getX(), perpendicularRobotVector.getY()));
+                        // Calculate new angle using adjusted point
+                        Rotation2d adjustedAngle = new Rotation2d(
+                                adjustedPoint.getX() - currentPose.getX(), adjustedPoint.getY() - currentPose.getY());
+
+                        double rotateOutput = swerveDrivetrainSubsystem.aimController.calculate(
+                                currentPose.getRotation().getDegrees() + 180, adjustedAngle.getDegrees());
                         swerveDrivetrainSubsystem.setTargetChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
-                                xVelocity, yVelocity, omega, swerveDrivetrainSubsystem.getRobotRotation()));
+                                velocityOutput * Math.cos(moveDirection),
+                                velocityOutput * Math.sin(moveDirection),
+                                rotateOutput,
+                                swerveDrivetrainSubsystem.getRobotRotation()));
+                    } else {
+                        if (robotOrientedSupplier.getAsBoolean()) {
+                            swerveDrivetrainSubsystem.setTargetChassisSpeeds(
+                                    new ChassisSpeeds(xVelocity, yVelocity, omega));
+                        } else {
+                            swerveDrivetrainSubsystem.setTargetChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    xVelocity, yVelocity, omega, swerveDrivetrainSubsystem.getRobotRotation()));
+                        }
                     }
                 },
                 swerveDrivetrainSubsystem);

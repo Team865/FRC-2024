@@ -21,7 +21,7 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
         // TODO: FIX config
         motor.enableVoltageCompensation(12.0);
         motor.setSmartCurrentLimit(15);
-        motor.setIdleMode(IdleMode.kCoast);
+        motor.setIdleMode(IdleMode.kBrake);
         if (invert) {
             motor.setInverted(true);
         }
