@@ -35,6 +35,7 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
 import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -68,11 +69,6 @@ public class RobotContainer {
             new LoggedDashboardNumber("Bottom Left Shooter Speed", 8000.0);
     private final LoggedDashboardNumber bottomRightShooterSpeed =
             new LoggedDashboardNumber("Bottom Right Shooter Speed", 8000.0);
-
-    private final LoggedDashboardNumber feederVolts = new LoggedDashboardNumber("Feeder Volts", -6);
-    private final LoggedDashboardNumber reverseFeederVolts = new LoggedDashboardNumber("Reverse Feeder Volts", 6);
-
-    private final LoggedDashboardNumber intakeVolts = new LoggedDashboardNumber("Intake Volts", -6);
 
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
@@ -140,7 +136,8 @@ public class RobotContainer {
                 ledSubsystem = new LEDSubsystem(0);
         }
 
-        autonomousRoutineChooser = new LoggedDashboardChooser<>("Autonomous Routine Chooser");
+        autonomousRoutineChooser =
+                new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
 
         if (Constants.TUNING_MODE) {
             autonomousRoutineChooser.addOption(

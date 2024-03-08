@@ -106,6 +106,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         aimAtFeedback = new PIDController(aimAtkP.get(), aimAtkI.get(), aimAtkD.get());
         aimAtFeedback.enableContinuousInput(-180, 180);
 
+        setPose(new Pose2d(0, 0, new Rotation2d()));
+
         // Configure PathPlanner
         AutoBuilder.configureHolonomic(
                 this::getPose,
