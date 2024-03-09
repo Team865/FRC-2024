@@ -147,6 +147,7 @@ public class RobotContainer {
         }
 
         simpleIntake = Commands.parallel(
+                        ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
                         intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
                         feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
                 .andThen(

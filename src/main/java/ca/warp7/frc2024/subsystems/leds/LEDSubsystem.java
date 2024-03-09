@@ -6,12 +6,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class LEDSubsystem extends SubsystemBase {
     private Spark blinkin;
 
     @Getter
+    @AutoLogOutput(key = "LED/Color")
     private SparkColor color;
 
     private SparkColor defaultColor = SparkColor.WHITE;
@@ -50,6 +51,7 @@ public class LEDSubsystem extends SubsystemBase {
         CLIMBING
     }
 
+    @AutoLogOutput(key = "LED/State")
     private LEDState currentLEDState = LEDState.INTAKING;
 
     public LEDSubsystem(int port) {
@@ -64,12 +66,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (currentLEDState == LEDState.CLIMBING) {
-            
-        } else if (currentLEDState == LEDState.INTAKING) {
-            blinkin.set(color.sparkOutput);
-            Logger.recordOutput("LEDColor", color);
-        }
+        blinkin.set(color.sparkOutput);
     }
 
     private void solidColor(SparkColor color) {
