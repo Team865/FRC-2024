@@ -43,7 +43,9 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void runVoltage(double volts) {
-        io.setVoltage(volts);
+        if (!lockedOut) {
+            io.setVoltage(volts);
+        }
     }
 
     public Trigger climberLockoutDisabledTrigger() {
