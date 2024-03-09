@@ -352,8 +352,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     public Command zeroGyroAndPoseCommand() {
         return this.runOnce(() -> {
-            this.zeroGyro();
-
             if (DriverStation.getAlliance().get() == Alliance.Red) {
                 this.setPose(new Pose2d(
                         this.getPose().getTranslation(), new Rotation2d().plus(Rotation2d.fromDegrees(180))));
@@ -411,7 +409,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                     if (DriverStation.getAlliance().get() == Alliance.Red) {
                         xVelocity *= -1.0;
                         yVelocity *= -1.0;
-                        omega *= -1.0;
                     }
 
                     // Log raw inputs

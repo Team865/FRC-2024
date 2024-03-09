@@ -4,6 +4,7 @@
 
 package ca.warp7.frc2024;
 
+import ca.warp7.frc2024.Constants.CLIMBER.STATE;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMax;
@@ -165,21 +166,22 @@ public class RobotContainer {
                 shooterSubsystem.stopShooterCommand());
 
         simpleAmp = Commands.sequence(
-                shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3),
-                feederSubsystem.runVoltage(-12),
-                Commands.waitSeconds(0.75),
-                shooterSubsystem.stopShooterCommand(),
-                feederSubsystem.runVoltage(0));
+                Commands.parallel(
+                                shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3),
+                                feederSubsystem.runVoltage(-12).withTimeout(0.0625))
+                        .withTimeout(3),
+                Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltage(0))
+                        .withTimeout(0.125));
 
         noteFlowForward = Commands.parallel(
-                intakeSubsystem.runVoltage(10),
-                feederSubsystem.runVoltage(10),
-                shooterSubsystem.runRPMCommand(8000, 0, 1, 2, 3));
+                intakeSubsystem.runVoltage(8),
+                feederSubsystem.runVoltage(8),
+                shooterSubsystem.runRPMCommand(6000, 0, 1, 2, 3));
 
         noteFlowReverse = Commands.parallel(
-                intakeSubsystem.runVoltage(-10),
-                feederSubsystem.runVoltage(-10),
-                shooterSubsystem.runRPMCommand(-8000, 0, 1, 2, 3));
+                intakeSubsystem.runVoltage(-11),
+                feederSubsystem.runVoltage(-8),
+                shooterSubsystem.runRPMCommand(-6000, 0, 1, 2, 3));
 
         stopNoteFlow = Commands.parallel(
                 intakeSubsystem.runVoltage(0), feederSubsystem.runVoltage(0), shooterSubsystem.stopShooterCommand());
@@ -301,11 +303,11 @@ public class RobotContainer {
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(simpleShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.AMP)).onTrue(simpleAmp);
-
+//fix amp score
 
         /* Override Procedures */
         operator.leftBumper().onTrue(noteFlowReverse).onFalse(stopNoteFlow);
-        operator.rightBumper().onTrue(noteFlowForward).onTrue(stopNoteFlow);
+        operator.rightBumper().onTrue(noteFlowForward).onFalse(stopNoteFlow);
         operator.b().onTrue(stopNoteFlow);
 
         /* Climbing */
@@ -314,6 +316,9 @@ public class RobotContainer {
         operator.leftStick().onTrue(climberSubsystem.toggleClimberLockout());
 
         climberSubsystem.climberLockoutDisabledTrigger().onTrue(ledSubsystem.solidColorCommand(SparkColor.RED));
+        climberSubsystem.climberInState(STATE.CLIMBER_START_HIGHEST).onTrue(ledSubsystem.solidColorCommand(SparkColor.ORANGE));
+        climberSubsystem.climberInState(STATE.CLIMBER_END).onTrue(ledSubsystem.solidColorCommand(SparkColor.YELLOW));
+
         // spotless:on
     }
 

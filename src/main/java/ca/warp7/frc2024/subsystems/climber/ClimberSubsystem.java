@@ -52,6 +52,10 @@ public class ClimberSubsystem extends SubsystemBase {
         return new Trigger(() -> !lockedOut);
     }
 
+    public Trigger climberInState(STATE state) {
+        return new Trigger(() -> state == this.currentState);
+    }
+
     public Command setClimberLockout(boolean lockoutEnabled) {
         return this.runOnce(() -> lockedOut = lockoutEnabled);
     }
