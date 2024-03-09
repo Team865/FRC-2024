@@ -64,7 +64,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             VecBuilder.fill(0.05, 0.05, 0.05),
             VecBuilder.fill(0.5, 0.5, 999999999));
 
-    private SwerveDrivePoseEstimator poseEstimatorNoVision =
+    private SwerveDrivePoseEstimator poseEstimatorVision =
             new SwerveDrivePoseEstimator(swerveDriveKinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
     /* Controllers */
@@ -193,10 +193,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
-        poseEstimatorNoVision.update(rawGyroRotation, getModulePositions());
+        poseEstimatorVision.update(rawGyroRotation, getModulePositions());
 
-        if (rearVisionInputs.tagCount >= 1 && rearVisionInputs.avgTagDist < 2) {
-            poseEstimator.addVisionMeasurement(
+        if (rearVisionInputs.tagCount >= 2) {
+            poseEstimatorVision.addVisionMeasurement(
                     rearVisionInputs.blueOriginRobotPose,
                     rearVisionInputs.timestamp,
                     VecBuilder.fill(0.7, 0.7, 999999999));
@@ -272,8 +272,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Drivetrain/Odometry/RobotNoVision")
-    public Pose2d getPoseNoVision() {
-        return poseEstimatorNoVision.getEstimatedPosition();
+    public Pose2d getPoseVision() {
+        return poseEstimatorVision.getEstimatedPosition();
     }
 
     /**
@@ -289,7 +289,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
-        poseEstimatorNoVision.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        poseEstimatorVision.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
     /**

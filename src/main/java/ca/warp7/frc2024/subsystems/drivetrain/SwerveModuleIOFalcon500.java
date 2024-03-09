@@ -69,7 +69,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         this.steerAppliedVolts = steerTalonFX.getMotorVoltage();
         this.steerCurrent = steerTalonFX.getStatorCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, steerPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(200, drivePosition, steerPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50,
                 driveVelocity,
@@ -105,7 +105,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 .minus(absoluteEncoderOffset);
         inputs.steerPosition = Rotation2d.fromRotations(steerPosition.getValueAsDouble() / STEER_GEAR_RATIO);
         inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble()) / STEER_GEAR_RATIO;
-        inputs.steerAppliedVolts = steerAppliedVolts.getValueAsDouble();
+        inputs.steerAppliedVolts = steerAppliedVolts.getValueAsDouble(); 
         inputs.steerCurrentAmps = steerCurrent.getValueAsDouble();
     }
 

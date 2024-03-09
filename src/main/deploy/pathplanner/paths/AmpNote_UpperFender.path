@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.9,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.840294240773667,
+        "y": 6.983305934204462
+      },
+      "isLocked": false,
+      "linkedName": "AmpNote"
+    },
+    {
+      "anchor": {
+        "x": 0.74,
+        "y": 6.70324920742434
+      },
+      "prevControl": {
+        "x": 1.6419504181600957,
+        "y": 6.944646704108224
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "AmpSubwoofer"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 60.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}
