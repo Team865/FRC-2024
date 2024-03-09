@@ -72,7 +72,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
         this.steerAbsolutePosition = cancoder.getAbsolutePosition();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(100, drivePosition, steerPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, steerPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50,
                 driveVelocity,
