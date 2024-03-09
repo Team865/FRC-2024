@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 
 public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
     private final TalonFX driveTalonFX;
@@ -36,6 +37,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
         steerTalonFX = new TalonFX(steerTalonID, "CANivore");
+        Timer.delay(2);
         cancoder = new CANcoder(cancoderID, "CANivore");
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
