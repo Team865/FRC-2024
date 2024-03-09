@@ -1,0 +1,56 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7420213082613666,
+      "y": 6.69184359295058
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "UpperSub_UpperNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "UpperNote_UpperSub"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "armSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "simpleShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "armSubwoofer"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

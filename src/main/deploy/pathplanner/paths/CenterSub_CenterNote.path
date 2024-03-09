@@ -3,59 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.74,
-        "y": 6.70324920742434
+        "x": 1.35,
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9103444159779099,
-        "y": 6.906257777144377
+        "x": 1.85,
+        "y": 5.55
       },
       "isLocked": false,
-      "linkedName": "AmpSubwoofer"
+      "linkedName": "CenterSubwoofer"
     },
     {
       "anchor": {
-        "x": 1.75,
-        "y": 7.0
+        "x": 3.002149596891787,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 1.0,
-        "y": 7.0
-      },
-      "nextControl": {
-        "x": 2.5,
-        "y": 7.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.9,
-        "y": 7.0
-      },
-      "prevControl": {
-        "x": 2.9087723073594294,
-        "y": 7.021233442929849
+        "x": 2.502149596891787,
+        "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpNote"
+      "linkedName": "CenterNote"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 0.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "sequential",
         "data": {
@@ -63,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "autoIntake"
+                "name": "simpleIntake"
               }
             }
           ]
@@ -79,14 +57,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 60.0,
+    "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

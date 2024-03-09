@@ -79,6 +79,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 steerVelocity,
                 steerAppliedVolts,
                 steerCurrent);
+        cancoder.optimizeBusUtilization();
         driveTalonFX.optimizeBusUtilization();
         steerTalonFX.optimizeBusUtilization();
     }
@@ -91,7 +92,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 driveAppliedVolts,
                 driveCurrent,
                 steerPosition,
-                steerAbsolutePosition,
+                steerVelocity,
                 steerAbsolutePosition,
                 steerAppliedVolts,
                 steerCurrent);
