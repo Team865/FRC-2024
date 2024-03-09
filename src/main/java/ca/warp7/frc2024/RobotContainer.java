@@ -89,8 +89,8 @@ public class RobotContainer {
                         new GyroIONavX() {},
                         new VisionIOLimelight("limelight-front"),
                         new VisionIOLimelight("limelight-rear"),
-                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0)),
                         new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
+                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0)),
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
                 armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
