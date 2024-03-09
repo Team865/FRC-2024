@@ -69,13 +69,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "shoot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "armStow"
+                  "name": "autoShoot"
                 }
               }
             ]
