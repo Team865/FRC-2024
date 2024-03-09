@@ -32,8 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -79,9 +78,23 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
 
     /* Setpoints */
-    @Getter
-    @Setter
-    private Translation2d pointAt;
+    @RequiredArgsConstructor
+    public enum PointAtLocation {
+        NONE(new Translation2d()),
+        SPEAKER(new Translation2d(0.25, 5.55));
+
+        private final Translation2d bluePoint;
+
+        public Translation2d getTranslatedPoint() {
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                return new Translation2d(16.54 - bluePoint.getX(), bluePoint.getY());
+            } else {
+                return bluePoint;
+            }
+        }
+    }
+
+    private PointAtLocation pointAt = PointAtLocation.NONE;
 
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
@@ -337,6 +350,23 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         return this.runOnce(this::zeroGyro);
     }
 
+    public Command zeroGyroAndPoseCommand() {
+        return this.runOnce(() -> {
+            this.zeroGyro();
+
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                this.setPose(new Pose2d(
+                        this.getPose().getTranslation(), new Rotation2d().plus(Rotation2d.fromDegrees(180))));
+            } else {
+                this.setPose(new Pose2d(this.getPose().getTranslation(), new Rotation2d()));
+            }
+        });
+    }
+
+    public Command setPointAtCommand(PointAtLocation pointAt) {
+        return this.runOnce(() -> this.pointAt = pointAt);
+    }
+
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return sysId.quasistatic(direction);
     }
@@ -378,6 +408,12 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                                     MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND))
                             * MAX_ANGULAR_SPEED;
 
+                    if (DriverStation.getAlliance().get() == Alliance.Red) {
+                        xVelocity *= -1.0;
+                        yVelocity *= -1.0;
+                        omega *= -1.0;
+                    }
+
                     // Log raw inputs
                     Logger.recordOutput("OI/Raw x Velocity", rawxVelocity);
                     Logger.recordOutput("OI/Raw y Velocity", rawyVelocity);
@@ -389,7 +425,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                     Logger.recordOutput("OI/y Velocity", yVelocity);
                     Logger.recordOutput("OI/Omega", omega);
 
-                    Translation2d pointAt = swerveDrivetrainSubsystem.getPointAt();
+                    Translation2d pointAt = swerveDrivetrainSubsystem.pointAt == PointAtLocation.NONE
+                            ? null
+                            : swerveDrivetrainSubsystem.pointAt.getTranslatedPoint();
 
                     /* Aim at code courtesy of FRC 418 */
                     if (pointAt != null) {
