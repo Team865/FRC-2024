@@ -185,6 +185,10 @@ public class RobotContainer {
         stopNoteFlow = Commands.parallel(
                 intakeSubsystem.runVoltage(0), feederSubsystem.runVoltage(0), shooterSubsystem.stopShooterCommand());
 
+                                NamedCommands.registerCommand("Shoot2", simpleShoot);
+
+                NamedCommands.registerCommand("Shoot2", simpleShoot);
+
         NamedCommands.registerCommand(
                 "autoIntake",
                 Commands.parallel(

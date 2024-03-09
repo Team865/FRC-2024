@@ -69,7 +69,19 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoShoot"
+                  "name": "armSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "armStow"
                 }
               }
             ]
