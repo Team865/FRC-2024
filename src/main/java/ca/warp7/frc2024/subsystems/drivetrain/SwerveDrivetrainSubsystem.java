@@ -190,7 +190,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
 
-        if (rearVisionInputs.tagCount >= 2) {
+        if (rearVisionInputs.tagCount >= 1 && rearVisionInputs.avgTagDist < 2) {
             poseEstimator.addVisionMeasurement(
                     rearVisionInputs.blueOriginRobotPose,
                     rearVisionInputs.timestamp,

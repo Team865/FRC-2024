@@ -166,7 +166,7 @@ public class RobotContainer {
                 shooterSubsystem.stopShooterCommand());
 
         simpleAmp = Commands.sequence(
-                Commands.parallel(shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3), feederSubsystem.runVoltage(-12))
+                Commands.parallel(shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3), feederSubsystem.runVoltage(-8))
                         .withTimeout(3),
                 Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltage(0))
                         .withTimeout(0.125));
