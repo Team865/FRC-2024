@@ -24,6 +24,24 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
