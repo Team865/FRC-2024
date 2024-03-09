@@ -49,12 +49,14 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveTalonFX.getConfigurator().apply(driveConfig);
+        driveTalonFX.setPosition(0);
 
         var steerConfig = new TalonFXConfiguration();
         steerConfig.CurrentLimits.StatorCurrentLimit = 30.0;
         steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         steerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         steerTalonFX.getConfigurator().apply(steerConfig);
+        steerTalonFX.setPosition(0);
 
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
