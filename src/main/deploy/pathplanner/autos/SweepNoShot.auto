@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.72,
-      "y": 6.7
+      "x": 1.4,
+      "y": 7.3
     },
-    "rotation": 60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -14,13 +14,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "UpperSub_UpperDepartA"
+            "waitTime": 5.0
           }
         },
         {
