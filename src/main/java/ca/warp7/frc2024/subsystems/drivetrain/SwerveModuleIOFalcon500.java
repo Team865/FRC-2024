@@ -35,7 +35,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
-        Timer.delay(1);
+        Timer.delay(2);
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
         Timer.delay(1);
 
@@ -72,7 +72,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
         this.steerAbsolutePosition = cancoder.getAbsolutePosition();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, steerPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(100, drivePosition, steerPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50,
                 driveVelocity,
