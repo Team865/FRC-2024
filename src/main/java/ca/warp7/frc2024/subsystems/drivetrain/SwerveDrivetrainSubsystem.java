@@ -64,9 +64,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             VecBuilder.fill(0.05, 0.05, 0.05),
             VecBuilder.fill(0.5, 0.5, 999999999));
 
-    private SwerveDrivePoseEstimator poseEstimatorNoVision =
-            new SwerveDrivePoseEstimator(swerveDriveKinematics, rawGyroRotation, lastModulePositions, new Pose2d());
-
     /* Controllers */
     private final PIDController aimAtFeedback;
 
@@ -193,14 +190,13 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, getModulePositions());
-        poseEstimatorNoVision.update(rawGyroRotation, getModulePositions());
 
-        if (rearVisionInputs.tagCount >= 1 && rearVisionInputs.avgTagDist < 2) {
-            poseEstimator.addVisionMeasurement(
-                    rearVisionInputs.blueOriginRobotPose,
-                    rearVisionInputs.timestamp,
-                    VecBuilder.fill(0.7, 0.7, 999999999));
-        }
+        // if (rearVisionInputs.tagCount >= 2) {
+        //     poseEstimator.addVisionMeasurement(
+        //             rearVisionInputs.blueOriginRobotPose,
+        //             rearVisionInputs.timestamp,
+        //             VecBuilder.fill(0.7, 0.7, 999999999));
+        // }
 
         // poseEstimator.addVisionMeasurement(, DEADBAND);
 
@@ -271,11 +267,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
-    @AutoLogOutput(key = "Drivetrain/Odometry/RobotNoVision")
-    public Pose2d getPoseNoVision() {
-        return poseEstimatorNoVision.getEstimatedPosition();
-    }
-
     /**
      * @return Current rotation from pose estimator
      */
@@ -289,7 +280,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
-        poseEstimatorNoVision.resetPosition(rawGyroRotation, getModulePositions(), pose);
     }
 
     /**

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.55,
-        "y": 5.551620265124392
+        "x": 1.35,
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0459393391787195,
-        "y": 5.551620265124392
+        "x": 1.85,
+        "y": 5.55
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CenterSubwoofer"
     },
     {
       "anchor": {
-        "x": 1.5,
-        "y": 5.551620265124392
+        "x": 3.002149596891787,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 1.808896897830087,
-        "y": 5.551620265124392
+        "x": 2.502149596891787,
+        "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CenterNote"
     }
   ],
   "rotationTargets": [],
@@ -33,18 +33,25 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.35,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "simpleIntake"
+              }
+            }
+          ]
         }
       }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 1.5,
-    "maxAcceleration": 2.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 720.0
   },
@@ -59,5 +66,5 @@
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

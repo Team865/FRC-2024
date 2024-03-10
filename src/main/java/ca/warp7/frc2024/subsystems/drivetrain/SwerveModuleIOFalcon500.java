@@ -7,10 +7,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 
 public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
     private final TalonFX driveTalonFX;
@@ -35,8 +35,13 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
+        Timer.delay(2);
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
+        Timer.delay(1);
+
         steerTalonFX = new TalonFX(steerTalonID, "CANivore");
+        Timer.delay(1);
+
         cancoder = new CANcoder(cancoderID, "CANivore");
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
@@ -53,9 +58,6 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         steerTalonFX.getConfigurator().apply(steerConfig);
         steerTalonFX.setPosition(0);
 
-        var encoderConfig = new CANcoderConfiguration();
-        encoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
         this.drivePosition = driveTalonFX.getPosition();
@@ -63,13 +65,14 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         this.driveAppliedVolts = driveTalonFX.getMotorVoltage();
         this.driveCurrent = driveTalonFX.getStatorCurrent();
 
-        this.steerAbsolutePosition = cancoder.getAbsolutePosition();
         this.steerPosition = steerTalonFX.getPosition();
         this.steerVelocity = steerTalonFX.getVelocity();
         this.steerAppliedVolts = steerTalonFX.getMotorVoltage();
         this.steerCurrent = steerTalonFX.getStatorCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, steerPosition);
+        this.steerAbsolutePosition = cancoder.getAbsolutePosition();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(100, drivePosition, steerPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50,
                 driveVelocity,
@@ -79,6 +82,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 steerVelocity,
                 steerAppliedVolts,
                 steerCurrent);
+        cancoder.optimizeBusUtilization();
         driveTalonFX.optimizeBusUtilization();
         steerTalonFX.optimizeBusUtilization();
     }
@@ -91,7 +95,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 driveAppliedVolts,
                 driveCurrent,
                 steerPosition,
-                steerAbsolutePosition,
+                steerVelocity,
                 steerAbsolutePosition,
                 steerAppliedVolts,
                 steerCurrent);

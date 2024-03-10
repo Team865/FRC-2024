@@ -3,41 +3,54 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.55,
-        "y": 5.551620265124392
+        "x": 0.74,
+        "y": 6.70324920742434
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0459393391787195,
-        "y": 5.551620265124392
+        "x": 0.9103444159779099,
+        "y": 6.906257777144377
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSubwoofer"
     },
     {
       "anchor": {
-        "x": 1.5,
-        "y": 5.551620265124392
+        "x": 2.9041653731455614,
+        "y": 6.9998147912962505
       },
       "prevControl": {
-        "x": 1.808896897830087,
-        "y": 5.551620265124392
+        "x": 2.912937680504991,
+        "y": 7.021048234226099
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpNote"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.5,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "simpleIntake"
+              }
+            }
+          ]
         }
       }
     }
@@ -50,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 60.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

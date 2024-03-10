@@ -85,14 +85,6 @@ public class RobotContainer {
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
-                        new GyroIONavX() {},
-                        new VisionIOLimelight("limelight-front"),
-                        new VisionIOLimelight("limelight-rear"),
-                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0.488)),
-                        new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
-                        new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
-                        new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
                 armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31, 4));
                 shooterSubsystem = new ShooterSubsystem(
@@ -103,6 +95,14 @@ public class RobotContainer {
                 feederSubsystem = new FeederSubsystem(new FeederIOSparkMax(24, 25, 3));
                 climberSubsystem = new ClimberSubsystem(new ClimberIOSparkMaxNeo(30));
                 ledSubsystem = new LEDSubsystem(0);
+                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
+                        new GyroIONavX() {},
+                        new VisionIOLimelight("limelight-front"),
+                        new VisionIOLimelight("limelight-rear"),
+                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0)),
+                        new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
+                        new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
+                        new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
                 break;
             case SIM:
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
@@ -184,6 +184,9 @@ public class RobotContainer {
 
         stopNoteFlow = Commands.parallel(
                 intakeSubsystem.runVoltage(0), feederSubsystem.runVoltage(0), shooterSubsystem.stopShooterCommand());
+
+        NamedCommands.registerCommand("simpleIntake", simpleIntake);
+        NamedCommands.registerCommand("simpleShoot", simpleShoot);
 
         NamedCommands.registerCommand(
                 "autoIntake",
