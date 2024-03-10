@@ -16,37 +16,21 @@
     },
     {
       "anchor": {
-        "x": 2.1494493127875147,
+        "x": 1.5,
         "y": 7.431717372694005
       },
       "prevControl": {
-        "x": 1.2580173664616878,
-        "y": 7.431717372694005
-      },
-      "nextControl": {
-        "x": 2.929968244104489,
-        "y": 7.431717372694005
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.7357377538829155,
-        "y": 7.431717372694005
-      },
-      "prevControl": {
-        "x": 3.9733589893376715,
+        "x": 1.3,
         "y": 7.431717372694005
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DepartA"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.15,
       "rotationDegrees": 60.0,
       "rotateFast": false
     }
