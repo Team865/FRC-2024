@@ -101,17 +101,7 @@ public class SwerveModule {
             double steerVoltage = steerFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians());
             moduleIO.setSteerVoltage(steerVoltage);
 
-            Logger.recordOutput(
-                    "Drivetrain/Module" + Integer.toString(moduleID) + "/Angle Setpoint", angleSetpoint.getRadians());
-
-            Logger.recordOutput("Drivetrain/Module" + Integer.toString(moduleID) + "/Steer Voltage", steerVoltage);
-
             if (speedSetpoint != null) {
-
-                // FIXME: Might be unneeded
-                Logger.recordOutput(
-                        "Drivetrain/Module" + Integer.toString(moduleID) + "/Steer Position Error",
-                        steerFeedback.getPositionError());
                 double adjustedSpeedSetpoint = speedSetpoint * Math.cos(steerFeedback.getPositionError());
 
                 double velocityRadPerSec = adjustedSpeedSetpoint / WHEEL_RADIUS;
@@ -120,8 +110,6 @@ public class SwerveModule {
                         + driveFeedback.calculate(moduleInputs.driveVelocityRadPerSec, velocityRadPerSec);
 
                 moduleIO.setDriveVoltage(driveVoltage);
-
-                Logger.recordOutput("Drivetrain/Module" + Integer.toString(moduleID) + "/Drive Voltage", driveVoltage);
             }
         }
     }

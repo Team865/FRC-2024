@@ -1,0 +1,297 @@
+{
+  "hubs": [
+    {
+      "x": 1252,
+      "y": 0,
+      "width": 2195,
+      "height": 1407,
+      "state": {
+        "sidebar": {
+          "width": 500,
+          "expanded": [
+            "/AdvantageKit/RealOutputs",
+            "/AdvantageKit/RealOutputs/Drivetrain",
+            "/AdvantageKit/RealOutputs/Drivetrain/Odometry",
+            "/PathPlanner",
+            "/SmartDashboard",
+            "/SmartDashboard/Autonomous Routine Chooser",
+            "/SmartDashboard/Autonomous Routine Chooser/options",
+            "/Drivetrain/Vision/rear",
+            "/Drivetrain/Vision/Front",
+            "/RealOutputs/Drivetrain",
+            "/RealOutputs/Drivetrain/Odometry",
+            "/Drivetrain/Gyro",
+            "/RealOutputs/LED",
+            "/RealOutputs/Drivetrain/Swerve",
+            "/RealOutputs/Drivetrain/Odometry/Robot",
+            "/RealOutputs/Drivetrain/Odometry/Robot/rotation",
+            "/RealOutputs/Shooter",
+            "/RealOutputs/Shooter/BottomLeft",
+            "/RealOutputs/Shooter/BottomRight",
+            "/Shooter/BottomLeft",
+            "/Shooter/BottomRight",
+            "/Shooter/TopLeft",
+            "/Shooter/TopRight",
+            "/RealOutputs/Drivetrain/Module0",
+            "/SystemStats",
+            "/SystemStats/CANBus",
+            "/RealOutputs/LoggedRobot",
+            "/RealOutputs/Logger"
+          ]
+        },
+        "tabs": {
+          "selected": 9,
+          "tabs": [
+            {
+              "type": 0,
+              "path": "../docs/INDEX.md"
+            },
+            {
+              "type": 12,
+              "title": "Metadata"
+            },
+            {
+              "type": 3,
+              "field": "/RealOutputs/Console",
+              "title": "Console"
+            },
+            {
+              "type": 8,
+              "uuid": "ycj1ohldr32f1r18ccp8xodqj4gttg19",
+              "fields": [],
+              "listFields": [],
+              "options": {
+                "ids": [
+                  0,
+                  1,
+                  2
+                ],
+                "layouts": [
+                  "Xbox Controller (White)",
+                  "Xbox Controller (Blue)",
+                  "None"
+                ]
+              },
+              "configHidden": true,
+              "visualizer": null,
+              "title": "Joysticks"
+            },
+            {
+              "type": 5,
+              "uuid": "joyrh1qds1pxlsra1kek2cbik50yclhd",
+              "fields": [],
+              "listFields": [
+                [
+                  {
+                    "type": "Robot",
+                    "key": "/RealOutputs/Drivetrain/Odometry/Robot",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose2d"
+                  },
+                  {
+                    "type": "Ghost",
+                    "key": "/Drivetrain/Vision/rear/BlueOriginRobotPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose2d"
+                  },
+                  {
+                    "type": "Ghost",
+                    "key": "/Drivetrain/Vision/Front/BlueOriginRobotPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose2d"
+                  }
+                ]
+              ],
+              "options": {
+                "game": "2024 Field",
+                "unitDistance": "meters",
+                "unitRotation": "radians",
+                "origin": "right",
+                "size": 0.93,
+                "allianceBumpers": "auto",
+                "allianceOrigin": "blue",
+                "orientation": "blue left, red right"
+              },
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Pose"
+            },
+            {
+              "type": 9,
+              "uuid": "bqky50ft37f0mnngiztj71k736dz38xx",
+              "fields": [
+                {
+                  "key": "/RealOutputs/Drivetrain/Swerve/TargetStatesOptimized",
+                  "sourceTypeIndex": 1,
+                  "sourceType": "SwerveModuleState[]"
+                },
+                {
+                  "key": "/RealOutputs/Drivetrain/Swerve/States",
+                  "sourceTypeIndex": 1,
+                  "sourceType": "SwerveModuleState[]"
+                },
+                {
+                  "key": "/RealOutputs/Drivetrain/Odometry/Robot/rotation",
+                  "sourceTypeIndex": 1,
+                  "sourceType": "Rotation2d"
+                }
+              ],
+              "listFields": [],
+              "options": {
+                "maxSpeed": 4.5,
+                "rotationUnits": "radians",
+                "arrangement": "1,0,2,3",
+                "sizeLeftRight": 0.93,
+                "sizeFrontBack": 0.93,
+                "forwardDirection": "up"
+              },
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Swerve"
+            },
+            {
+              "type": 2,
+              "fields": [
+                "/RealOutputs/LED/Color"
+              ],
+              "title": "LEDs"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "/Intake/IntakeAppliedVolts",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "/Intake/IntakeSensorTriggered",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": []
+                }
+              },
+              "title": "Intake"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.1802773497688752,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": "angle",
+                    "factor": 0.16666666666666666,
+                    "from": "radians",
+                    "to": "degrees"
+                  },
+                  "fields": [
+                    {
+                      "key": "/Shooter/BottomLeft/ShooterVelocityRadPerSec",
+                      "color": "#2b66a2",
+                      "show": true
+                    },
+                    {
+                      "key": "/Shooter/BottomRight/ShooterVelocityRadPerSec",
+                      "color": "#e5b31b",
+                      "show": true
+                    },
+                    {
+                      "key": "/Shooter/TopLeft/ShooterVelocityRadPerSec",
+                      "color": "#af2437",
+                      "show": true
+                    },
+                    {
+                      "key": "/Shooter/TopRight/ShooterVelocityRadPerSec",
+                      "color": "#80588e",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": []
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": []
+                }
+              },
+              "title": "Shooter"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "/SystemStats/BatteryVoltage",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": [
+                    {
+                      "key": "/SystemStats/BrownedOut",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "/PowerDistribution/TotalCurrent",
+                      "color": "#af2437",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Battery"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "3.2.0"
+}

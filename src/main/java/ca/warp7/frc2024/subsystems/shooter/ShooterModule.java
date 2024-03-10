@@ -3,7 +3,6 @@ package ca.warp7.frc2024.subsystems.shooter;
 import ca.warp7.frc2024.Constants;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterModule {
@@ -42,7 +41,6 @@ public class ShooterModule {
     /**
      * @return Shooter velocity in RPM converted from radians per second
      */
-    @AutoLogOutput(key = "Shooter/{shooterModuleName}/RealRPM")
     public double getVelocityRPM() {
         return Units.radiansPerSecondToRotationsPerMinute(shooterModuleInputs.shooterVelocityRadPerSec);
     }
