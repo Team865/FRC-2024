@@ -14,19 +14,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.5
+            "waitTime": 4.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SweepA_SweepB"
+            "pathName": "Wait SweepA_SweepB"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SweepB_SweepC"
+            "pathName": "Wait SweepB_SweepC"
           }
         }
       ]
