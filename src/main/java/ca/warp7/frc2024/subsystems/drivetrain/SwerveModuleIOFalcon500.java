@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -35,19 +36,21 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
-        Timer.delay(2);
+        Timer.delay(0.5);
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
-        Timer.delay(1);
 
+        Timer.delay(0.5);
         steerTalonFX = new TalonFX(steerTalonID, "CANivore");
-        Timer.delay(1);
 
+        Timer.delay(0.5);
         cancoder = new CANcoder(cancoderID, "CANivore");
+
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         var driveConfig = new TalonFXConfiguration();
         driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveTalonFX.getConfigurator().apply(driveConfig);
         driveTalonFX.setPosition(0);
 
@@ -55,6 +58,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         steerConfig.CurrentLimits.StatorCurrentLimit = 30.0;
         steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         steerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         steerTalonFX.getConfigurator().apply(steerConfig);
         steerTalonFX.setPosition(0);
 

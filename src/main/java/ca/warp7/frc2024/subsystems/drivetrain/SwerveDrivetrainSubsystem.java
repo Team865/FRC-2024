@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,7 +50,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final VisionIOInputsAutoLogged rearVisionInputs = new VisionIOInputsAutoLogged();
 
     /* Drivetrain */
-    private final SwerveModule[] swerveModules;
+    private final SwerveModule[] swerveModules = new SwerveModule[4];
     private final SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(SWERVE_MODULE_TRANSLATIONS);
     private Rotation2d rawGyroRotation = new Rotation2d();
     private SwerveModulePosition[] lastModulePositions = new SwerveModulePosition[] {
@@ -73,10 +74,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final LoggedTunableNumber aimAtkD = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kD", 0);
 
     private final SysIdRoutine sysId;
-
-    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
-    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
-    // private final LoggedTunableNumber AimAtkP = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kP", 0.4);
 
     /* Setpoints */
     @RequiredArgsConstructor
@@ -109,12 +106,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         this.frontVisionIO = frontVisionIO;
         this.rearVisionIO = rearVisionIO;
 
-        swerveModules = new SwerveModule[] {
-            new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight"),
-            new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft"),
-            new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft"),
-            new SwerveModule(backRightSwerveModuleIO, 3, "BackRight")
-        };
+        Timer.delay(5);
+        swerveModules[0] = new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight");
+        swerveModules[1] = new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft");
+        swerveModules[2] = new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft");
+        swerveModules[3] = new SwerveModule(backRightSwerveModuleIO, 3, "BackRight");
 
         // Create and configure feedback controller
         aimAtFeedback = new PIDController(aimAtkP.get(), aimAtkI.get(), aimAtkD.get());
@@ -163,7 +159,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         Logger.processInputs("Drivetrain/Vision/Front", frontVisionInputs);
 
         rearVisionIO.updateInputs(rearVisionInputs);
-        Logger.processInputs("Drivetrain/Vision/rear", rearVisionInputs);
+        Logger.processInputs("Drivetrain/Vision/Rear", rearVisionInputs);
 
         // Run swerve module periodic routines
         for (var module : swerveModules) {
@@ -189,7 +185,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         }
 
         // Update pose estimator using odometry
-        poseEstimator.update(rawGyroRotation, getModulePositions());
+        poseEstimator.update(rawGyroRotation, modulePositions);
 
         // if (rearVisionInputs.tagCount >= 2) {
         //     poseEstimator.addVisionMeasurement(
