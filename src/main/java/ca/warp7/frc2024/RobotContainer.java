@@ -148,9 +148,9 @@ public class RobotContainer {
                         shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3));
 
         simpleShoot = Commands.sequence(
-                shooterSubsystem.runRPMCommand(-8000, 0, 1, 2, 3).withTimeout(0.5),
-                Commands.waitSeconds(0.2),
-                feederSubsystem.runVoltage(-12).withTimeout(0.075),
+                shooterSubsystem.runRPMCommand(-8000, 0, 1, 2, 3).withTimeout(0.75),
+                Commands.waitSeconds(0.3),
+                feederSubsystem.runVoltage(-12).withTimeout(0.1),
                 shooterSubsystem.runRPMCommand(8500, 0, 1, 2, 3),
                 Commands.waitSeconds(0.75),
                 feederSubsystem.runVoltage(12).withTimeout(1),
