@@ -244,6 +244,8 @@ public class RobotContainer {
         operator.povRight().onTrue(armSubsystem.setSetpointCommand(Setpoint.SUBWOOFER));
         operator.povLeft().onTrue(armSubsystem.setSetpointCommand(Setpoint.AMP));
 
+        operator.y().onTrue(armSubsystem.setSetpointCommand(Setpoint.BLOCKER));
+
         /* Scoring */
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(simpleShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleShoot);
