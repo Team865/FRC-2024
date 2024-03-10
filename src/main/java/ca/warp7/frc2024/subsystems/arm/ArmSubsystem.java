@@ -20,6 +20,8 @@ import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
+// TODO: Use absolute encoder if greater than x degrees
+
 public class ArmSubsystem extends SubsystemBase {
     /* AdvantageKit */
     private final ArmIO io;
@@ -53,7 +55,7 @@ public class ArmSubsystem extends SubsystemBase {
         HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 0)),
         STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 0)),
         AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 67)),
-        TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 30)),
+        TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 3)),
         PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 65)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/SubwooferDegrees", 50)),
         IDLE(() -> 0);

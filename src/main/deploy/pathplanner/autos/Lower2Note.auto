@@ -14,19 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "simpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armStow"
+            "name": "shootAtSubwoofer"
           }
         },
         {
@@ -44,24 +32,12 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "simpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armStow"
+            "name": "shootAtSubwoofer"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "2 Note",
   "choreoAuto": false
 }

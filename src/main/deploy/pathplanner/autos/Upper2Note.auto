@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7420213082613666,
-      "y": 6.69184359295058
+      "x": 0.72,
+      "y": 6.7
     },
     "rotation": 60.0
   },
@@ -14,19 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "simpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armStow"
+            "name": "shootAtSubwoofer"
           }
         },
         {
@@ -42,33 +30,14 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "armSubwoofer"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "simpleShoot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "armStow"
-                }
-              }
-            ]
+            "name": "shootAtSubwoofer"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "2 Note",
   "choreoAuto": false
 }

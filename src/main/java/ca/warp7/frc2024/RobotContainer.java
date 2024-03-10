@@ -40,15 +40,12 @@ import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
-// USe absolute encoder if greater than x degrees
 public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
     private final ArmSubsystem armSubsystem;
@@ -61,16 +58,6 @@ public class RobotContainer {
     /* OI Controllers */
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController operator = new CommandXboxController(1);
-    private final CommandXboxController technician = new CommandXboxController(2);
-
-    private final LoggedDashboardNumber topRightShooterSpeed =
-            new LoggedDashboardNumber("Top Right Shooter Speed", 9000.0);
-    private final LoggedDashboardNumber topLeftShooterSpeed =
-            new LoggedDashboardNumber("Top Left Shooter Speed", 9000.0);
-    private final LoggedDashboardNumber bottomLeftShooterSpeed =
-            new LoggedDashboardNumber("Bottom Left Shooter Speed", 9000.0);
-    private final LoggedDashboardNumber bottomRightShooterSpeed =
-            new LoggedDashboardNumber("Bottom Right Shooter Speed", 9000.0);
 
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
@@ -78,6 +65,8 @@ public class RobotContainer {
     private final Command simpleIntake;
     private final Command simpleShoot;
     private final Command simpleAmp;
+    private final Command armStow;
+    private final Command armSubwoofer;
     private final Command noteFlowForward;
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
@@ -172,6 +161,14 @@ public class RobotContainer {
                 Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltage(0))
                         .withTimeout(0.125));
 
+        armStow = armSubsystem
+                .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
+                .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE));
+
+        armSubwoofer = armSubsystem
+                .setSetpointCommand(Setpoint.SUBWOOFER)
+                .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER));
+
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltage(8),
                 feederSubsystem.runVoltage(8),
@@ -187,62 +184,9 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("simpleIntake", simpleIntake);
         NamedCommands.registerCommand("simpleShoot", simpleShoot);
-
-        NamedCommands.registerCommand(
-                "autoIntake",
-                Commands.parallel(
-                                intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
-                                feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
-                        .andThen(
-                                Commands.parallel(
-                                        shooterSubsystem.runRPMCommand(-1500, 0, 1, 2, 3),
-                                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                        intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
-                                        feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
-                                shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3)));
-        NamedCommands.registerCommand(
-                "armSubwoofer",
-                armSubsystem
-                        .setSetpointCommand(Setpoint.SUBWOOFER)
-                        .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)));
-        NamedCommands.registerCommand(
-                "armStow",
-                armSubsystem
-                        .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
-                        .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE)));
-        NamedCommands.registerCommand(
-                "shoot",
-                Commands.sequence(
-                        shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3).withTimeout(0.25),
-                        feederSubsystem.runVoltage(-12).withTimeout(0.0625),
-                        shooterSubsystem.runRPMCommand(topRightShooterSpeed.get(), 0),
-                        shooterSubsystem.runRPMCommand(topLeftShooterSpeed.get(), 1),
-                        shooterSubsystem.runRPMCommand(bottomLeftShooterSpeed.get(), 2),
-                        shooterSubsystem.runRPMCommand(bottomRightShooterSpeed.get(), 3),
-                        Commands.waitSeconds(1),
-                        feederSubsystem.runVoltage(12).withTimeout(1),
-                        shooterSubsystem.stopShooterCommand()));
-
-        Command shoot = Commands.sequence(
-                shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3).withTimeout(0.25),
-                feederSubsystem.runVoltage(-12).withTimeout(0.0625),
-                shooterSubsystem.runRPMCommand(topRightShooterSpeed.get(), 0),
-                shooterSubsystem.runRPMCommand(topLeftShooterSpeed.get(), 1),
-                shooterSubsystem.runRPMCommand(bottomLeftShooterSpeed.get(), 2),
-                shooterSubsystem.runRPMCommand(bottomRightShooterSpeed.get(), 3),
-                Commands.waitSeconds(1),
-                feederSubsystem.runVoltage(12).withTimeout(1),
-                shooterSubsystem.stopShooterCommand());
-
-        Command armStow = armSubsystem
-                .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
-                .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE));
-
-        Command armSubwoofer = armSubsystem
-                .setSetpointCommand(Setpoint.SUBWOOFER)
-                .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER));
-
-        NamedCommands.registerCommand("autoShoot", Commands.sequence(armSubwoofer, shoot, armStow));
+        NamedCommands.registerCommand("armSubwoofer", armSubwoofer);
+        NamedCommands.registerCommand("armStow", armStow);
+        NamedCommands.registerCommand("shootAtSubwoofer", Commands.sequence(armSubwoofer, simpleShoot, armStow));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
@@ -266,8 +210,6 @@ public class RobotContainer {
 
         configureDriverBindings();
         configureOperatorBindings();
-
-        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     private void configureDriverBindings() {
@@ -305,7 +247,6 @@ public class RobotContainer {
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(simpleShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.AMP)).onTrue(simpleAmp);
-//fix amp score
 
         /* Override Procedures */
         operator.leftBumper().onTrue(noteFlowReverse).onFalse(stopNoteFlow);
