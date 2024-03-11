@@ -70,10 +70,46 @@
           "data": {
             "name": "armStow"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterSub_LowerNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowerNote_CenterSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
         }
       ]
     }
   },
-  "folder": "2 Note",
+  "folder": "3 Note",
   "choreoAuto": false
 }

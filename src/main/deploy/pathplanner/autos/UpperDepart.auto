@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.35,
-      "y": 5.55
+      "x": 0.72,
+      "y": 6.7
     },
-    "rotation": 0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -36,44 +36,26 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "CenterSub_CenterNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CenterNote_CenterSub"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armSubwoofer"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 2.0
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "simpleShoot"
+            "pathName": "UpperSub_UpperDepartA"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "armStow"
+            "pathName": "UpperDepartA_UpperDepartB"
           }
         }
       ]
     }
   },
-  "folder": "2 Note",
+  "folder": null,
   "choreoAuto": false
 }

@@ -58,6 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
         TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 3)),
         PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 65)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/SubwooferDegrees", 50)),
+        BLOCKER(new LoggedTunableNumber("Arm/Setpoint/BlockerDegrees", 80)),
         IDLE(() -> 0);
 
         private final DoubleSupplier armSetpointSupplier;

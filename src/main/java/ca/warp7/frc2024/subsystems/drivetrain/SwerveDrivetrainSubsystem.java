@@ -84,7 +84,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         private final Translation2d bluePoint;
 
         public Translation2d getTranslatedPoint() {
-            if (DriverStation.getAlliance().get() == Alliance.Red) {
+            if (DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red) {
                 return new Translation2d(16.54 - bluePoint.getX(), bluePoint.getY());
             } else {
                 return bluePoint;
@@ -106,7 +107,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         this.frontVisionIO = frontVisionIO;
         this.rearVisionIO = rearVisionIO;
 
-        Timer.delay(5);
+        Timer.delay(6);
         swerveModules[0] = new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight");
         swerveModules[1] = new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft");
         swerveModules[2] = new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft");
@@ -349,7 +350,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     public Command zeroGyroAndPoseCommand() {
         return this.runOnce(() -> {
-            if (DriverStation.getAlliance().get() == Alliance.Red) {
+            if (DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == Alliance.Red) {
                 this.setPose(new Pose2d(
                         this.getPose().getTranslation(), new Rotation2d().plus(Rotation2d.fromDegrees(180))));
             } else {
@@ -403,7 +405,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                                     MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND))
                             * MAX_ANGULAR_SPEED;
 
-                    if (DriverStation.getAlliance().get() == Alliance.Red) {
+                    if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == Alliance.Red) {
                         xVelocity *= -1.0;
                         yVelocity *= -1.0;
                     }

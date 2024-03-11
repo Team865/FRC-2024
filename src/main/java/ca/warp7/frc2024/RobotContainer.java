@@ -88,7 +88,7 @@ public class RobotContainer {
                         new GyroIONavX() {},
                         new VisionIOLimelight("limelight-front"),
                         new VisionIOLimelight("limelight-rear"),
-                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0)),
+                        new SwerveModuleIOFalcon500(12, 11, 10, Rotation2d.fromRotations(0.488)),
                         new SwerveModuleIOFalcon500(22, 21, 20, Rotation2d.fromRotations(-0.242)),
                         new SwerveModuleIOFalcon500(32, 31, 30, Rotation2d.fromRotations(0.096)),
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
@@ -149,6 +149,7 @@ public class RobotContainer {
 
         simpleShoot = Commands.sequence(
                 shooterSubsystem.runRPMCommand(-8000, 0, 1, 2, 3).withTimeout(0.75),
+                Commands.waitSeconds(0.3),
                 feederSubsystem.runVoltage(-12).withTimeout(0.1),
                 shooterSubsystem.runRPMCommand(8500, 0, 1, 2, 3),
                 Commands.waitSeconds(0.75),
@@ -186,7 +187,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("simpleShoot", simpleShoot);
         NamedCommands.registerCommand("armSubwoofer", armSubwoofer);
         NamedCommands.registerCommand("armStow", armStow);
-        NamedCommands.registerCommand("shootAtSubwoofer", Commands.sequence(armSubwoofer, simpleShoot, armStow));
+        // NamedCommands.registerCommand("shootAtSubwoofer", Commands.sequence(armSubwoofer, simpleShoot, armStow));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
@@ -242,6 +243,8 @@ public class RobotContainer {
         operator.povUp().onTrue(armSubsystem.setSetpointCommand(Setpoint.PODIUM));
         operator.povRight().onTrue(armSubsystem.setSetpointCommand(Setpoint.SUBWOOFER));
         operator.povLeft().onTrue(armSubsystem.setSetpointCommand(Setpoint.AMP));
+
+        operator.y().onTrue(armSubsystem.setSetpointCommand(Setpoint.BLOCKER));
 
         /* Scoring */
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(simpleShoot);
