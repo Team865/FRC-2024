@@ -4,10 +4,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class ShooterIOSim implements ShooterModuleIO {
+// TODO: Sim currently broken
+public class ShooterModuleIOSim implements ShooterModuleIO {
     private static final double LOOP_PERIOD_SECS = 0.02;
 
-    private DCMotorSim shooterSim = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.001); // TODO: Get more accurate MOI value
+    private DCMotorSim shooterSim = new DCMotorSim(DCMotor.getNeo550(1), 1, 0.001);
     private double shooterAppliedVolts = 0.0;
 
     @Override
@@ -20,7 +21,7 @@ public class ShooterIOSim implements ShooterModuleIO {
     }
 
     @Override
-    public void setShooterVoltage(double volts) {
+    public void setVoltage(double volts) {
         shooterAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
         shooterSim.setInputVoltage(shooterAppliedVolts);
     }

@@ -1,35 +1,29 @@
 package ca.warp7.frc2024.subsystems.feeder;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface FeederIO {
+    @AutoLog
     public static class FeederIOInputs {
-        @AutoLog
-        public static class FeederRollerIOInputs {
-            public double VelocityRPM = 0.0;
-            public double VoltsApplied = 0.0;
-            public double CurrentDraw = 0.0;
-        }
+        public Rotation2d feederPosition = new Rotation2d();
+        public double feederVelocityRadPerSec = 0.0;
+        public double[] feederAppliedVolts = new double[] {};
+        public double[] feederCurrentAmps = new double[] {};
+        public double[] feederTempCelsius = new double[] {};
 
-        public FeederRollerIOInputsAutoLogged topRoller = new FeederRollerIOInputsAutoLogged();
-        public FeederRollerIOInputsAutoLogged bottomRoller = new FeederRollerIOInputsAutoLogged();
+        public boolean feederSensorTriggered = false;
     }
 
     /** Updates the set of loggable inputs.
      *
      * @param inputs
      */
-    public void updateInputs(FeederIOInputs inputs);
+    public default void updateInputs(FeederIOInputs inputs) {}
 
-    /** Run the top feeder roller at the specified voltage.
+    /** Run the feeder rollers at the specified voltage.
      *
      * @param volts
      */
-    public void setTopVoltage(double volts);
-
-    /** Run the bottom feeder roller at the specified voltage.
-     *
-     * @param volts
-     */
-    public void setBottomVoltage(double volts);
+    public default void setVoltage(double volts) {}
 }

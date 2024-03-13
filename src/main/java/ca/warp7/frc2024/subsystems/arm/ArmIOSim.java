@@ -15,15 +15,17 @@ public class ArmIOSim implements ArmIO {
 
     private double armAppliedVolts = 0.0;
 
+    private final double randomInitialPosition = 79.0; // Initialize to random value
+
     private final SingleJointedArmSim armSim = new SingleJointedArmSim(
             DCMotor.getNEO(2),
             20 * (74 / 22),
             SingleJointedArmSim.estimateMOI(Units.inchesToMeters(ARM_LENGTH), Units.lbsToKilograms(ARM_MASS)),
             ARM_LENGTH,
-            Units.degreesToRadians(130),
+            Units.degreesToRadians(120),
             Units.degreesToRadians(200),
             false,
-            Units.degreesToRadians(200),
+            Units.degreesToRadians(120 + randomInitialPosition),
             VecBuilder.fill(2 * Math.PI / 4096));
 
     @Override
@@ -32,15 +34,17 @@ public class ArmIOSim implements ArmIO {
 
         armSim.update(LOOP_PERIOD_SECS);
 
-        inputs.armPosition = new Rotation2d(armSim.getAngleRads());
-        inputs.armAbsolutePosition = new Rotation2d(armSim.getAngleRads());
-        inputs.armVelocityRadPerSec = armSim.getVelocityRadPerSec();
-        inputs.armAppliedVolts = armAppliedVolts;
+        inputs.armInternalIncrementalPosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        inputs.armExternalIncrementalPosition =
+                Rotation2d.fromRadians(armSim.getAngleRads()).minus(Rotation2d.fromDegrees(120));
+        inputs.armExternalAbsolutePosition = Rotation2d.fromRadians(armSim.getAngleRads());
+        inputs.armInternalVelocityRadPerSec = armSim.getVelocityRadPerSec();
+        inputs.armAppliedVolts = new double[] {armAppliedVolts};
         inputs.armCurrentAmps = new double[] {armSim.getCurrentDrawAmps()};
     }
 
     @Override
-    public void setArmVoltage(double volts) {
+    public void setVoltage(double volts) {
         armAppliedVolts = MathUtil.clamp(volts, -12, 12);
         armSim.setInputVoltage(armAppliedVolts);
     }

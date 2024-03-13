@@ -7,12 +7,15 @@ import edu.wpi.first.wpilibj.SPI;
 public class GyroIONavX implements GyroIO {
     private final AHRS navx = new AHRS(SPI.Port.kMXP);
 
-    public GyroIONavX() {
-        // navx.zeroYaw();
-    }
+    public GyroIONavX() {}
 
     public void updateInputs(GyroIOInputs inputs) {
-        inputs.connected = navx.isConnected();
-        inputs.yaw = navx.getRotation2d();
+        inputs.gyroConnected = navx.isConnected();
+        inputs.gyroYaw = navx.getRotation2d();
+    }
+
+    @Override
+    public void zeroYaw() {
+        navx.zeroYaw();
     }
 }

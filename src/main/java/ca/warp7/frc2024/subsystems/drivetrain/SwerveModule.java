@@ -33,12 +33,14 @@ public class SwerveModule {
 
         switch (Constants.CURRENT_MODE) {
             case REAL:
+                driveFeedforward = new SimpleMotorFeedforward(0.23466, 0.12025);
+                driveFeedback = new PIDController(0.1, 0.0, 0.0);
+                steerFeedback = new PIDController(6.5, 0.0, 0);
+                break;
             case SIM:
                 driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
                 steerFeedback = new PIDController(10.0, 0.0, 0.0);
-                // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
-                steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
                 break;
             default:
                 driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
@@ -46,6 +48,8 @@ public class SwerveModule {
                 steerFeedback = new PIDController(0.0, 0.0, 0.0);
                 break;
         }
+        // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
+        steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public double getDistanceMeters() {
@@ -78,9 +82,16 @@ public class SwerveModule {
         return optimizedState;
     }
 
+    public void runCharacterization(double volts) {
+        angleSetpoint = new Rotation2d();
+
+        moduleIO.setDriveVoltage(volts);
+        speedSetpoint = null;
+    }
+
     public void periodic() {
         moduleIO.updateInputs(moduleInputs);
-        Logger.processInputs("Drivetrain/Module" + Integer.toString(moduleID), moduleInputs);
+        Logger.processInputs("Drivetrain/" + moduleName + "Module", moduleInputs);
 
         if (finalSteerOffset == null && moduleInputs.steerAbsolutePosition.getRadians() != 0.0) {
             finalSteerOffset = moduleInputs.steerAbsolutePosition.minus(moduleInputs.steerPosition);
@@ -90,17 +101,7 @@ public class SwerveModule {
             double steerVoltage = steerFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians());
             moduleIO.setSteerVoltage(steerVoltage);
 
-            Logger.recordOutput(
-                    "Drivetrain/Module" + Integer.toString(moduleID) + "/Angle Setpoint", angleSetpoint.getRadians());
-
-            Logger.recordOutput("Drivetrain/Module" + Integer.toString(moduleID) + "/Steer Voltage", steerVoltage);
-
             if (speedSetpoint != null) {
-
-                // FIXME: Might be unneeded
-                Logger.recordOutput(
-                        "Drivetrain/Module" + Integer.toString(moduleID) + "/Steer Position Error",
-                        steerFeedback.getPositionError());
                 double adjustedSpeedSetpoint = speedSetpoint * Math.cos(steerFeedback.getPositionError());
 
                 double velocityRadPerSec = adjustedSpeedSetpoint / WHEEL_RADIUS;
@@ -109,8 +110,6 @@ public class SwerveModule {
                         + driveFeedback.calculate(moduleInputs.driveVelocityRadPerSec, velocityRadPerSec);
 
                 moduleIO.setDriveVoltage(driveVoltage);
-
-                Logger.recordOutput("Drivetrain/Module" + Integer.toString(moduleID) + "/Drive Voltage", driveVoltage);
             }
         }
     }

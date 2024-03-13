@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class IntakeIOSIM implements IntakeIO {
+public class IntakeIOSim implements IntakeIO {
 
     private double intakeAppliedVolts = 0.0;
     private final double LOOP_PERIOD_SECS = 0.02;
@@ -12,13 +12,10 @@ public class IntakeIOSIM implements IntakeIO {
 
     public void updateInputs(IntakeIOInputs inputs) {
         intakeSim.update(LOOP_PERIOD_SECS);
-
-        inputs.intakeAppliedVolts = intakeAppliedVolts;
-        inputs.intakeCurrentAmps = new double[] {intakeSim.getCurrentDrawAmps()};
     }
 
     @Override
-    public void setIntakeVoltage(double volts) {
+    public void setVoltage(double volts) {
         intakeAppliedVolts = MathUtil.clamp(volts, -12, 12);
         intakeSim.setInputVoltage(intakeAppliedVolts);
     }

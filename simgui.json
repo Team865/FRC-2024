@@ -1,8 +1,16 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Mechanism2d/ArmShooter": "Mechanism2d",
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Autonomous Routine Chooser": "String Chooser"
     }
   },
   "NetworkTables": {

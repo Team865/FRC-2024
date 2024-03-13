@@ -24,14 +24,14 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
         inputs.drivePositionRad = driveSim.getAngularPositionRad();
         inputs.driveVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
         inputs.driveAppliedVolts = driveAppliedVolts;
-        inputs.driveCurrentAmps = new double[] {driveSim.getCurrentDrawAmps()};
+        inputs.driveCurrentAmps = driveSim.getCurrentDrawAmps();
 
         inputs.steerAbsolutePosition =
                 new Rotation2d(steerSim.getAngularPositionRad()).plus(steerAbsoluteInitialPosition);
         inputs.steerPosition = new Rotation2d(steerSim.getAngularPositionRad());
         inputs.steerVelocityRadPerSec = steerSim.getAngularVelocityRadPerSec();
         inputs.steerAppliedVolts = steerAppliedVolts;
-        inputs.steerCurrentAmps = new double[] {steerSim.getCurrentDrawAmps()};
+        inputs.steerCurrentAmps = steerSim.getCurrentDrawAmps();
     }
 
     @Override
