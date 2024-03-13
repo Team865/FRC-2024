@@ -3,6 +3,7 @@ package ca.warp7.frc2024.subsystems.arm;
 import static ca.warp7.frc2024.Constants.ARM.*;
 
 import ca.warp7.frc2024.util.LoggedTunableNumber;
+import ca.warp7.frc2024.util.PolynomialRegression;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,6 +50,16 @@ public class ArmSubsystem extends SubsystemBase {
     private static final LoggedTunableNumber maxAcceleration =
             new LoggedTunableNumber("Arm/Constraint/MaxAcceleration", MAX_ACCELERATION_DEG);
 
+    /* Interpolation */
+    private static PolynomialRegression polynominal = new PolynomialRegression(DISTANCE, ANGLE, 2, "Distance");
+    private static double distance = 0;
+    private static DoubleSupplier armAngleSupplier = new DoubleSupplier() {
+        @Override
+        public double getAsDouble() {
+            return polynominal.predict(distance);
+        }
+    };
+
     /* Setpoints */
     @RequiredArgsConstructor
     public enum Setpoint {
@@ -59,7 +70,8 @@ public class ArmSubsystem extends SubsystemBase {
         PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 65)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/SubwooferDegrees", 50)),
         BLOCKER(new LoggedTunableNumber("Arm/Setpoint/BlockerDegrees", 80)),
-        IDLE(() -> 0);
+        IDLE(() -> 0),
+        INTERPOLATED(armAngleSupplier);
 
         private final DoubleSupplier armSetpointSupplier;
 
@@ -173,5 +185,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command setSetpointCommand(Setpoint setpoint) {
         return this.runOnce(() -> this.setpoint = setpoint);
+    }
+
+    public Command setDistance(double distance) {
+        return this.runOnce(() -> ArmSubsystem.distance = distance);
     }
 }

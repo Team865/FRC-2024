@@ -231,6 +231,11 @@ public class RobotContainer {
                 .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointAtLocation.NONE));
 
         driver.b().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
+
+        driver.povDown().onTrue(armSubsystem.setSetpointCommand(Setpoint.INTERPOLATED));
+        driver.povUp().onTrue(armSubsystem.setDistance(10.0));
+        driver.povLeft().onTrue(armSubsystem.setDistance(100.0));
+        driver.povRight().onTrue(armSubsystem.setDistance(2.0));
     }
 
     private void configureOperatorBindings() {

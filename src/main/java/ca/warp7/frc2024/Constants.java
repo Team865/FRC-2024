@@ -28,6 +28,12 @@ public final class Constants {
 
         public static final double MAX_VELOCITY_DEG = 4000;
         public static final double MAX_ACCELERATION_DEG = 2000;
+
+        // angle in degrees,
+        public static final double[] ANGLE = {42.0, 53.0};
+
+        // distance in meters
+        public static final double[] DISTANCE = {0.0, 31.0};
     }
 
     public final class CLIMBER {
