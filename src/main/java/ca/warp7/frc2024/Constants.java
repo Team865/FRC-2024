@@ -16,8 +16,8 @@ public final class Constants {
     public static final MODE CURRENT_MODE = MODE.REAL;
     public static final boolean TUNING_MODE = false;
 
-    public final class ARM {
-        public record Gains(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
+    public static final class ARM {
+        public static final record Gains(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
 
         public static final ARM.Gains GAINS =
                 switch (CURRENT_MODE) {
@@ -36,7 +36,7 @@ public final class Constants {
         public static final double[] DISTANCE = {0.0, 31.0};
     }
 
-    public final class CLIMBER {
+    public static final class CLIMBER {
         @RequiredArgsConstructor
         public static enum STATE {
             CLIMBER_START(0),
@@ -52,7 +52,7 @@ public final class Constants {
         }
     }
 
-    public class DRIVETRAIN {
+    public static final class DRIVETRAIN {
         public static final double DRIVE_BASE_X = Units.inchesToMeters(24.750);
         public static final double DRIVE_BASE_Y = Units.inchesToMeters(24.750);
 
@@ -72,7 +72,7 @@ public final class Constants {
         };
     }
 
-    public class OI {
+    public static final class OI {
         public static final double DEADBAND = 0.1;
     }
 
