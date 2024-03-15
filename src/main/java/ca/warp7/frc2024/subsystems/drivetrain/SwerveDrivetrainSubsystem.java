@@ -26,7 +26,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -107,11 +106,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         this.frontVisionIO = frontVisionIO;
         this.rearVisionIO = rearVisionIO;
 
-        Timer.delay(6);
-        swerveModules[0] = new SwerveModule(frontRightSwerveModuleIO, 0, "FrontRight");
-        swerveModules[1] = new SwerveModule(frontLeftSwerveModuleIO, 1, "FrontLeft");
-        swerveModules[2] = new SwerveModule(backLeftSwerveModuleIO, 2, "BackLeft");
-        swerveModules[3] = new SwerveModule(backRightSwerveModuleIO, 3, "BackRight");
+        swerveModules[0] = new SwerveModule(frontRightSwerveModuleIO, "FrontRight");
+        swerveModules[1] = new SwerveModule(frontLeftSwerveModuleIO, "FrontLeft");
+        swerveModules[2] = new SwerveModule(backLeftSwerveModuleIO, "BackLeft");
+        swerveModules[3] = new SwerveModule(backRightSwerveModuleIO, "BackRight");
 
         // Create and configure feedback controller
         aimAtFeedback = new PIDController(aimAtkP.get(), aimAtkI.get(), aimAtkD.get());

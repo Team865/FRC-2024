@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
     private final SwerveModuleIO moduleIO;
-    private final int moduleID;
     private final String moduleName;
 
     private final SimpleMotorFeedforward driveFeedforward;
@@ -26,9 +25,8 @@ public class SwerveModule {
     private final SwerveModuleIOInputsAutoLogged moduleInputs = new SwerveModuleIOInputsAutoLogged();
     private Rotation2d finalSteerOffset = null;
 
-    public SwerveModule(SwerveModuleIO moduleIO, int moduleID, String moduleName) {
+    public SwerveModule(SwerveModuleIO moduleIO, String moduleName) {
         this.moduleIO = moduleIO;
-        this.moduleID = moduleID;
         this.moduleName = moduleName;
 
         switch (Constants.CURRENT_MODE) {
