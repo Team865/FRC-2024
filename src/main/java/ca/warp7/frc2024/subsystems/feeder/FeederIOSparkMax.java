@@ -1,8 +1,10 @@
 package ca.warp7.frc2024.subsystems.feeder;
 
+import static ca.warp7.frc2024.util.SparkMaxManager.safeBurnSparkMax;
+import static ca.warp7.frc2024.util.SparkMaxManager.safeSparkMax;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,33 +19,33 @@ public class FeederIOSparkMax implements FeederIO {
     private DigitalInput sensor;
 
     public FeederIOSparkMax(int topID, int bottomID, int photoSensorID) {
+        /* Create hardware object  */
         topMotor = new CANSparkMax(topID, MotorType.kBrushless);
         bottomMotor = new CANSparkMax(bottomID, MotorType.kBrushless);
         encoder = topMotor.getEncoder();
         sensor = new DigitalInput(photoSensorID);
 
-        topMotor.restoreFactoryDefaults();
-        bottomMotor.restoreFactoryDefaults();
+        /* Factory reset SparkMaxes */
+        safeSparkMax(topMotor, topMotor::restoreFactoryDefaults);
+        safeSparkMax(bottomMotor, bottomMotor::restoreFactoryDefaults);
 
+        /* Configure motor invert and follows */
         topMotor.setInverted(true);
-        bottomMotor.follow(topMotor, false);
+        safeSparkMax(bottomMotor, () -> bottomMotor.follow(topMotor, false));
 
-        topMotor.setSmartCurrentLimit(20);
-        bottomMotor.setSmartCurrentLimit(20);
-        topMotor.enableVoltageCompensation(12);
-        bottomMotor.enableVoltageCompensation(12);
-        topMotor.setIdleMode(IdleMode.kBrake);
-        bottomMotor.setIdleMode(IdleMode.kBrake);
+        /* Configure electrical */
+        safeSparkMax(topMotor, () -> topMotor.setSmartCurrentLimit(20));
+        safeSparkMax(bottomMotor, () -> bottomMotor.setSmartCurrentLimit(20));
+        safeSparkMax(topMotor, () -> topMotor.enableVoltageCompensation(12.0));
+        safeSparkMax(bottomMotor, () -> bottomMotor.enableVoltageCompensation(12.0));
+        safeSparkMax(topMotor, () -> topMotor.setIdleMode(IdleMode.kBrake));
+        safeSparkMax(bottomMotor, () -> bottomMotor.setIdleMode(IdleMode.kBrake));
 
-        bottomMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
+        /* Save configurations */
+        safeBurnSparkMax(topMotor);
+        safeBurnSparkMax(bottomMotor);
 
         encoder.setPosition(0);
-
-        topMotor.setInverted(true);
-        bottomMotor.follow(topMotor, false);
-
-        topMotor.burnFlash();
-        bottomMotor.burnFlash();
     }
 
     @Override
@@ -62,5 +64,10 @@ public class FeederIOSparkMax implements FeederIO {
     @Override
     public void setVoltage(double volts) {
         topMotor.setVoltage(volts);
+    }
+
+    @Override
+    public void stop() {
+        topMotor.stopMotor();
     }
 }

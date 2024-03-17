@@ -80,6 +80,10 @@ public class SwerveModule {
         return optimizedState;
     }
 
+    public void setDriveFeedback() {
+        
+    }
+
     public void runCharacterization(double volts) {
         angleSetpoint = new Rotation2d();
 
