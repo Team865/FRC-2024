@@ -14,7 +14,7 @@ public final class Constants {
     }
 
     public static final MODE CURRENT_MODE = MODE.REAL;
-    public static final boolean TUNING_MODE = false;
+    public static final boolean TUNING_MODE = true;
 
     public static final class ARM {
         public static final record Gains(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
@@ -44,9 +44,9 @@ public final class Constants {
             CLIMBER_END_HIGHEST(750),
             CLIMBER_END(1250);
 
-            private final float position;
+            private final double position;
 
-            public float getStatePosition() {
+            public double getStatePosition() {
                 return position;
             }
         }

@@ -16,7 +16,7 @@ import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
 import ca.warp7.frc2024.subsystems.arm.ArmSubsystem.Setpoint;
 import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
-import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMaxNeo;
+import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMax;
 import ca.warp7.frc2024.subsystems.climber.ClimberSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIONavX;
@@ -37,6 +37,7 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
 import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
+import ca.warp7.frc2024.util.LoggedTunableNumber;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -61,8 +62,12 @@ public class RobotContainer {
 
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
+    private static final LoggedTunableNumber allShooterSpeed =
+            new LoggedTunableNumber("Shooter/AllShooterSpeed", 10000);
+
     /* Commands */
     private final Command simpleIntake;
+    private final Command simpleQueue;
     private final Command simpleShoot;
     private final Command simpleAmp;
     private final Command armStow;
@@ -70,6 +75,8 @@ public class RobotContainer {
     private final Command noteFlowForward;
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
+
+    private final Command queueShoot;
 
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
@@ -82,7 +89,7 @@ public class RobotContainer {
                         new ShooterModuleIOSparkMax550(21, true),
                         new ShooterModuleIOSparkMax550(20, false));
                 feederSubsystem = new FeederSubsystem(new FeederIOSparkMax(24, 25, 3));
-                climberSubsystem = new ClimberSubsystem(new ClimberIOSparkMaxNeo(30));
+                climberSubsystem = new ClimberSubsystem(new ClimberIOSparkMax(30));
                 ledSubsystem = new LEDSubsystem(0);
                 swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
                         new GyroIONavX() {},
@@ -137,29 +144,43 @@ public class RobotContainer {
 
         simpleIntake = Commands.parallel(
                         ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-                        intakeSubsystem.runVoltage(10).until(intakeSubsystem.sensorTrigger()),
-                        feederSubsystem.runVoltage(8).until(intakeSubsystem.sensorTrigger()))
+                        intakeSubsystem.runVoltageCommandEnds(10).until(intakeSubsystem.sensorTrigger()),
+                        feederSubsystem.runVoltageCommandEnds(8).until(intakeSubsystem.sensorTrigger()))
                 .andThen(
                         Commands.parallel(
-                                shooterSubsystem.runRPMCommand(-1500, 0, 1, 2, 3),
+                                shooterSubsystem.runVelocityCommand(-1500, 0, 1, 2, 3),
                                 ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                intakeSubsystem.runVoltage(10).until(feederSubsystem.sensorTrigger()),
-                                feederSubsystem.runVoltage(8).until(feederSubsystem.sensorTrigger())),
-                        shooterSubsystem.runRPMCommand(0, 0, 1, 2, 3));
+                                intakeSubsystem.runVoltageCommandEnds(10).until(feederSubsystem.sensorTrigger()),
+                                feederSubsystem.runVoltageCommandEnds(8).until(feederSubsystem.sensorTrigger())),
+                        shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
+
+        simpleQueue = shooterSubsystem
+                .runVelocityCommandEnds(-8000, 0, 1, 2, 3)
+                .alongWith(feederSubsystem.runVoltageCommandEnds(-3))
+                .until(feederSubsystem.sensorTrigger().negate());
+
+        // simpleShoot = Commands.sequence(
+        //         shooterSubsystem.runVelocityCommand(9000, 1, 2),
+        //         shooterSubsystem.runVelocityCommand(5000, 0, 3),
+        //         Commands.waitSeconds(0.75),
+        //         feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
+        //         shooterSubsystem.stopShooterCommand());
 
         simpleShoot = Commands.sequence(
-                shooterSubsystem.runRPMCommand(-8000, 0, 1, 2, 3).withTimeout(0.75),
-                Commands.waitSeconds(0.3),
-                feederSubsystem.runVoltage(-12).withTimeout(0.1),
-                shooterSubsystem.runRPMCommand(8500, 0, 1, 2, 3),
+                shooterSubsystem.runVelocityCommand(4500, 0, 3),
+                shooterSubsystem.runVelocityCommand(9000, 1, 2),
                 Commands.waitSeconds(0.75),
-                feederSubsystem.runVoltage(12).withTimeout(1),
+                feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
                 shooterSubsystem.stopShooterCommand());
 
+        queueShoot = Commands.sequence(simpleQueue, simpleShoot);
+
         simpleAmp = Commands.sequence(
-                Commands.parallel(shooterSubsystem.runRPMCommand(-5000, 0, 1, 2, 3), feederSubsystem.runVoltage(-8))
+                Commands.parallel(
+                                shooterSubsystem.runVelocityCommand(-5000, 0, 1, 2, 3),
+                                feederSubsystem.runVoltageCommandEnds(-8))
                         .withTimeout(3),
-                Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltage(0))
+                Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltageCommandEnds(0))
                         .withTimeout(0.125));
 
         armStow = armSubsystem
@@ -171,17 +192,19 @@ public class RobotContainer {
                 .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER));
 
         noteFlowForward = Commands.parallel(
-                intakeSubsystem.runVoltage(8),
-                feederSubsystem.runVoltage(8),
-                shooterSubsystem.runRPMCommand(6000, 0, 1, 2, 3));
+                intakeSubsystem.runVoltageCommandEnds(8),
+                feederSubsystem.runVoltageCommandEnds(8),
+                shooterSubsystem.runVelocityCommand(6000, 0, 1, 2, 3));
 
         noteFlowReverse = Commands.parallel(
-                intakeSubsystem.runVoltage(-11),
-                feederSubsystem.runVoltage(-8),
-                shooterSubsystem.runRPMCommand(-6000, 0, 1, 2, 3));
+                intakeSubsystem.runVoltageCommandEnds(-11),
+                feederSubsystem.runVoltageCommandEnds(-8),
+                shooterSubsystem.runVelocityCommand(-6000, 0, 1, 2, 3));
 
         stopNoteFlow = Commands.parallel(
-                intakeSubsystem.runVoltage(0), feederSubsystem.runVoltage(0), shooterSubsystem.stopShooterCommand());
+                intakeSubsystem.runVoltageCommandEnds(0),
+                feederSubsystem.runVoltageCommandEnds(0),
+                shooterSubsystem.stopShooterCommand());
 
         NamedCommands.registerCommand("simpleIntake", simpleIntake);
         NamedCommands.registerCommand("simpleShoot", simpleShoot);
@@ -204,9 +227,7 @@ public class RobotContainer {
 
             autonomousRoutineChooser.addOption(
                     "Shooter dynamic reverse", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-            autonomousRoutineChooser.addOption("Zero shooter", Commands.runOnce(() -> {
-                shooterSubsystem.zeroEncoder();
-            }));
+            autonomousRoutineChooser.addOption("Zero shooter", shooterSubsystem.zeroEncoderCommand());
         }
 
         configureDriverBindings();
@@ -231,11 +252,6 @@ public class RobotContainer {
                 .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointAtLocation.NONE));
 
         driver.b().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
-
-        driver.povDown().onTrue(armSubsystem.setSetpointCommand(Setpoint.INTERPOLATED));
-        driver.povUp().onTrue(armSubsystem.setDistance(10.0));
-        driver.povLeft().onTrue(armSubsystem.setDistance(100.0));
-        driver.povRight().onTrue(armSubsystem.setDistance(2.0));
     }
 
     private void configureOperatorBindings() {
@@ -252,14 +268,15 @@ public class RobotContainer {
         operator.y().onTrue(armSubsystem.setSetpointCommand(Setpoint.BLOCKER));
 
         /* Scoring */
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(simpleShoot);
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleShoot);
+        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(queueShoot);
+        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleQueue);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.AMP)).onTrue(simpleAmp);
 
         /* Override Procedures */
         operator.leftBumper().onTrue(noteFlowReverse).onFalse(stopNoteFlow);
         operator.rightBumper().onTrue(noteFlowForward).onFalse(stopNoteFlow);
         operator.b().onTrue(stopNoteFlow);
+        operator.start().whileTrue(Commands.runEnd(() -> shooterSubsystem.setVelocity(allShooterSpeed.get(), 0,1,2,3), () -> shooterSubsystem.stopShooter()));
 
         /* Climbing */
         climberSubsystem.setDefaultCommand(

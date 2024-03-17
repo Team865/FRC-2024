@@ -32,7 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 new SysIdRoutine.Config(
                         null, null, null, (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
-                        (voltage) -> runShooterVolts(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
+                        (voltage) -> setVoltage(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
     }
 
     @Override
@@ -54,15 +54,15 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    public void runShooterVolts(double volts, int... shooterModules) {
+    private void setVoltage(double volts, int... shooterModules) {
         for (var shooterModule : shooterModules) {
-            this.shooterModules[shooterModule].runShooterVolts(volts);
+            this.shooterModules[shooterModule].setVoltage(volts);
         }
     }
 
-    public void setRPM(double RPM, int... shooterModules) {
+    public void setVelocity(double RPM, int... shooterModules) {
         for (var shooterModule : shooterModules) {
-            this.shooterModules[shooterModule].runShooterTargetVelocity(RPM);
+            this.shooterModules[shooterModule].setVelocity(RPM);
         }
     }
 
@@ -76,22 +76,34 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    public void zeroEncoder() {
+    private void zeroEncoder() {
         for (var shooterModule : shooterModules) {
             shooterModule.zeroEncoder();
         }
     }
 
-    public Command runRPMCommand(double RPM, int... shooterModules) {
-        return this.runOnce(() -> setRPM(RPM, shooterModules));
+    public Command runVelocityCommand(double RPM, int... shooterModules) {
+        return this.runOnce(() -> setVelocity(RPM, shooterModules));
+    }
+
+    public Command runVelocityCommandEnds(double RPM, int... shooterModules) {
+        return this.startEnd(() -> setVelocity(RPM, shooterModules), () -> stopShooter());
     }
 
     public Command runVoltageCommand(double volts, int... shooterModules) {
-        return this.runOnce(() -> runShooterVolts(volts, shooterModules));
+        return this.runOnce(() -> setVoltage(volts, shooterModules));
+    }
+
+    public Command runVoltageCommandEnds(double volts, int... shooterModules) {
+        return this.startEnd(() -> setVoltage(volts, shooterModules), () -> stopShooter());
     }
 
     public Command stopShooterCommand() {
         return this.runOnce(() -> stopShooter());
+    }
+
+    public Command zeroEncoderCommand() {
+        return this.runOnce(() -> zeroEncoder());
     }
 
     /**

@@ -61,8 +61,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             rawGyroRotation,
             lastModulePositions,
             new Pose2d(),
-            VecBuilder.fill(0.05, 0.05, 0.05),
-            VecBuilder.fill(0.5, 0.5, 999999999));
+            VecBuilder.fill(0.05, 0.05, 0.005),
+            VecBuilder.fill(2, 2, 999999999));
 
     /* Controllers */
     private final PIDController aimAtFeedback;
@@ -80,14 +80,14 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         NONE(new Translation2d()),
         SPEAKER(new Translation2d(0.25, 5.55));
 
-        private final Translation2d bluePoint;
+        private final Translation2d blueTranslation;
 
-        public Translation2d getTranslatedPoint() {
+        public Translation2d getAllianceTranslation() {
             if (DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red) {
-                return new Translation2d(16.54 - bluePoint.getX(), bluePoint.getY());
+                return new Translation2d(16.54 - blueTranslation.getX(), blueTranslation.getY());
             } else {
-                return bluePoint;
+                return blueTranslation;
             }
         }
     }
@@ -186,12 +186,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
 
-        // if (rearVisionInputs.tagCount >= 2) {
-        //     poseEstimator.addVisionMeasurement(
-        //             rearVisionInputs.blueOriginRobotPose,
-        //             rearVisionInputs.timestamp,
-        //             VecBuilder.fill(0.7, 0.7, 999999999));
-        // }
+        if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 2.5) {
+            poseEstimator.addVisionMeasurement(
+                    rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(2, 2, 999999999));
+        }
 
         // poseEstimator.addVisionMeasurement(, DEADBAND);
 
@@ -329,7 +327,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      * @return Command for stopWithX
      */
     public Command stopWithXCommand() {
-        return this.runOnce(this::stopWithX);
+        return this.run(this::stopWithX);
     }
 
     /**
@@ -422,7 +420,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
                     Translation2d pointAt = swerveDrivetrainSubsystem.pointAt == PointAtLocation.NONE
                             ? null
-                            : swerveDrivetrainSubsystem.pointAt.getTranslatedPoint();
+                            : swerveDrivetrainSubsystem.pointAt.getAllianceTranslation();
 
                     /* Aim at code courtesy of FRC 418 */
                     if (pointAt != null) {

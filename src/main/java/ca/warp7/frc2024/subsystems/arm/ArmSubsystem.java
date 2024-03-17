@@ -4,6 +4,7 @@ import static ca.warp7.frc2024.Constants.ARM.*;
 
 import ca.warp7.frc2024.util.LoggedTunableNumber;
 import ca.warp7.frc2024.util.PolynomialRegression;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
@@ -67,7 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
         STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 0)),
         AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 67)),
         TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 3)),
-        PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 65)),
+        PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 63)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/SubwooferDegrees", 50)),
         BLOCKER(new LoggedTunableNumber("Arm/Setpoint/BlockerDegrees", 80)),
         IDLE(() -> 0),
@@ -84,6 +86,7 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
+    @Getter
     private Setpoint setpoint = Setpoint.IDLE;
 
     private Rotation2d armOffset = null;
@@ -152,13 +155,9 @@ public class ArmSubsystem extends SubsystemBase {
                 kA);
 
         // Log angles in degrees
-        Logger.recordOutput("Arm/InternalIncrementalAngleDegrees", inputs.armInternalIncrementalPosition.getDegrees());
-        Logger.recordOutput("Arm/ExternalIncrementalAngleDegrees", inputs.armExternalIncrementalPosition.getDegrees());
-        Logger.recordOutput("Arm/ExternalAbsoluteEncoderAngleDegrees", inputs.armExternalAbsolutePosition.getDegrees());
         Logger.recordOutput(
                 "Arm/IdealIncrementalAngleDegrees", getIdealIncrementalAngle().getDegrees());
         Logger.recordOutput("Arm/OffsetDegrees", armOffset.getDegrees());
-        Logger.recordOutput("Arm/SetpointDegrees", setpoint.getDegrees());
 
         // Log mechanism2d
         mechanismLigament.setAngle(getIdealIncrementalAngle().getDegrees());
@@ -166,11 +165,11 @@ public class ArmSubsystem extends SubsystemBase {
 
         // Calculate and  voltage if setpoint is not idle
         if (setpoint != Setpoint.IDLE) {
-            double setpointVoltage =
-                    feedback.calculate(getIdealIncrementalAngle().getDegrees(), setpoint.getDegrees());
+            double setpointDegrees = MathUtil.clamp(setpoint.getDegrees(), 0, 81);
+            Logger.recordOutput("Arm/SetpointDegrees", setpointDegrees);
 
-            Logger.recordOutput("Arm/FeedbackVoltage", setpointVoltage);
-            Logger.recordOutput("Arm/SetpointDifference", mechanism);
+            double setpointVoltage =
+                    feedback.calculate(getIdealIncrementalAngle().getDegrees(), setpointDegrees);
             io.setVoltage(setpointVoltage);
         }
     }

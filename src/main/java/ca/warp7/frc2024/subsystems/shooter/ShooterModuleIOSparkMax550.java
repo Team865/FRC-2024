@@ -1,5 +1,8 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
+import static ca.warp7.frc2024.util.SparkMaxManager.safeBurnSparkMax;
+import static ca.warp7.frc2024.util.SparkMaxManager.safeSparkMax;
+
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -16,19 +19,25 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
     private final SparkPIDController feedback;
 
     public ShooterModuleIOSparkMax550(int shooterSparkMaxId, boolean invert) {
+        /* Create hardware objects */
         motor = new CANSparkMax(shooterSparkMaxId, MotorType.kBrushless);
-
-        // TODO: FIX config
-        motor.enableVoltageCompensation(12.0);
-        motor.setSmartCurrentLimit(15);
-        motor.setIdleMode(IdleMode.kBrake);
-        if (invert) {
-            motor.setInverted(true);
-        }
-
-        // Specify encoder type: https://www.chiefdelphi.com/t/psa-new-crash-bug-in-revlib-2024-2-2/456242
         encoder = motor.getEncoder();
         feedback = motor.getPIDController();
+
+        /* Factory reset SparkMax */
+        safeSparkMax(motor, motor::restoreFactoryDefaults);
+
+        /* Configure motor invert */
+        motor.setInverted(invert);
+
+        /* Configure electrical */
+        safeSparkMax(motor, () -> motor.setSmartCurrentLimit(20));
+        safeSparkMax(motor, () -> motor.enableVoltageCompensation(12.0));
+        safeSparkMax(motor, () -> motor.setIdleMode(IdleMode.kBrake));
+
+        /* Save configurations */
+        safeBurnSparkMax(motor);
+
         encoder.setAverageDepth(8);
         encoder.setMeasurementPeriod(8);
         feedback.setFeedbackDevice(encoder);
@@ -45,9 +54,9 @@ public class ShooterModuleIOSparkMax550 implements ShooterModuleIO {
 
     @Override
     public void configurePID(double kP, double kI, double kD) {
-        feedback.setP(kP, 0);
-        feedback.setI(kI, 0);
-        feedback.setD(kD, 0);
+        safeSparkMax(motor, () -> feedback.setP(kP, 0));
+        safeSparkMax(motor, () -> feedback.setI(kI, 0));
+        safeSparkMax(motor, () -> feedback.setD(kD, 0));
     }
 
     @Override

@@ -49,7 +49,7 @@ public class ShooterModule {
      * Set closed loop control target velocity
      * @param velocityRPM
      */
-    public void runShooterTargetVelocity(double velocityRPM) {
+    public void setVelocity(double velocityRPM) {
         double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
         shooterModuleIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
@@ -64,7 +64,7 @@ public class ShooterModule {
      * Set open loop control volts
      * @param volts
      */
-    public void runShooterVolts(double volts) {
+    public void setVoltage(double volts) {
         shooterModuleIO.setVoltage(volts);
     }
 
