@@ -7,16 +7,14 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterModule {
     private final ShooterModuleIO shooterModuleIO;
-    private final int shooterModuleID;
     private final String shooterModuleName;
 
     private SimpleMotorFeedforward feedforward;
 
     private final ShooterModuleIOInputsAutoLogged shooterModuleInputs = new ShooterModuleIOInputsAutoLogged();
 
-    public ShooterModule(ShooterModuleIO shooterModuleIO, int shooterModuleID, String shooterModuleName) {
+    public ShooterModule(ShooterModuleIO shooterModuleIO, String shooterModuleName) {
         this.shooterModuleIO = shooterModuleIO;
-        this.shooterModuleID = shooterModuleID;
         this.shooterModuleName = shooterModuleName;
 
         switch (Constants.CURRENT_MODE) {
