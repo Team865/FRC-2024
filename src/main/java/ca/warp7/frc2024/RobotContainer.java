@@ -31,10 +31,11 @@ import ca.warp7.frc2024.subsystems.feeder.FeederIOSparkMax;
 import ca.warp7.frc2024.subsystems.feeder.FeederSubsystem;
 import ca.warp7.frc2024.subsystems.leds.LEDSubsystem;
 import ca.warp7.frc2024.subsystems.leds.LEDSubsystem.SparkColor;
+import ca.warp7.frc2024.subsystems.shooter.ShooterConstants;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIO;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSim;
 import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
-import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystem;
+import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystemCommands;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
 import ca.warp7.frc2024.util.LoggedTunableNumber;
@@ -51,7 +52,7 @@ public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
     private final ArmSubsystem armSubsystem;
     private final IntakeSubsystem intakeSubsystem;
-    private final ShooterSubsystem shooterSubsystem;
+    private final ShooterSubsystemCommands shooterSubsystem;
     private final FeederSubsystem feederSubsystem;
     private final ClimberSubsystem climberSubsystem;
     private final LEDSubsystem ledSubsystem;
@@ -83,7 +84,7 @@ public class RobotContainer {
             case REAL:
                 armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31, 4));
-                shooterSubsystem = new ShooterSubsystem(
+                shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIOSparkMax550(22, true),
                         new ShooterModuleIOSparkMax550(23, false),
                         new ShooterModuleIOSparkMax550(21, true),
@@ -111,7 +112,7 @@ public class RobotContainer {
                         new SwerveModuleIOSim());
                 armSubsystem = new ArmSubsystem(new ArmIOSim() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSim() {});
-                shooterSubsystem = new ShooterSubsystem(
+                shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIOSim(),
                         new ShooterModuleIOSim(),
                         new ShooterModuleIOSim(),
@@ -132,7 +133,7 @@ public class RobotContainer {
                         new SwerveModuleIO() {});
                 armSubsystem = new ArmSubsystem(new ArmIO() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
-                shooterSubsystem = new ShooterSubsystem(
+                shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIO() {},
                         new ShooterModuleIO() {},
                         new ShooterModuleIO() {},
@@ -276,7 +277,7 @@ public class RobotContainer {
         operator.leftBumper().onTrue(noteFlowReverse).onFalse(stopNoteFlow);
         operator.rightBumper().onTrue(noteFlowForward).onFalse(stopNoteFlow);
         operator.b().onTrue(stopNoteFlow);
-        operator.start().whileTrue(Commands.runEnd(() -> shooterSubsystem.setVelocity(allShooterSpeed.get(), 0,1,2,3), () -> shooterSubsystem.stopShooter()));
+        operator.start().whileTrue(shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.TUNING));
 
         /* Climbing */
         climberSubsystem.setDefaultCommand(

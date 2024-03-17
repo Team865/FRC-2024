@@ -2,6 +2,7 @@ package ca.warp7.frc2024.subsystems.drivetrain;
 
 import static ca.warp7.frc2024.Constants.DRIVETRAIN.*;
 import static ca.warp7.frc2024.Constants.OI.*;
+import static ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.*;
 import static edu.wpi.first.units.Units.Volts;
 
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
@@ -72,13 +73,24 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final LoggedTunableNumber aimAtkI = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kI", 0);
     private final LoggedTunableNumber aimAtkD = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kD", 0);
 
+    private final LoggedTunableNumber drivekS = new LoggedTunableNumber("Drivetrain/Gains/Drive/kS", DRIVE_GAINS.kS());
+    private final LoggedTunableNumber drivekV = new LoggedTunableNumber("Drivetrain/Gains/Drive/kV", DRIVE_GAINS.kV());
+
+    private final LoggedTunableNumber drivekP = new LoggedTunableNumber("Drivetrain/Gains/Drive/kP", DRIVE_GAINS.kP());
+    private final LoggedTunableNumber drivekI = new LoggedTunableNumber("Drivetrain/Gains/Drive/kI", DRIVE_GAINS.kI());
+    private final LoggedTunableNumber drivekD = new LoggedTunableNumber("Drivetrain/Gains/Drive/kD", DRIVE_GAINS.kD());
+
+    private final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drivetrain/Gains/Steer/kP", STEER_GAINS.kP());
+    private final LoggedTunableNumber steerkI = new LoggedTunableNumber("Drivetrain/Gains/Steer/kI", STEER_GAINS.kI());
+    private final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drivetrain/Gains/Steer/kD", STEER_GAINS.kD());
+
     private final SysIdRoutine sysId;
 
     /* Setpoints */
     @RequiredArgsConstructor
     public enum PointAtLocation {
         NONE(new Translation2d()),
-        SPEAKER(new Translation2d(0.25, 5.55));
+        SPEAKER(new Translation2d(0.15, 5.55));
 
         private final Translation2d blueTranslation;
 
@@ -115,7 +127,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         aimAtFeedback = new PIDController(aimAtkP.get(), aimAtkI.get(), aimAtkD.get());
         aimAtFeedback.enableContinuousInput(-180, 180);
 
+        // Reset robot pose
         setPose(new Pose2d(0, 0, new Rotation2d()));
+
+        // Set initial gains
+        for (int i = 0; i < 4; i++) {
+            swerveModules[i].setDriveFeedforwardGains(drivekS.get(), drivekV.get());
+            swerveModules[i].setDriveFeedbackGains(drivekP.get(), drivekI.get(), drivekD.get());
+            swerveModules[i].setSteerFeedbackGains(steerkP.get(), steerkI.get(), steerkD.get());
+        }
 
         // Configure PathPlanner
         AutoBuilder.configureHolonomic(
@@ -127,6 +147,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);
+
+        // Log PathPlanner
         PathPlannerLogging.setLogActivePathCallback((activePath) -> {
             Logger.recordOutput("Drivetrain/Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
         });
@@ -168,7 +190,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Calculate last module position
         SwerveModulePosition[] modulePositions = getModulePositions();
         SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
-        for (int i = 0; i <= 3; i++) {
+        for (int i = 0; i < 4; i++) {
             moduleDeltas[i] = new SwerveModulePosition(
                     modulePositions[i].distanceMeters - lastModulePositions[i].distanceMeters,
                     modulePositions[i].angle);
@@ -229,6 +251,38 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 aimAtkP,
                 aimAtkI,
                 aimAtkD);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    for (int i = 0; i < 4; i++) {
+                        swerveModules[i].setDriveFeedforwardGains(drivekS.get(), drivekV.get());
+                    }
+                },
+                drivekS,
+                drivekV);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    for (int i = 0; i < 4; i++) {
+                        swerveModules[i].setDriveFeedbackGains(drivekP.get(), drivekI.get(), drivekD.get());
+                    }
+                },
+                drivekP,
+                drivekI,
+                drivekD);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    for (int i = 0; i < 4; i++) {
+                        swerveModules[i].setSteerFeedbackGains(steerkP.get(), steerkI.get(), steerkD.get());
+                    }
+                },
+                steerkP,
+                steerkI,
+                steerkD);
     }
 
     /**
@@ -243,7 +297,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Set individual modules target state
         SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
-        for (int i = 0; i <= 3; i++) {
+        for (int i = 0; i < 4; i++) {
             optimizedStates[i] = swerveModules[i].setTargetState(swerveModuleStates[i]);
         }
 
@@ -310,7 +364,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      * @return Command for stop
      */
     public Command stopCommand() {
-        return this.runOnce(this::stopCommand);
+        return this.runOnce(this::stop);
     }
 
     /**
