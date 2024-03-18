@@ -1,0 +1,97 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.38,
+      "y": 5.55
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "queueShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Move Test"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Copy of Move Test"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "queueShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterSub_CenterNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterNote_CenterSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "queueShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

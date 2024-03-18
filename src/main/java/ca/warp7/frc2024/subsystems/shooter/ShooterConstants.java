@@ -10,7 +10,7 @@ public final class ShooterConstants {
 
     public static final Gains Gains =
             switch (CURRENT_MODE) {
-                case REAL -> new Gains(0.00065, 0.0, 0.1, 0.021949, 0.010201, 0.0010146);
+                case REAL -> new Gains(0.0008, 0.0, 0.01, 0.021949, 0.010201, 0.0010146);
                 case SIM -> new Gains(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                 default -> new Gains(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             };

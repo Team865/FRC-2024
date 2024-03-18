@@ -58,7 +58,7 @@ public final class Constants {
 
         public static final double DRIVE_BASE_RADIUS = Math.hypot(DRIVE_BASE_X / 2.0, DRIVE_BASE_Y / 2.0);
 
-        public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
+        public static final double WHEEL_DIAMETER = Units.inchesToMeters(3.9);
         public static final double WHEEL_RADIUS = WHEEL_DIAMETER / 2.0;
 
         public static final double MAX_LINEAR_SPEED = Units.feetToMeters(16.5);
