@@ -1,6 +1,6 @@
 package ca.warp7.frc2024.subsystems.arm;
 
-import static ca.warp7.frc2024.Constants.ARM.*;
+import static ca.warp7.frc2024.subsystems.arm.ArmConstants.*;
 
 import ca.warp7.frc2024.util.LoggedTunableNumber;
 import ca.warp7.frc2024.util.PolynomialRegression;
@@ -9,18 +9,13 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 // TODO: Use absolute encoder if greater than x degrees
@@ -54,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     /* Interpolation */
     private static PolynomialRegression polynominal = new PolynomialRegression(DISTANCE, ANGLE, 2, "Distance");
-    private static double distance = 0;
+    protected static double distance = 0;
     private static DoubleSupplier armAngleSupplier = new DoubleSupplier() {
         @Override
         public double getAsDouble() {
@@ -63,33 +58,11 @@ public class ArmSubsystem extends SubsystemBase {
     };
 
     /* Setpoints */
-    @RequiredArgsConstructor
-    public enum Setpoint {
-        HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Setpoint/HandoffIntakeDegrees", 0)),
-        STATION_INTAKE(new LoggedTunableNumber("Arm/Setpoint/StationIntakeDegrees", 0)),
-        AMP(new LoggedTunableNumber("Arm/Setpoint/AmpDegrees", 67)),
-        TRAP(new LoggedTunableNumber("Arm/Setpoint/TrapDegrees", 3)),
-        PODIUM(new LoggedTunableNumber("Arm/Setpoint/PodiumDegrees", 63)),
-        SUBWOOFER(new LoggedTunableNumber("Arm/Setpoint/SubwooferDegrees", 50)),
-        BLOCKER(new LoggedTunableNumber("Arm/Setpoint/BlockerDegrees", 80)),
-        IDLE(() -> 0),
-        INTERPOLATED(armAngleSupplier);
-
-        private final DoubleSupplier armSetpointSupplier;
-
-        private double getDegrees() {
-            return armSetpointSupplier.getAsDouble();
-        }
-
-        private double getRadians() {
-            return Units.degreesToRadians(getDegrees());
-        }
-    }
-
-    @Getter
-    private Setpoint setpoint = Setpoint.IDLE;
+    protected Goal currentGoal = Goal.IDLE;
 
     private Rotation2d armOffset = null;
+
+    protected boolean lockout = false;
 
     public ArmSubsystem(ArmIO armIO) {
         this.io = armIO;
@@ -108,7 +81,8 @@ public class ArmSubsystem extends SubsystemBase {
         mechanismLigament = mechanismRoot.append(new MechanismLigament2d(
                 "ArmShooter", 0.5, getIdealIncrementalAngle().getDegrees(), 2, new Color8Bit(Color.kAqua)));
 
-        setpoint = Setpoint.HANDOFF_INTAKE;
+        // Arm starts stowed
+        currentGoal = Goal.HANDOFF_INTAKE;
     }
 
     private Rotation2d getIdealIncrementalAngle() {
@@ -125,6 +99,7 @@ public class ArmSubsystem extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
+        // Calculate offset from absolute encoder
         if (armOffset == null) {
             armOffset = inputs.armExternalAbsolutePosition.minus(inputs.armExternalIncrementalPosition);
             feedback.reset(getIdealIncrementalAngle().getDegrees());
@@ -163,30 +138,19 @@ public class ArmSubsystem extends SubsystemBase {
         mechanismLigament.setAngle(getIdealIncrementalAngle().getDegrees());
         Logger.recordOutput("Arm/Mechanism2d/ArmPivot", mechanism);
 
-        // Calculate and  voltage if setpoint is not idle
-        if (setpoint != Setpoint.IDLE) {
-            double setpointDegrees = MathUtil.clamp(setpoint.getDegrees(), 0, 81);
-            Logger.recordOutput("Arm/SetpointDegrees", setpointDegrees);
+        // Calculate and set voltage if goal is not idle
+        // If lockout is engaged, the goal is set to the stow position
+        if (currentGoal != Goal.IDLE) {
+            Goal goal = lockout ? Goal.HANDOFF_INTAKE : currentGoal;
+            double goalDegrees = MathUtil.clamp(goal.getDegrees(), 0, 81);
 
-            double setpointVoltage =
-                    feedback.calculate(getIdealIncrementalAngle().getDegrees(), setpointDegrees);
-            io.setVoltage(setpointVoltage);
+            Logger.recordOutput("Arm/GoalDegrees", goalDegrees);
+            double goalVoltage = feedback.calculate(getIdealIncrementalAngle().getDegrees(), goalDegrees);
+            io.setVoltage(goalVoltage);
         }
     }
 
-    private boolean atSetpoint(Setpoint setpoint) {
-        return this.setpoint == setpoint && feedback.atGoal() ? true : false;
-    }
-
-    public Trigger atSetpointTrigger(Setpoint setpoint) {
-        return new Trigger(() -> atSetpoint(setpoint)).debounce(0.1);
-    }
-
-    public Command setSetpointCommand(Setpoint setpoint) {
-        return this.runOnce(() -> this.setpoint = setpoint);
-    }
-
-    public Command setDistance(double distance) {
-        return this.runOnce(() -> ArmSubsystem.distance = distance);
+    protected boolean atGoal(Goal goal) {
+        return this.currentGoal == goal && feedback.atGoal();
     }
 }

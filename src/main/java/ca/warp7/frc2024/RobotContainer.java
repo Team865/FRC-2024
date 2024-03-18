@@ -9,11 +9,11 @@ import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMax;
 import ca.warp7.frc2024.subsystems.Intake.IntakeSubsystem;
+import ca.warp7.frc2024.subsystems.arm.ArmConstants;
 import ca.warp7.frc2024.subsystems.arm.ArmIO;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSim;
 import ca.warp7.frc2024.subsystems.arm.ArmIOSparkMax;
-import ca.warp7.frc2024.subsystems.arm.ArmSubsystem;
-import ca.warp7.frc2024.subsystems.arm.ArmSubsystem.Setpoint;
+import ca.warp7.frc2024.subsystems.arm.ArmSubsystemCommands;
 import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMax;
@@ -38,10 +38,10 @@ import ca.warp7.frc2024.subsystems.shooter.ShooterModuleIOSparkMax550;
 import ca.warp7.frc2024.subsystems.shooter.ShooterSubsystemCommands;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
-import ca.warp7.frc2024.util.LoggedTunableNumber;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -50,7 +50,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
     private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
-    private final ArmSubsystem armSubsystem;
+    private final ArmSubsystemCommands armSubsystem;
     private final IntakeSubsystem intakeSubsystem;
     private final ShooterSubsystemCommands shooterSubsystem;
     private final FeederSubsystem feederSubsystem;
@@ -63,26 +63,24 @@ public class RobotContainer {
 
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
-    private static final LoggedTunableNumber allShooterSpeed =
-            new LoggedTunableNumber("Shooter/AllShooterSpeed", 10000);
-
     /* Commands */
     private final Command simpleIntake;
     private final Command simpleQueue;
     private final Command simpleShoot;
     private final Command simpleAmp;
-    private final Command armStow;
-    private final Command armSubwoofer;
     private final Command noteFlowForward;
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
 
     private final Command queueShoot;
 
+    private final Command rumbleDriver;
+    private final Command rumbleOperator;
+
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                armSubsystem = new ArmSubsystem(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
+                armSubsystem = new ArmSubsystemCommands(new ArmIOSparkMax(11, 10, 0, 1, 2, new Rotation2d(1.543)));
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSparkMax(31, 4));
                 shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIOSparkMax550(22, true),
@@ -110,7 +108,7 @@ public class RobotContainer {
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim(),
                         new SwerveModuleIOSim());
-                armSubsystem = new ArmSubsystem(new ArmIOSim() {});
+                armSubsystem = new ArmSubsystemCommands(new ArmIOSim() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIOSim() {});
                 shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIOSim(),
@@ -131,7 +129,7 @@ public class RobotContainer {
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {},
                         new SwerveModuleIO() {});
-                armSubsystem = new ArmSubsystem(new ArmIO() {});
+                armSubsystem = new ArmSubsystemCommands(new ArmIO() {});
                 intakeSubsystem = new IntakeSubsystem(new IntakeIO() {});
                 shooterSubsystem = new ShooterSubsystemCommands(
                         new ShooterModuleIO() {},
@@ -142,6 +140,16 @@ public class RobotContainer {
                 climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
                 ledSubsystem = new LEDSubsystem(0);
         }
+
+        rumbleDriver = Commands.sequence(
+                Commands.runOnce(() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.25)),
+                Commands.waitSeconds(0.5),
+                Commands.runOnce(() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0)));
+
+        rumbleOperator = Commands.runEnd(
+                        () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.25),
+                        () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+                .withTimeout(0.5);
 
         simpleIntake = Commands.parallel(
                         ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
@@ -155,17 +163,26 @@ public class RobotContainer {
                                 feederSubsystem.runVoltageCommandEnds(8).until(feederSubsystem.sensorTrigger())),
                         shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
 
+        // simpleIntake = Commands.sequence(
+        //         Commands.parallel(
+        //                         ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
+        //                         intakeSubsystem.runVoltageCommandEnds(10),
+        //                         feederSubsystem.runVoltageCommandEnds(8))
+        //                 .until(intakeSubsystem.sensorTrigger()),
+        //         Commands.parallel(
+        //                         shooterSubsystem.runVelocityCommand(-1500, 0, 1, 2, 3),
+        //                         ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+        //                         rumbleDriver,
+        //                         rumbleOperator,
+        //                         intakeSubsystem.runVoltageCommandEnds(10),
+        //                         feederSubsystem.runVoltageCommandEnds(8))
+        //                 .until(feederSubsystem.sensorTrigger()),
+        //         shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
+
         simpleQueue = shooterSubsystem
                 .runVelocityCommandEnds(-8000, 0, 1, 2, 3)
                 .alongWith(feederSubsystem.runVoltageCommandEnds(-3))
                 .until(feederSubsystem.sensorTrigger().negate());
-
-        // simpleShoot = Commands.sequence(
-        //         shooterSubsystem.runVelocityCommand(9000, 1, 2),
-        //         shooterSubsystem.runVelocityCommand(5000, 0, 3),
-        //         Commands.waitSeconds(0.75),
-        //         feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
-        //         shooterSubsystem.stopShooterCommand());
 
         simpleShoot = Commands.sequence(
                 shooterSubsystem.runVelocityCommand(4500, 0, 3),
@@ -174,50 +191,39 @@ public class RobotContainer {
                 feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
                 shooterSubsystem.stopShooterCommand());
 
+        simpleAmp = Commands.sequence(Commands.parallel(
+                        shooterSubsystem.runVelocityCommandEnds(-8000, 0, 1, 2, 3),
+                        feederSubsystem.runVoltageCommandEnds(-8))
+                .withTimeout(1.5));
+
         queueShoot = Commands.sequence(simpleQueue, simpleShoot);
-
-        simpleAmp = Commands.sequence(
-                Commands.parallel(
-                                shooterSubsystem.runVelocityCommand(-5000, 0, 1, 2, 3),
-                                feederSubsystem.runVoltageCommandEnds(-8))
-                        .withTimeout(3),
-                Commands.parallel(shooterSubsystem.stopShooterCommand(), feederSubsystem.runVoltageCommandEnds(0))
-                        .withTimeout(0.125));
-
-        armStow = armSubsystem
-                .setSetpointCommand(Setpoint.HANDOFF_INTAKE)
-                .until(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE));
-
-        armSubwoofer = armSubsystem
-                .setSetpointCommand(Setpoint.SUBWOOFER)
-                .until(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER));
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
                 feederSubsystem.runVoltageCommandEnds(8),
-                shooterSubsystem.runVelocityCommand(6000, 0, 1, 2, 3));
+                shooterSubsystem.runVelocityCommandEnds(6000, 0, 1, 2, 3));
 
         noteFlowReverse = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(-11),
                 feederSubsystem.runVoltageCommandEnds(-8),
-                shooterSubsystem.runVelocityCommand(-6000, 0, 1, 2, 3));
+                shooterSubsystem.runVelocityCommandEnds(-6000, 0, 1, 2, 3));
 
         stopNoteFlow = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(0),
                 feederSubsystem.runVoltageCommandEnds(0),
                 shooterSubsystem.stopShooterCommand());
 
+        NamedCommands.registerCommand("armStow", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
+        NamedCommands.registerCommand("armSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
         NamedCommands.registerCommand("simpleIntake", simpleIntake);
         NamedCommands.registerCommand("simpleShoot", simpleShoot);
-        NamedCommands.registerCommand("armSubwoofer", armSubwoofer);
         NamedCommands.registerCommand("queueShoot", queueShoot);
-        NamedCommands.registerCommand("armStow", armStow);
-        // NamedCommands.registerCommand("shootAtSubwoofer", Commands.sequence(armSubwoofer, simpleShoot, armStow));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
 
         if (Constants.TUNING_MODE) {
+            // Shooter SysID routines
             autonomousRoutineChooser.addOption(
                     "Shooter quasistatic forward", shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
 
@@ -229,8 +235,10 @@ public class RobotContainer {
 
             autonomousRoutineChooser.addOption(
                     "Shooter dynamic reverse", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
             autonomousRoutineChooser.addOption("Zero shooter", shooterSubsystem.zeroEncoderCommand());
 
+            // Drivetrain SysID routines
             autonomousRoutineChooser.addOption(
                     "Drivetrain quasistatic forward",
                     swerveDrivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -262,7 +270,11 @@ public class RobotContainer {
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
-        driver.leftBumper().whileTrue(armSubsystem.setSetpointCommand(Setpoint.HANDOFF_INTAKE));
+
+        driver.leftBumper()
+                .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE))
+                .onTrue(armSubsystem.setLockoutCommand(true))
+                .onFalse(armSubsystem.setLockoutCommand(false));
 
         driver.a()
                 .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointAtLocation.SPEAKER))
@@ -274,25 +286,26 @@ public class RobotContainer {
     private void configureOperatorBindings() {
         // spotless:off
         /* Intaking */
-        operator.rightTrigger().and(armSubsystem.atSetpointTrigger(Setpoint.HANDOFF_INTAKE)).onTrue(simpleIntake);
+        operator.rightTrigger().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE)).onTrue(simpleIntake);
 
         /* Arm */
-        operator.povDown().onTrue(armSubsystem.setSetpointCommand(Setpoint.HANDOFF_INTAKE));
-        operator.povUp().onTrue(armSubsystem.setSetpointCommand(Setpoint.PODIUM));
-        operator.povRight().onTrue(armSubsystem.setSetpointCommand(Setpoint.SUBWOOFER));
-        operator.povLeft().onTrue(armSubsystem.setSetpointCommand(Setpoint.AMP));
+        operator.povDown().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
+        operator.povUp().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.PODIUM));
+        operator.povRight().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.SUBWOOFER));
+        operator.povLeft().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.AMP));
 
-        operator.y().onTrue(armSubsystem.setSetpointCommand(Setpoint.BLOCKER));
+        operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.BLOCKER));
 
         /* Scoring */
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(queueShoot);
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(queueShoot);
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.AMP)).onTrue(simpleAmp);
+        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueShoot);
+        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.SUBWOOFER)).onTrue(queueShoot);
+        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.AMP)).onTrue(simpleAmp);
 
         /* Override Procedures */
-        operator.leftBumper().onTrue(noteFlowReverse).onFalse(stopNoteFlow);
-        operator.rightBumper().onTrue(noteFlowForward).onFalse(stopNoteFlow);
+        operator.leftBumper().onTrue(noteFlowReverse);
+        operator.rightBumper().onTrue(noteFlowForward);
         operator.b().onTrue(stopNoteFlow);
+
         operator.start().whileTrue(shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.TUNING));
 
         /* Climbing */
