@@ -149,7 +149,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                         new PIDConstants(5.0),
                         MAX_LINEAR_SPEED,
                         DRIVE_BASE_RADIUS,
-                        new ReplanningConfig()),
+                        new ReplanningConfig(true, true, 1, 0.15)),
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);

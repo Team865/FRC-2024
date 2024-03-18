@@ -2,10 +2,13 @@
   "robotWidth": 0.93,
   "robotLength": 0.93,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "New Market"
+  ],
   "autoFolders": [
     "2 Note",
-    "3 Note"
+    "3 Note",
+    "New Market"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.5,
