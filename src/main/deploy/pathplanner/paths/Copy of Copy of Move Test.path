@@ -3,28 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.73,
-        "y": 4.397650730486647
+        "x": 2.7,
+        "y": 4.1
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5974715190171123,
-        "y": 4.063791757213145
-      },
-      "isLocked": false,
-      "linkedName": "LowerSub"
-    },
-    {
-      "anchor": {
-        "x": 1.9398224583486205,
-        "y": 4.1
-      },
-      "prevControl": {
-        "x": 1.7626351455367284,
-        "y": 4.1
-      },
-      "nextControl": {
-        "x": 2.1498224583486203,
+        "x": 2.1500000000000004,
         "y": 4.1
       },
       "isLocked": false,
@@ -32,32 +16,42 @@
     },
     {
       "anchor": {
-        "x": 2.72,
-        "y": 4.1
+        "x": 1.88,
+        "y": 4.5
       },
       "prevControl": {
-        "x": 2.2818764757899888,
-        "y": 4.084932595791118
+        "x": 1.88,
+        "y": 4.0
+      },
+      "nextControl": {
+        "x": 1.88,
+        "y": 4.95
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.38,
+        "y": 5.55
+      },
+      "prevControl": {
+        "x": 2.13,
+        "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LowerNote"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 0.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.0,
+      "name": "Intake",
+      "waypointRelativePos": 1.25,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
@@ -85,7 +79,7 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -60.0,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

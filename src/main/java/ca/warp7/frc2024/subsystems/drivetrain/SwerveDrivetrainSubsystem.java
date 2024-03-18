@@ -11,6 +11,7 @@ import ca.warp7.frc2024.util.LoggedTunableNumber;
 import ca.warp7.frc2024.util.SensitivityGainAdjustment;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
@@ -143,7 +144,12 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 this::setPose,
                 () -> swerveDriveKinematics.toChassisSpeeds(getModuleStates()),
                 this::setTargetChassisSpeeds,
-                new HolonomicPathFollowerConfig(MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+                new HolonomicPathFollowerConfig(
+                        new PIDConstants(5.0),
+                        new PIDConstants(5.0),
+                        MAX_LINEAR_SPEED,
+                        DRIVE_BASE_RADIUS,
+                        new ReplanningConfig()),
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);

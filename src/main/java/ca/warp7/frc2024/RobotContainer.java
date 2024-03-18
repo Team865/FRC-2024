@@ -210,6 +210,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("simpleIntake", simpleIntake);
         NamedCommands.registerCommand("simpleShoot", simpleShoot);
         NamedCommands.registerCommand("armSubwoofer", armSubwoofer);
+        NamedCommands.registerCommand("queueShoot", queueShoot);
         NamedCommands.registerCommand("armStow", armStow);
         // NamedCommands.registerCommand("shootAtSubwoofer", Commands.sequence(armSubwoofer, simpleShoot, armStow));
 
@@ -229,6 +230,21 @@ public class RobotContainer {
             autonomousRoutineChooser.addOption(
                     "Shooter dynamic reverse", shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
             autonomousRoutineChooser.addOption("Zero shooter", shooterSubsystem.zeroEncoderCommand());
+
+            autonomousRoutineChooser.addOption(
+                    "Drivetrain quasistatic forward",
+                    swerveDrivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+
+            autonomousRoutineChooser.addOption(
+                    "Drivetrain quasistatic reverse",
+                    swerveDrivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            autonomousRoutineChooser.addOption(
+                    "Drivetrain dynamic forward",
+                    swerveDrivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+
+            autonomousRoutineChooser.addOption(
+                    "Drivetrain dynamic reverse",
+                    swerveDrivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
 
         configureDriverBindings();
@@ -270,7 +286,7 @@ public class RobotContainer {
 
         /* Scoring */
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.PODIUM)).onTrue(queueShoot);
-        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(simpleQueue);
+        operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.SUBWOOFER)).onTrue(queueShoot);
         operator.a().and(armSubsystem.atSetpointTrigger(Setpoint.AMP)).onTrue(simpleAmp);
 
         /* Override Procedures */
