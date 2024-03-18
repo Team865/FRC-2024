@@ -1,5 +1,7 @@
 package ca.warp7.frc2024.subsystems.arm;
 
+import static ca.warp7.frc2024.util.SparkMaxManager.*;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -46,20 +48,21 @@ public class ArmIOSparkMax implements ArmIO {
         extAbsEncoder = new DutyCycleEncoder(dutyCycleEncChannel);
 
         /* Factory reset SparkMaxes */
-        rightMotor.restoreFactoryDefaults();
-        leftMotor.restoreFactoryDefaults();
+        safeSparkMax(rightMotor, rightMotor::restoreFactoryDefaults);
+        safeSparkMax(leftMotor, leftMotor::restoreFactoryDefaults);
 
         /* Configure motor invert and follows */
         rightMotor.setInverted(false);
-        leftMotor.follow(rightMotor, true); // Set the left motor to follow the right motor
+        safeSparkMax(
+                leftMotor, () -> leftMotor.follow(rightMotor, true)); // Set the left motor to follow the right motor
 
         /* Configure electrical */
-        rightMotor.setSmartCurrentLimit(40);
-        leftMotor.setSmartCurrentLimit(40);
-        rightMotor.enableVoltageCompensation(12.0);
-        leftMotor.enableVoltageCompensation(12.0);
-        rightMotor.setIdleMode(IdleMode.kBrake);
-        leftMotor.setIdleMode(IdleMode.kBrake);
+        safeSparkMax(rightMotor, () -> rightMotor.setSmartCurrentLimit(40));
+        safeSparkMax(leftMotor, () -> leftMotor.setSmartCurrentLimit(40));
+        safeSparkMax(rightMotor, () -> rightMotor.enableVoltageCompensation(12.0));
+        safeSparkMax(leftMotor, () -> leftMotor.enableVoltageCompensation(12.0));
+        safeSparkMax(rightMotor, () -> rightMotor.setIdleMode(IdleMode.kBrake));
+        safeSparkMax(leftMotor, () -> leftMotor.setIdleMode(IdleMode.kBrake));
 
         /* Configure status frames */
         // While we are using an external encoder, we rely on the internal encoder as a fallback if the external encoder
@@ -67,16 +70,15 @@ public class ArmIOSparkMax implements ArmIO {
         // rightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 5);
         // leftMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // No positional telemetry from follower motor
 
+        /* Save configurations */
+        safeBurnSparkMax(rightMotor);
+        safeBurnSparkMax(leftMotor);
+
         /* Configure encoders */
         intIncEncoder.setPosition(0.0);
         extIncEncoder.reset();
-        extAbsEncoder.reset();
 
         this.dutyCycleEncOffset = dutyCycleEncOffset;
-
-        /* Save configuration */
-        rightMotor.burnFlash();
-        leftMotor.burnFlash();
     }
 
     @Override

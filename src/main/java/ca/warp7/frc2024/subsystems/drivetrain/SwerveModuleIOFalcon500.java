@@ -11,7 +11,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 
 public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
     private final TalonFX driveTalonFX;
@@ -34,15 +33,21 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
     private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double STEER_GEAR_RATIO = 150.0 / 7.0;
 
+    private final double PHOENIX_TIMEOUT = 2.0;
+
+    private final VoltageOut driveVoltageOut = new VoltageOut(0, false, false, false, false);
+    private final VoltageOut steerVoltageOut = new VoltageOut(0, false, false, false, false);
+
     public SwerveModuleIOFalcon500(
             int driveTalonID, int steerTalonID, int cancoderID, Rotation2d absoluteEncoderOffset) {
-        Timer.delay(1);
+        // TODO: Switch from waiting to using .waitForUpdate()
+        // Timer.delay(1);
         driveTalonFX = new TalonFX(driveTalonID, "CANivore");
 
-        Timer.delay(1);
+        // Timer.delay(1);
         steerTalonFX = new TalonFX(steerTalonID, "CANivore");
 
-        Timer.delay(1);
+        // Timer.delay(1);
         cancoder = new CANcoder(cancoderID, "CANivore");
 
         this.absoluteEncoderOffset = absoluteEncoderOffset;
@@ -64,19 +69,19 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
-        this.drivePosition = driveTalonFX.getPosition();
-        this.driveVelocity = driveTalonFX.getVelocity();
-        this.driveAppliedVolts = driveTalonFX.getMotorVoltage();
-        this.driveCurrent = driveTalonFX.getStatorCurrent();
+        this.drivePosition = driveTalonFX.getPosition().waitForUpdate(PHOENIX_TIMEOUT);
+        this.driveVelocity = driveTalonFX.getVelocity().waitForUpdate(PHOENIX_TIMEOUT);
+        this.driveAppliedVolts = driveTalonFX.getMotorVoltage().waitForUpdate(PHOENIX_TIMEOUT);
+        this.driveCurrent = driveTalonFX.getStatorCurrent().waitForUpdate(PHOENIX_TIMEOUT);
 
-        this.steerPosition = steerTalonFX.getPosition();
-        this.steerVelocity = steerTalonFX.getVelocity();
-        this.steerAppliedVolts = steerTalonFX.getMotorVoltage();
-        this.steerCurrent = steerTalonFX.getStatorCurrent();
+        this.steerPosition = steerTalonFX.getPosition().waitForUpdate(PHOENIX_TIMEOUT);
+        this.steerVelocity = steerTalonFX.getVelocity().waitForUpdate(PHOENIX_TIMEOUT);
+        this.steerAppliedVolts = steerTalonFX.getMotorVoltage().waitForUpdate(PHOENIX_TIMEOUT);
+        this.steerCurrent = steerTalonFX.getStatorCurrent().waitForUpdate(PHOENIX_TIMEOUT);
 
-        this.steerAbsolutePosition = cancoder.getAbsolutePosition();
+        this.steerAbsolutePosition = cancoder.getAbsolutePosition().waitForUpdate(PHOENIX_TIMEOUT);
 
-        BaseStatusSignal.setUpdateFrequencyForAll(100, drivePosition, steerPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, steerPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50,
                 driveVelocity,
@@ -86,9 +91,9 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 steerVelocity,
                 steerAppliedVolts,
                 steerCurrent);
-        cancoder.optimizeBusUtilization();
         driveTalonFX.optimizeBusUtilization();
         steerTalonFX.optimizeBusUtilization();
+        cancoder.optimizeBusUtilization();
     }
 
     @Override
@@ -119,11 +124,11 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
 
     @Override
     public void setDriveVoltage(double volts) {
-        driveTalonFX.setControl(new VoltageOut(volts));
+        driveTalonFX.setControl(driveVoltageOut.withOutput(volts));
     }
 
     @Override
     public void setSteerVoltage(double volts) {
-        steerTalonFX.setControl(new VoltageOut(volts));
+        steerTalonFX.setControl(steerVoltageOut.withOutput(volts));
     }
 }
