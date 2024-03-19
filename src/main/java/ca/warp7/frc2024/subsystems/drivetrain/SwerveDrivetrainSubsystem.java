@@ -145,11 +145,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 () -> swerveDriveKinematics.toChassisSpeeds(getModuleStates()),
                 this::setTargetChassisSpeeds,
                 new HolonomicPathFollowerConfig(
-                        new PIDConstants(5.0),
-                        new PIDConstants(5.0),
+                        new PIDConstants(2.5),
+                        new PIDConstants(2.5),
                         MAX_LINEAR_SPEED,
                         DRIVE_BASE_RADIUS,
-                        new ReplanningConfig(true, true, 1, 0.15)),
+                        new ReplanningConfig(true, true, 1, 0.05)),
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);
@@ -214,9 +214,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
 
-        if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 2.5) {
+        if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.5) {
             poseEstimator.addVisionMeasurement(
-                    rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(2, 2, 999999999));
+                    rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(1, 1, 999999999));
         }
 
         // poseEstimator.addVisionMeasurement(, DEADBAND);

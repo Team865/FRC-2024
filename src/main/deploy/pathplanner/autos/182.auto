@@ -18,15 +18,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
+            "name": "QueueShoot"
           }
         },
         {
@@ -38,31 +32,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterSub_CenterNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CenterNote_CenterSub"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmSubwoofer"
+            "pathName": "Curvey"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.1
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
+            "name": "ArmPodium"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueShoot"
           }
         },
         {
@@ -74,31 +62,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterSub_LowerNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LowerNote_LowerSub"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmSubwoofer"
+            "pathName": "Curvey2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.1
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
+            "name": "ArmPodium"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Curvey3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmPodium"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueShoot"
           }
         },
         {
@@ -110,6 +122,6 @@
       ]
     }
   },
-  "folder": "3 Note",
+  "folder": null,
   "choreoAuto": false
 }

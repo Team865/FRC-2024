@@ -15,7 +15,7 @@ public final class DrivetrainConstants {
 
     public static final Gains STEER_GAINS =
             switch (CURRENT_MODE) {
-                case REAL -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0);
+                case REAL -> new Gains(6.5, 0.0, 0.0, 0.0, 0.0);
                 case SIM -> new Gains(10, 0.0, 0.0, 0.0, 0.0);
                 default -> new Gains(0.0, 0.0, 0.0, 0.0, 0.0);
             };

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 // TODO: Use absolute encoder if greater than x degrees
@@ -48,17 +47,12 @@ public class ArmSubsystem extends SubsystemBase {
             new LoggedTunableNumber("Arm/Constraint/MaxAcceleration", MAX_ACCELERATION_DEG);
 
     /* Interpolation */
-    private static PolynomialRegression polynominal = new PolynomialRegression(DISTANCE, ANGLE, 2, "Distance");
-    protected static double distance = 0;
-    private static DoubleSupplier armAngleSupplier = new DoubleSupplier() {
-        @Override
-        public double getAsDouble() {
-            return polynominal.predict(distance);
-        }
-    };
+    private PolynomialRegression regression = new PolynomialRegression(DISTANCE, ANGLE, 2, "Distance");
+    protected double distance = 0;
 
     /* Setpoints */
     protected Goal currentGoal = Goal.IDLE;
+    private double goalDegrees;
 
     private Rotation2d armOffset = null;
 
@@ -139,15 +133,20 @@ public class ArmSubsystem extends SubsystemBase {
         Logger.recordOutput("Arm/Mechanism2d/ArmPivot", mechanism);
 
         // Calculate and set voltage if goal is not idle
-        // If lockout is engaged, the goal is set to the stow position
-        if (currentGoal != Goal.IDLE) {
-            Goal goal = lockout ? Goal.HANDOFF_INTAKE : currentGoal;
-            double goalDegrees = MathUtil.clamp(goal.getDegrees(), 0, 81);
+        // If lockout is engaged, the goal is set to the stow position'
 
-            Logger.recordOutput("Arm/GoalDegrees", goalDegrees);
-            double goalVoltage = feedback.calculate(getIdealIncrementalAngle().getDegrees(), goalDegrees);
-            io.setVoltage(goalVoltage);
+        if (lockout || currentGoal == Goal.IDLE) {
+            goalDegrees = Goal.HANDOFF_INTAKE.getDegrees();
+        } else if (currentGoal == Goal.INTERPOLATION) {
+            goalDegrees = regression.predict(distance);
+        } else {
+            goalDegrees = currentGoal.getDegrees();
         }
+
+        goalDegrees = MathUtil.clamp(goalDegrees, 0, 81);
+        Logger.recordOutput("Arm/GoalDegrees", goalDegrees);
+        double goalVoltage = feedback.calculate(getIdealIncrementalAngle().getDegrees(), goalDegrees);
+        io.setVoltage(goalVoltage);
     }
 
     protected boolean atGoal(Goal goal) {

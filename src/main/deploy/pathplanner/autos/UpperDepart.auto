@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
+            "name": "ArmSubwoofer"
           }
         },
         {
@@ -26,13 +26,13 @@
         {
           "type": "named",
           "data": {
-            "name": "simpleShoot"
+            "name": "SimpleShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armStow"
+            "name": "ArmStow"
           }
         },
         {

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.35,
-        "y": 5.55
+        "x": 2.9,
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.228192998052663,
-        "y": 5.148506806272872
+        "x": 3.778192998052663,
+        "y": 6.598506806272872
       },
       "isLocked": false,
       "linkedName": "CenterSub"
@@ -57,7 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "simpleIntake"
+                "name": "Intake"
               }
             }
           ]
