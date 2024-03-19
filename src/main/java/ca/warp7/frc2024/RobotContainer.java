@@ -65,6 +65,8 @@ public class RobotContainer {
 
     /* Commands */
     private final Command simpleIntake;
+    private final Command simpleFeed;
+
     private final Command simpleQueue;
     private final Command simpleShoot;
     private final Command simpleAmp;
@@ -72,10 +74,11 @@ public class RobotContainer {
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
 
+    private final Command intakeFeed;
     private final Command queueShoot;
 
-    private final Command rumbleDriver;
-    private final Command rumbleOperator;
+    private final Command vibrateDriver;
+    private final Command vibrateOperator;
 
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
@@ -141,48 +144,49 @@ public class RobotContainer {
                 ledSubsystem = new LEDSubsystem(0);
         }
 
-        rumbleDriver = Commands.sequence(
-                Commands.runOnce(() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.25)),
-                Commands.waitSeconds(0.5),
-                Commands.runOnce(() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0)));
+        vibrateDriver = Commands.runEnd(
+                        () -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.25),
+                        () -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+                .withTimeout(0.25);
 
-        rumbleOperator = Commands.runEnd(
+        vibrateOperator = Commands.runEnd(
                         () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.25),
                         () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.0))
-                .withTimeout(0.5);
+                .withTimeout(0.25);
 
         simpleIntake = Commands.parallel(
-                        ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-                        intakeSubsystem.runVoltageCommandEnds(10).until(intakeSubsystem.sensorTrigger()),
-                        feederSubsystem.runVoltageCommandEnds(8).until(intakeSubsystem.sensorTrigger()))
-                .andThen(
-                        Commands.parallel(
-                                shooterSubsystem.runVelocityCommand(-1500, 0, 1, 2, 3),
-                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                intakeSubsystem.runVoltageCommandEnds(10).until(feederSubsystem.sensorTrigger()),
-                                feederSubsystem.runVoltageCommandEnds(8).until(feederSubsystem.sensorTrigger())),
-                        shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
+                        intakeSubsystem.runVoltageCommandEnds(10), feederSubsystem.runVoltageCommandEnds(8))
+                .until(intakeSubsystem.sensorTrigger());
 
-        // simpleIntake = Commands.sequence(
-        //         Commands.parallel(
-        //                         ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-        //                         intakeSubsystem.runVoltageCommandEnds(10),
-        //                         feederSubsystem.runVoltageCommandEnds(8))
-        //                 .until(intakeSubsystem.sensorTrigger()),
-        //         Commands.parallel(
+        simpleFeed = Commands.parallel(
+                        shooterSubsystem.runVelocityCommandEnds(-1500, 0, 1, 2, 3),
+                        intakeSubsystem.runVoltageCommandEnds(10),
+                        feederSubsystem.runVoltageCommandEnds(8))
+                .until(feederSubsystem.sensorTrigger());
+
+        // simpleIntake = Commands.parallel(
+        //                 ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
+        //                 intakeSubsystem.runVoltageCommandEnds(10).until(intakeSubsystem.sensorTrigger()),
+        //                 feederSubsystem.runVoltageCommandEnds(8).until(intakeSubsystem.sensorTrigger()))
+        //         .andThen(
+        //                 Commands.parallel(
         //                         shooterSubsystem.runVelocityCommand(-1500, 0, 1, 2, 3),
         //                         ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-        //                         rumbleDriver,
-        //                         rumbleOperator,
-        //                         intakeSubsystem.runVoltageCommandEnds(10),
-        //                         feederSubsystem.runVoltageCommandEnds(8))
-        //                 .until(feederSubsystem.sensorTrigger()),
-        //         shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
+        //                         intakeSubsystem.runVoltageCommandEnds(10).until(feederSubsystem.sensorTrigger()),
+        //                         feederSubsystem.runVoltageCommandEnds(8).until(feederSubsystem.sensorTrigger())),
+        //                 shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
 
         simpleQueue = shooterSubsystem
                 .runVelocityCommandEnds(-8000, 0, 1, 2, 3)
                 .alongWith(feederSubsystem.runVoltageCommandEnds(-3))
                 .until(feederSubsystem.sensorTrigger().negate());
+
+        intakeFeed = Commands.sequence(
+                ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
+                simpleIntake,
+                simpleFeed,
+                Commands.parallel(
+                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1), vibrateDriver, vibrateOperator));
 
         simpleShoot = Commands.sequence(
                 shooterSubsystem.runVelocityCommand(4500, 0, 3),
@@ -213,11 +217,11 @@ public class RobotContainer {
                 feederSubsystem.runVoltageCommandEnds(0),
                 shooterSubsystem.stopShooterCommand());
 
-        NamedCommands.registerCommand("armStow", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
-        NamedCommands.registerCommand("armSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
-        NamedCommands.registerCommand("simpleIntake", simpleIntake);
-        NamedCommands.registerCommand("simpleShoot", simpleShoot);
-        NamedCommands.registerCommand("queueShoot", queueShoot);
+        NamedCommands.registerCommand("ArmStow", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
+        NamedCommands.registerCommand("ArmSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
+        NamedCommands.registerCommand("ArmPodium", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PODIUM));
+        NamedCommands.registerCommand("Intake", intakeFeed);
+        NamedCommands.registerCommand("QueueShoot", queueShoot);
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());

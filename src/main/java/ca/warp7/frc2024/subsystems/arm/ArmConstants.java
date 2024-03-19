@@ -29,6 +29,7 @@ public final class ArmConstants {
         PODIUM(new LoggedTunableNumber("Arm/Goals/PodiumDegrees", 63)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Goals/SubwooferDegrees", 50)),
         BLOCKER(new LoggedTunableNumber("Arm/Goals/BlockerDegrees", 80)),
+        INTERPOLATION(() -> 0),
         IDLE(() -> 0);
 
         private final DoubleSupplier armGoalSupplier;

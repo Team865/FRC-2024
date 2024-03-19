@@ -14,49 +14,19 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
+            "name": "ArmSubwoofer"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "queueShoot"
+            "name": "QueueShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armStow"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Copy of Move Test"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Copy of Copy of Move Test"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armSubwoofer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "queueShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armStow"
+            "name": "ArmStow"
           }
         },
         {
@@ -74,19 +44,49 @@
         {
           "type": "named",
           "data": {
-            "name": "armSubwoofer"
+            "name": "ArmSubwoofer"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "queueShoot"
+            "name": "QueueShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "armStow"
+            "name": "ArmStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Move Test"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Copy of Move Test"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmSubwoofer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmStow"
           }
         }
       ]
