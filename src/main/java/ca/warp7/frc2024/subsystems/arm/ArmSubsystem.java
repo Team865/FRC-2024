@@ -2,8 +2,8 @@ package ca.warp7.frc2024.subsystems.arm;
 
 import static ca.warp7.frc2024.subsystems.arm.ArmConstants.*;
 
+import ca.warp7.frc2024.subsystems.arm.ArmConstants.Goal;
 import ca.warp7.frc2024.util.LoggedTunableNumber;
-import ca.warp7.frc2024.util.PolynomialRegression;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.littletonrobotics.junction.Logger;
 
 // TODO: Use absolute encoder if greater than x degrees
@@ -47,7 +49,8 @@ public class ArmSubsystem extends SubsystemBase {
             new LoggedTunableNumber("Arm/Constraint/MaxAcceleration", MAX_ACCELERATION_DEG);
 
     /* Interpolation */
-    private PolynomialRegression regression = new PolynomialRegression(DISTANCE, ANGLE, 2, "Distance");
+    private PolynomialCurveFitter curveFitter = PolynomialCurveFitter.create(3);
+    private PolynomialFunction polynomialFunction;
     protected double distance = 0;
 
     /* Setpoints */
@@ -60,6 +63,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem(ArmIO armIO) {
         this.io = armIO;
+
+        double[] coefficients = curveFitter.fit(ArmConstants.POINTS);
+
+        polynomialFunction = new PolynomialFunction(coefficients);
+        Logger.recordOutput("Arm/RegressionCoefficients", coefficients);
 
         feedback = new ProfiledPIDController(
                 kP.get(),
@@ -138,7 +146,7 @@ public class ArmSubsystem extends SubsystemBase {
         if (lockout || currentGoal == Goal.IDLE) {
             goalDegrees = Goal.HANDOFF_INTAKE.getDegrees();
         } else if (currentGoal == Goal.INTERPOLATION) {
-            goalDegrees = regression.predict(distance);
+            goalDegrees = polynomialFunction.value(distance);
         } else {
             goalDegrees = currentGoal.getDegrees();
         }

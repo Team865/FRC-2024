@@ -5,6 +5,7 @@ import static ca.warp7.frc2024.Constants.OI.*;
 import static ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.*;
 import static edu.wpi.first.units.Units.Volts;
 
+import ca.warp7.frc2024.FieldConstants;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOInputsAutoLogged;
 import ca.warp7.frc2024.util.LoggedTunableNumber;
@@ -245,6 +246,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         //             VecBuilder.fill(0.7 * rearVisionInputs.avgTagDist, 0.7 * rearVisionInputs.avgTagDist,
         // 999999999));
         // }
+
+        Logger.recordOutput(
+                "Drivetrain/DistanceToSpeaker",
+                getPose().getTranslation().getDistance(FieldConstants.FieldLocations.SPEAKER.getAllianceTranslation()));
 
         // Update if PID gains have changed
         LoggedTunableNumber.ifChanged(
