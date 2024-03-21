@@ -39,11 +39,25 @@ public final class ShooterConstants {
             new LoggedTunableNumber("Shooter/Goals/Podium/BottomLeft", 0),
             new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", 0));
 
+    private static final Speeds DEFAULT_SPEEDS = new Speeds(
+            new LoggedTunableNumber("Shooter/Goals/Podium/TopRight", 7000),
+            new LoggedTunableNumber("Shooter/Goals/Podium/TopLeft", 9500),
+            new LoggedTunableNumber("Shooter/Goals/Podium/BottomLeft", 9500),
+            new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", 7000));
+
+    private static final Speeds AMP_SPEEDS = new Speeds(
+            new LoggedTunableNumber("Shooter/Goals/Podium/TopRight", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Podium/TopLeft", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Podium/BottomLeft", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", -8000));
+
     @RequiredArgsConstructor
     public enum Goal {
         IDLE(IDLE_SPEEDS),
         TUNING(TUNING_SPEEDS),
-        PODIUM(PODIUM_SPEEDS);
+        PODIUM(PODIUM_SPEEDS),
+        AMP(AMP_SPEEDS),
+        DEFAULT(DEFAULT_SPEEDS);
 
         private final Speeds speeds;
 
