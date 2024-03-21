@@ -4,7 +4,6 @@
 
 package ca.warp7.frc2024;
 
-import ca.warp7.frc2024.Constants.CLIMBER.STATE;
 import ca.warp7.frc2024.FieldConstants.PointOfInterest;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
@@ -64,25 +63,23 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> autonomousRoutineChooser;
 
     /* Commands */
+    private final Command vibrateDriver;
+    private final Command vibrateOperator;
+
     private final Command simpleIntake;
     private final Command simpleFeed;
-
     private final Command simpleQueue;
+    private final Command simpleRev;
     private final Command simpleShoot;
     private final Command simpleAmp;
-    private final Command simpleRev;
+
     private final Command noteFlowForward;
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
 
     private final Command intakeFeed;
-    private final Command queueShoot;
-    //     private final Command intakeFeedInterpolateQueue;
-
-    //     private final Command shootStow;
-
-    private final Command vibrateDriver;
-    private final Command vibrateOperator;
+    private final Command queueRev;
+    private final Command queueRevShoot;
 
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
@@ -151,57 +148,63 @@ public class RobotContainer {
         vibrateDriver = Commands.runEnd(
                         () -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.25),
                         () -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0))
-                .withTimeout(0.25);
+                .withTimeout(0.25)
+                .withName("Vibrate Driver Controller");
 
         vibrateOperator = Commands.runEnd(
                         () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.25),
                         () -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.0))
-                .withTimeout(0.25);
+                .withTimeout(0.25)
+                .withName("Vibrate Operator Controller");
 
         simpleIntake = Commands.parallel(
                         intakeSubsystem.runVoltageCommandEnds(10), feederSubsystem.runVoltageCommandEnds(8))
-                .until(intakeSubsystem.sensorTrigger());
+                .until(intakeSubsystem.sensorTrigger())
+                .withName("Simple Intake");
 
         simpleFeed = Commands.parallel(
                         shooterSubsystem.runVelocityCommandEnds(-1500, 0, 1, 2, 3),
                         intakeSubsystem.runVoltageCommandEnds(10),
                         feederSubsystem.runVoltageCommandEnds(8))
-                .until(feederSubsystem.sensorTrigger());
+                .until(feederSubsystem.sensorTrigger())
+                .withName("Simple Feed");
 
-        simpleQueue = shooterSubsystem
-                .runVelocityCommandEnds(-8000, 0, 1, 2, 3)
-                .alongWith(feederSubsystem.runVoltageCommandEnds(-3))
-                .until(feederSubsystem.sensorTrigger().negate());
-
-        intakeFeed = Commands.sequence(
-                ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-                simpleIntake.asProxy(),
-                simpleFeed.asProxy(),
-                Commands.parallel(
-                        ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1), vibrateDriver, vibrateOperator));
-
-        // intakeFeedInterpolateQueue = Commands.sequence(
-        //         intakeFeed, armSubsystem.runGoalCommandUntil(ArmConstants.Goal.INTERPOLATION), simpleQueue);
-
-        simpleShoot = Commands.sequence(
-                shooterSubsystem.runVelocityCommand(6500, 0, 3),
-                shooterSubsystem.runVelocityCommand(9500, 1, 2),
-                Commands.waitSeconds(0.75),
-                feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.15),
-                shooterSubsystem.stopShooterCommand());
+        simpleQueue = Commands.parallel(
+                        shooterSubsystem.runVelocityCommandEnds(-8000, 0, 1, 2, 3),
+                        feederSubsystem.runVoltageCommandEnds(-3))
+                .until(feederSubsystem.sensorTrigger().negate())
+                .withName("Simple Queue");
 
         simpleRev = Commands.sequence(
-                shooterSubsystem.runVelocityCommand(7000, 0, 3), shooterSubsystem.runVelocityCommand(9500, 1, 2));
+                        shooterSubsystem.runVelocityCommand(7000, 0, 3),
+                        shooterSubsystem.runVelocityCommand(9500, 1, 2),
+                        Commands.waitSeconds(0.65))
+                .withName("Simple Rev");
 
-        simpleAmp = Commands.sequence(Commands.parallel(
-                        shooterSubsystem.runVelocityCommandEnds(-8000, 0, 1, 2, 3),
+        simpleShoot = Commands.sequence(
+                        feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.15),
+                        Commands.waitSeconds(0.25),
+                        shooterSubsystem.stopShooterCommand())
+                .withName("Simple Shoot");
+
+        simpleAmp = Commands.parallel(
+                        shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.AMP),
                         feederSubsystem.runVoltageCommandEnds(-8))
-                .withTimeout(1.5));
+                .withTimeout(0.75)
+                .withName("Simple Amp");
 
-        // shootStow = Commands.sequence(simpleShoot,
-        // armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
+        intakeFeed = Commands.sequence(
+                        ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
+                        simpleIntake.asProxy(),
+                        simpleFeed.asProxy(),
+                        Commands.parallel(
+                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+                                vibrateDriver,
+                                vibrateOperator))
+                .withName("Intake Feed");
 
-        queueShoot = Commands.sequence(simpleQueue.asProxy(), simpleShoot.asProxy());
+        queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy());
+        queueRevShoot = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy());
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
@@ -226,25 +229,10 @@ public class RobotContainer {
                 armSubsystem
                         .runInterpolation(
                                 () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
-                        .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION))
-                        .alongWith(queueShoot.asProxy()));
+                        .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION)));
         NamedCommands.registerCommand("Intake", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
-        NamedCommands.registerCommand("QueueShoot", Commands.sequence(simpleQueue.asProxy(), simpleShoot.asProxy()));
-        NamedCommands.registerCommand(
-                "QuickDraw",
-                Commands.parallel(
-                        armSubsystem
-                                .runInterpolation(
-                                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
-                                .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION)),
-                        simpleQueue
-                                .asProxy()
-                                .andThen(
-                                        simpleRev.asProxy(),
-                                        Commands.waitSeconds(0.65),
-                                        feederSubsystem
-                                                .runVoltageCommandEnds(12)
-                                                .withTimeout(0.25))));
+        NamedCommands.registerCommand("QueueRev", Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()));
+        NamedCommands.registerCommand("Shoot", simpleShoot.asProxy());
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
@@ -294,25 +282,19 @@ public class RobotContainer {
                 () -> -driver.getRightX(),
                 driver.rightBumper()));
 
+        // was as proxy
         driver.rightTrigger()
                 .and(feederSubsystem.sensorTrigger())
-                .onTrue(armSubsystem.runInterpolation(
+                .toggleOnTrue(armSubsystem.runInterpolation(
                         () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
-                .onTrue(simpleQueue.asProxy().andThen(simpleRev.asProxy()));
+                .onTrue(queueRev);
 
         driver.rightTrigger()
-                .toggleOnFalse(feederSubsystem
-                        .runVoltageCommandEnds(12)
-                        .withTimeout(0.75)
+                .toggleOnFalse(simpleShoot
+                        .asProxy()
                         .andThen(
                                 shooterSubsystem.stopShooterCommand(),
-                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)));
-
-        // driver.rightTrigger()
-        //         .onFalse(simpleFeed)
-        //         .onFalse(armSubsystem
-        //                 .runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)
-        //                 .onlyIf(driver.leftTrigger()));
+                                armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
@@ -325,6 +307,9 @@ public class RobotContainer {
         driver.a()
                 .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.SPEAKER))
                 .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
+        driver.x()
+                .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.AMP))
+                .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
 
         driver.b().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
     }
@@ -335,41 +320,24 @@ public class RobotContainer {
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
                 .onTrue(intakeFeed);
 
-        /* Arm */
+        /* Arm Override Setpoints */
         operator.povDown().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
         operator.povUp().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.PODIUM));
         operator.povRight().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.SUBWOOFER));
         operator.povLeft().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.AMP));
-
         operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.BLOCKER));
 
-        // operator.leftTrigger()
-        //         .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.INTERPOLATION))
-        //         .whileTrue(armSubsystem.setInterpolationDistanceCommand(() -> swerveDrivetrainSubsystem
-        //                 .getPose()
-        //                 .getTranslation()
-        //                 .getDistance(FieldConstants.PointOfInterest.SPEAKER.getAllianceTranslation())))
-        //         .onFalse(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
-
         /* Scoring */
-        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueShoot);
-        operator.a()
-                .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION))
-                .onTrue(queueShoot);
+        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueRevShoot);
         operator.a()
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.SUBWOOFER))
-                .onTrue(queueShoot);
+                .onTrue(queueRevShoot);
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.AMP)).onTrue(simpleAmp);
 
         /* Override Procedures */
-        operator.leftBumper().onTrue(noteFlowReverse);
-        operator.rightBumper().onTrue(noteFlowForward);
+        operator.leftBumper().whileTrue(noteFlowReverse);
+        operator.rightBumper().whileTrue(noteFlowForward);
         operator.b().onTrue(stopNoteFlow);
-
-        operator.start()
-                .whileTrue(shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.TUNING))
-                .whileTrue(intakeSubsystem.runVoltageCommandEnds(8))
-                .whileTrue(feederSubsystem.runVoltageCommandEnds(8));
 
         /* Climbing */
         climberSubsystem.setDefaultCommand(
@@ -377,10 +345,6 @@ public class RobotContainer {
         operator.leftStick().onTrue(climberSubsystem.toggleClimberLockout());
 
         climberSubsystem.climberLockoutDisabledTrigger().onTrue(ledSubsystem.solidColorCommand(SparkColor.RED));
-        climberSubsystem
-                .climberInState(STATE.CLIMBER_START_HIGHEST)
-                .onTrue(ledSubsystem.solidColorCommand(SparkColor.ORANGE));
-        climberSubsystem.climberInState(STATE.CLIMBER_END).onTrue(ledSubsystem.solidColorCommand(SparkColor.YELLOW));
     }
 
     public Command getAutonomousCommand() {
