@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 7.857000653816122,
+        "x": 8.1,
         "y": 7.452739442515923
       },
       "prevControl": {
-        "x": 6.857000653816122,
+        "x": 7.1,
         "y": 7.452739442515923
       },
       "nextControl": null,
@@ -30,9 +30,33 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.05,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 4.0,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 450.0

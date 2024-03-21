@@ -187,7 +187,7 @@ public class RobotContainer {
                 shooterSubsystem.runVelocityCommand(6500, 0, 3),
                 shooterSubsystem.runVelocityCommand(9500, 1, 2),
                 Commands.waitSeconds(0.75),
-                feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
+                feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.15),
                 shooterSubsystem.stopShooterCommand());
 
         simpleRev = Commands.sequence(
@@ -218,15 +218,33 @@ public class RobotContainer {
                 feederSubsystem.runVoltageCommandEnds(0),
                 shooterSubsystem.stopShooterCommand());
 
-        NamedCommands.registerCommand("ArmStow", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
+        NamedCommands.registerCommand("ArmStow", armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
         NamedCommands.registerCommand("ArmSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
         NamedCommands.registerCommand("ArmPodium", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PODIUM));
         NamedCommands.registerCommand(
                 "ArmInterpolateSpeaker",
-                armSubsystem.runInterpolation(
-                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)));
+                armSubsystem
+                        .runInterpolation(
+                                () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
+                        .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION))
+                        .alongWith(queueShoot.asProxy()));
         NamedCommands.registerCommand("Intake", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
         NamedCommands.registerCommand("QueueShoot", Commands.sequence(simpleQueue.asProxy(), simpleShoot.asProxy()));
+        NamedCommands.registerCommand(
+                "QuickDraw",
+                Commands.parallel(
+                        armSubsystem
+                                .runInterpolation(
+                                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
+                                .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION)),
+                        simpleQueue
+                                .asProxy()
+                                .andThen(
+                                        simpleRev.asProxy(),
+                                        Commands.waitSeconds(0.65),
+                                        feederSubsystem
+                                                .runVoltageCommandEnds(12)
+                                                .withTimeout(0.25))));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
