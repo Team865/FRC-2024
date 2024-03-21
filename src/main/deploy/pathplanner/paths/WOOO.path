@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.857000653816122,
+        "y": 7.452739442515923
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.79989934053699,
+        "y": 7.140258845325242
+      },
+      "isLocked": false,
+      "linkedName": "WEEE"
+    },
+    {
+      "anchor": {
+        "x": 2.3621047705058373,
+        "y": 6.574682028993688
+      },
+      "prevControl": {
+        "x": 3.8511086651802935,
+        "y": 7.028497445883781
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 30.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

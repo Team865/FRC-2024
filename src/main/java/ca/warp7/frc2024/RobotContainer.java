@@ -5,6 +5,7 @@
 package ca.warp7.frc2024;
 
 import ca.warp7.frc2024.Constants.CLIMBER.STATE;
+import ca.warp7.frc2024.FieldConstants.PointOfInterest;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSparkMax;
@@ -21,7 +22,6 @@ import ca.warp7.frc2024.subsystems.climber.ClimberSubsystem;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIONavX;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystem;
-import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystem.PointAtLocation;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIO;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOFalcon500;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOSim;
@@ -70,6 +70,7 @@ public class RobotContainer {
     private final Command simpleQueue;
     private final Command simpleShoot;
     private final Command simpleAmp;
+    private final Command simpleRev;
     private final Command noteFlowForward;
     private final Command noteFlowReverse;
     private final Command stopNoteFlow;
@@ -167,18 +168,6 @@ public class RobotContainer {
                         feederSubsystem.runVoltageCommandEnds(8))
                 .until(feederSubsystem.sensorTrigger());
 
-        // simpleIntake = Commands.parallel(
-        //                 ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-        //                 intakeSubsystem.runVoltageCommandEnds(10).until(intakeSubsystem.sensorTrigger()),
-        //                 feederSubsystem.runVoltageCommandEnds(8).until(intakeSubsystem.sensorTrigger()))
-        //         .andThen(
-        //                 Commands.parallel(
-        //                         shooterSubsystem.runVelocityCommand(-1500, 0, 1, 2, 3),
-        //                         ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-        //                         intakeSubsystem.runVoltageCommandEnds(10).until(feederSubsystem.sensorTrigger()),
-        //                         feederSubsystem.runVoltageCommandEnds(8).until(feederSubsystem.sensorTrigger())),
-        //                 shooterSubsystem.runVelocityCommand(0, 0, 1, 2, 3));
-
         simpleQueue = shooterSubsystem
                 .runVelocityCommandEnds(-8000, 0, 1, 2, 3)
                 .alongWith(feederSubsystem.runVoltageCommandEnds(-3))
@@ -186,8 +175,8 @@ public class RobotContainer {
 
         intakeFeed = Commands.sequence(
                 ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
-                simpleIntake,
-                simpleFeed,
+                simpleIntake.asProxy(),
+                simpleFeed.asProxy(),
                 Commands.parallel(
                         ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1), vibrateDriver, vibrateOperator));
 
@@ -201,6 +190,9 @@ public class RobotContainer {
                 feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.75),
                 shooterSubsystem.stopShooterCommand());
 
+        simpleRev = Commands.sequence(
+                shooterSubsystem.runVelocityCommand(7000, 0, 3), shooterSubsystem.runVelocityCommand(9500, 1, 2));
+
         simpleAmp = Commands.sequence(Commands.parallel(
                         shooterSubsystem.runVelocityCommandEnds(-8000, 0, 1, 2, 3),
                         feederSubsystem.runVoltageCommandEnds(-8))
@@ -209,7 +201,7 @@ public class RobotContainer {
         // shootStow = Commands.sequence(simpleShoot,
         // armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
 
-        queueShoot = Commands.sequence(simpleQueue, simpleShoot);
+        queueShoot = Commands.sequence(simpleQueue.asProxy(), simpleShoot.asProxy());
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
@@ -229,8 +221,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("ArmStow", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE));
         NamedCommands.registerCommand("ArmSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
         NamedCommands.registerCommand("ArmPodium", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PODIUM));
-        NamedCommands.registerCommand("Intake", intakeFeed);
-        NamedCommands.registerCommand("QueueShoot", queueShoot);
+        NamedCommands.registerCommand(
+                "ArmInterpolateSpeaker",
+                armSubsystem.runInterpolation(
+                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)));
+        NamedCommands.registerCommand("Intake", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
+        NamedCommands.registerCommand("QueueShoot", Commands.sequence(simpleQueue.asProxy(), simpleShoot.asProxy()));
 
         autonomousRoutineChooser =
                 new LoggedDashboardChooser<>("Autonomous Routine Chooser", AutoBuilder.buildAutoChooser());
@@ -273,26 +269,32 @@ public class RobotContainer {
     }
 
     private void configureDriverBindings() {
-
-        swerveDrivetrainSubsystem.setDefaultCommand(SwerveDrivetrainSubsystem.teleopDriveCommand(
+        swerveDrivetrainSubsystem.setDefaultCommand(swerveDrivetrainSubsystem.teleopDriveCommand(
                 swerveDrivetrainSubsystem,
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
                 () -> -driver.getRightX(),
                 driver.rightBumper()));
 
-        //  driver.rightTrigger().whileTrue(intakeFeedInterpolateQueue).onFalse(shootStow);
         driver.rightTrigger()
                 .and(feederSubsystem.sensorTrigger())
-                .onTrue(armSubsystem.runGoalCommandUntil(ArmConstants.Goal.INTERPOLATION));
-
-        driver.rightTrigger().whileTrue(armSubsystem.setInterpolationDistanceCommand(() -> swerveDrivetrainSubsystem
-                .getPose()
-                .getTranslation()
-                .getDistance(FieldConstants.FieldLocations.SPEAKER.getAllianceTranslation())));
+                .onTrue(armSubsystem.runInterpolation(
+                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
+                .onTrue(simpleQueue.asProxy().andThen(simpleRev.asProxy()));
 
         driver.rightTrigger()
-                .onFalse(queueShoot.andThen(armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)));
+                .toggleOnFalse(feederSubsystem
+                        .runVoltageCommandEnds(12)
+                        .withTimeout(0.75)
+                        .andThen(
+                                shooterSubsystem.stopShooterCommand(),
+                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)));
+
+        // driver.rightTrigger()
+        //         .onFalse(simpleFeed)
+        //         .onFalse(armSubsystem
+        //                 .runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)
+        //                 .onlyIf(driver.leftTrigger()));
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
@@ -303,8 +305,8 @@ public class RobotContainer {
                 .onFalse(armSubsystem.setLockoutCommand(false));
 
         driver.a()
-                .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointAtLocation.SPEAKER))
-                .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointAtLocation.NONE));
+                .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.SPEAKER))
+                .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
 
         driver.b().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
     }
@@ -322,13 +324,14 @@ public class RobotContainer {
         operator.povLeft().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.AMP));
 
         operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.BLOCKER));
-        operator.leftTrigger()
-                .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.INTERPOLATION))
-                .whileTrue(armSubsystem.setInterpolationDistanceCommand(() -> swerveDrivetrainSubsystem
-                        .getPose()
-                        .getTranslation()
-                        .getDistance(FieldConstants.FieldLocations.SPEAKER.getAllianceTranslation())))
-                .onFalse(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
+
+        // operator.leftTrigger()
+        //         .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.INTERPOLATION))
+        //         .whileTrue(armSubsystem.setInterpolationDistanceCommand(() -> swerveDrivetrainSubsystem
+        //                 .getPose()
+        //                 .getTranslation()
+        //                 .getDistance(FieldConstants.PointOfInterest.SPEAKER.getAllianceTranslation())))
+        //         .onFalse(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
 
         /* Scoring */
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueShoot);
@@ -345,7 +348,10 @@ public class RobotContainer {
         operator.rightBumper().onTrue(noteFlowForward);
         operator.b().onTrue(stopNoteFlow);
 
-        operator.start().whileTrue(shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.TUNING));
+        operator.start()
+                .whileTrue(shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.TUNING))
+                .whileTrue(intakeSubsystem.runVoltageCommandEnds(8))
+                .whileTrue(feederSubsystem.runVoltageCommandEnds(8));
 
         /* Climbing */
         climberSubsystem.setDefaultCommand(

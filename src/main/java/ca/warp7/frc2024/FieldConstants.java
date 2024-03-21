@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 
 public final class FieldConstants {
     @RequiredArgsConstructor
-    public enum FieldLocations {
+    public enum PointOfInterest {
         NONE(new Translation2d()),
-        SPEAKER(new Translation2d(0.0, 5.55));
+        SPEAKER(new Translation2d(0.36, 5.55)),
+        SPEAKER_WALL(new Translation2d(0.0, 5.55)),
+        AMP(new Translation2d(1.82, 8.2));
 
         private final Translation2d blueTranslation;
 
