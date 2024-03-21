@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6768090480625408,
-        "y": 6.366539784005494
+        "x": 1.7184968814382076,
+        "y": 6.41006853310003
       },
       "isLocked": false,
       "linkedName": null
@@ -20,18 +20,18 @@
         "y": 6.86
       },
       "prevControl": {
-        "x": 1.5865986150079234,
-        "y": 6.2633654321938925
+        "x": 1.538530890364158,
+        "y": 6.355702672118739
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CCURVE"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.35,
-      "rotationDegrees": 30.0,
+      "rotationDegrees": 25.0,
       "rotateFast": true
     }
   ],
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 30.0,
+    "rotation": 25.0,
     "rotateFast": false
   },
   "reversed": false,

@@ -8,56 +8,38 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7795440220510073,
-        "y": 6.308343093538039
+        "x": 3.52630778703665,
+        "y": 7.2826182617407
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CCURVE"
     },
     {
       "anchor": {
-        "x": 2.9,
-        "y": 5.55220180810732
+        "x": 7.857000653816122,
+        "y": 7.452739442515923
       },
       "prevControl": {
-        "x": 1.4864821164827517,
-        "y": 5.330401156172684
+        "x": 6.857000653816122,
+        "y": 7.452739442515923
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "UpperNote"
+      "linkedName": "WEEE"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Intake",
-      "waypointRelativePos": 0.55,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 450.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 0,
     "rotateFast": true
   },
   "reversed": false,
@@ -66,5 +48,5 @@
     "rotation": 35.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -62,43 +62,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Curvey2"
+            "pathName": "WEEEE"
           }
         },
         {
           "type": "wait",
           "data": {
             "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Curvey3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
+            "pathName": "WOOO"
           }
         },
         {
