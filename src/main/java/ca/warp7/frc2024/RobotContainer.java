@@ -203,8 +203,9 @@ public class RobotContainer {
                                 vibrateOperator))
                 .withName("Intake Feed");
 
-        queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy());
-        queueRevShoot = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy());
+        queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()).withName("Queue Rev");
+        queueRevShoot = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy())
+                .withName("Queue Rev Shoot");
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
@@ -230,8 +231,10 @@ public class RobotContainer {
                         .runInterpolation(
                                 () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
                         .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION)));
-        NamedCommands.registerCommand("Intake", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
+        NamedCommands.registerCommand("IntakeFeed", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
         NamedCommands.registerCommand("QueueRev", Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()));
+        NamedCommands.registerCommand(
+                "QueueRevShoot", Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy()));
         NamedCommands.registerCommand("Shoot", simpleShoot.asProxy());
 
         autonomousRoutineChooser =
@@ -289,12 +292,10 @@ public class RobotContainer {
                         () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
                 .onTrue(queueRev);
 
+        driver.rightTrigger().onFalse(simpleShoot.asProxy().andThen(shooterSubsystem.stopShooterCommand()));
         driver.rightTrigger()
-                .toggleOnFalse(simpleShoot
-                        .asProxy()
-                        .andThen(
-                                shooterSubsystem.stopShooterCommand(),
-                                armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
+                .toggleOnFalse(Commands.waitSeconds(0.25)
+                        .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());

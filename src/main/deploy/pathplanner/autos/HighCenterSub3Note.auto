@@ -3,7 +3,7 @@
   "startingPose": {
     "position": {
       "x": 1.35,
-      "y": 5.55
+      "y": 6.0
     },
     "rotation": 0
   },
@@ -14,91 +14,61 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SimpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterSub_CenterNote"
+            "pathName": "HighCenSub_AngledUpNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterNote_CenterSub"
+            "pathName": "AngledUpNote_CenNote"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterSub_LowerNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LowerNote_LowerSub"
+            "pathName": "CenNote_AngledLowerNote"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
+            "name": "QueueRevShoot"
           }
         },
         {
@@ -110,6 +80,6 @@
       ]
     }
   },
-  "folder": "3 Note",
+  "folder": null,
   "choreoAuto": false
 }

@@ -26,12 +26,6 @@
         {
           "type": "named",
           "data": {
-            "name": "SimpleShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ArmStow"
           }
         },

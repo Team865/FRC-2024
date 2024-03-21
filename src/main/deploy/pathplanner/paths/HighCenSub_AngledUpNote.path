@@ -12,7 +12,7 @@
         "y": 6.41006853310003
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HighCenterSub"
     },
     {
       "anchor": {
@@ -20,28 +20,28 @@
         "y": 6.86
       },
       "prevControl": {
-        "x": 1.538530890364158,
-        "y": 6.355702672118739
+        "x": 1.5865986150079239,
+        "y": 6.263365432193893
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CCURVE"
+      "linkedName": "AngledUpperNote"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.35,
-      "rotationDegrees": 25.0,
+      "rotationDegrees": 30.0,
       "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.25,
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
@@ -53,7 +53,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "IntakeFeed"
               }
             }
           ]
@@ -62,14 +62,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 450.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 25.0,
+    "rotation": 30.0,
     "rotateFast": false
   },
   "reversed": false,
