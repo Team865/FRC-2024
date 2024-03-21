@@ -20,19 +20,13 @@
         {
           "type": "named",
           "data": {
-            "name": "QueueShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ArmStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Curvey"
+            "pathName": "CenSub_AngledUpNote"
           }
         },
         {
@@ -50,19 +44,13 @@
         {
           "type": "named",
           "data": {
-            "name": "QueueShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ArmStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Curvey2"
+            "pathName": "AngledUpNote_CenNote"
           }
         },
         {
@@ -80,19 +68,13 @@
         {
           "type": "named",
           "data": {
-            "name": "QueueShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ArmStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Curvey3"
+            "pathName": "CenNote_AngledLowerNote"
           }
         },
         {
@@ -105,12 +87,6 @@
           "type": "named",
           "data": {
             "name": "ArmPodium"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueShoot"
           }
         },
         {

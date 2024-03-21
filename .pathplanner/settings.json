@@ -10,7 +10,7 @@
     "3 Note",
     "New Market"
   ],
-  "defaultMaxVel": 2.5,
+  "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 360.0,
   "defaultMaxAngAccel": 450.0,

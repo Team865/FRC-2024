@@ -27,7 +27,7 @@ public final class ArmConstants {
     public static enum Goal {
         HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Goals/HandoffIntakeDegrees", 0)),
         STATION_INTAKE(new LoggedTunableNumber("Arm/Goals/StationIntakeDegrees", 0)),
-        AMP(new LoggedTunableNumber("Arm/Goals/AmpDegrees", 67)),
+        AMP(new LoggedTunableNumber("Arm/Goals/AmpDegrees", 68)),
         TRAP(new LoggedTunableNumber("Arm/Goals/TrapDegrees", 3)),
         PODIUM(new LoggedTunableNumber("Arm/Goals/PodiumDegrees", 63)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Goals/SubwooferDegrees", 50)),
