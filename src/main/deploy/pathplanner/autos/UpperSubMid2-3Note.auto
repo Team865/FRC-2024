@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.35,
-      "y": 6.0
+      "x": 0.72,
+      "y": 6.7
     },
-    "rotation": 0.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -20,19 +20,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HighCenSub_AngledUpNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
+            "pathName": "UpSub_AngledUpNote"
           }
         },
         {
@@ -44,55 +38,31 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_CenNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "pathName": "AngledUpNote_Mid2Note"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenNote_AngledLowerNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
+            "pathName": "Mid2Note_AngledUpNote"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
           }
         },
         {
@@ -104,6 +74,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "3 Note",
   "choreoAuto": false
 }
