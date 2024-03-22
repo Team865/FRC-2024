@@ -199,10 +199,13 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
 
-        if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 4.5) {
-            poseEstimator.addVisionMeasurement(
-                    rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(1, 1, 999999999));
-        }
+        // if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 4.5) {
+        //     poseEstimator.addVisionMeasurement(
+        //             rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(1, 1,
+        // 999999999));
+        // }
+
+        updatePoseEstimateWithVision();
 
         Logger.recordOutput("Drivetrain/DistanceToSpeakerWall", getDistanceToPOI(PointOfInterest.SPEAKER_WALL));
         Logger.recordOutput("Drivetrain/DistanceToAmp", getDistanceToPOI(PointOfInterest.AMP));
@@ -252,6 +255,32 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 steerkD);
     }
 
+    public void updatePoseEstimateWithVision() {
+        if (rearVisionInputs.tagCount >= 1) {
+            double xyStds;
+            double rotStds = 999999999;
+
+            double poseDifference = poseEstimator
+                    .getEstimatedPosition()
+                    .getTranslation()
+                    .getDistance(rearVisionInputs.blueOriginRobotPose.getTranslation());
+
+            if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 4.5) {
+                xyStds = 1.0;
+            } else if (rearVisionInputs.avgTagArea > 0.8 && poseDifference < 0.5) {
+                xyStds = 2.0;
+            } else if (rearVisionInputs.avgTagArea > 0.1 && poseDifference < 0.3) {
+                xyStds = 2.5;
+            } else {
+                return;
+            }
+
+            poseEstimator.addVisionMeasurement(
+                    rearVisionInputs.blueOriginRobotPose,
+                    rearVisionInputs.timestamp,
+                    VecBuilder.fill(xyStds, xyStds, rotStds));
+        }
+    }
     /**
      * Drive at desired velocities
      *
