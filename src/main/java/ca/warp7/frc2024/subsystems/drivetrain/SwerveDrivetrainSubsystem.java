@@ -265,11 +265,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                     .getTranslation()
                     .getDistance(rearVisionInputs.blueOriginRobotPose.getTranslation());
 
-            if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 4.5) {
-                xyStds = 1.0;
+            if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.65) {
+                xyStds = 1.5;
             } else if (rearVisionInputs.avgTagArea > 0.8 && poseDifference < 0.5) {
-                xyStds = 2.0;
-            } else if (rearVisionInputs.avgTagArea > 0.1 && poseDifference < 0.3) {
                 xyStds = 2.5;
             } else {
                 return;
