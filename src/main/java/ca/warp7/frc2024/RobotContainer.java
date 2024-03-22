@@ -70,6 +70,8 @@ public class RobotContainer {
     private final Command simpleFeed;
     private final Command simpleQueue;
     private final Command simpleRev;
+    private final Command simpleRevTrap;
+
     private final Command simpleShoot;
     private final Command simpleAmp;
 
@@ -80,6 +82,7 @@ public class RobotContainer {
     private final Command intakeFeed;
     private final Command queueRev;
     private final Command queueRevShoot;
+    private final Command queueRevShootTrap;
 
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
@@ -181,6 +184,10 @@ public class RobotContainer {
                         Commands.waitSeconds(0.65))
                 .withName("Simple Rev");
 
+        simpleRevTrap = Commands.sequence(
+                        shooterSubsystem.runGoalCommand(ShooterConstants.Goal.TRAP), Commands.waitSeconds(0.65))
+                .withName("Simple Rev Trap");
+
         simpleShoot = Commands.sequence(
                         feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.15),
                         Commands.waitSeconds(0.25),
@@ -206,6 +213,9 @@ public class RobotContainer {
         queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()).withName("Queue Rev");
         queueRevShoot = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy())
                 .withName("Queue Rev Shoot");
+
+        queueRevShootTrap = Commands.sequence(simpleQueue.asProxy(), simpleRevTrap.asProxy(), simpleShoot.asProxy())
+                .withName("Queue Rev Shoot Trap");
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
@@ -327,6 +337,7 @@ public class RobotContainer {
         operator.povRight().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.SUBWOOFER));
         operator.povLeft().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.AMP));
         operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.BLOCKER));
+        operator.x().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.TRAP));
 
         /* Scoring */
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueRevShoot);
@@ -334,6 +345,7 @@ public class RobotContainer {
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.SUBWOOFER))
                 .onTrue(queueRevShoot);
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.AMP)).onTrue(simpleAmp);
+        operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.TRAP)).onTrue(queueRevShootTrap);
 
         /* Override Procedures */
         operator.leftBumper().whileTrue(noteFlowReverse);
