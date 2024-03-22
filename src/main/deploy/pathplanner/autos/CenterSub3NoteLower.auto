@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.35,
-      "y": 6.0
+      "x": 0.72,
+      "y": 6.7
     },
-    "rotation": 0.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "UpSub_AngledUpNote"
+            "pathName": "CenSub_CenNote"
           }
         },
         {
@@ -44,13 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_Mid2Note"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid2Note_AngledUpNote"
+            "pathName": "CenNote_AngledLowerNote"
           }
         },
         {
