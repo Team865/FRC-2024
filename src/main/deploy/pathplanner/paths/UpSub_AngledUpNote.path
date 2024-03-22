@@ -3,32 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6983391189004604,
-        "y": 6.866199940733215
+        "x": 0.72283640634488,
+        "y": 6.703923954138813
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8578829648796948,
-        "y": 6.314543302518826
+        "x": 1.7367872698708364,
+        "y": 6.985028081167274
       },
       "isLocked": false,
-      "linkedName": "AngledUpperNote"
+      "linkedName": "UpperSub"
     },
     {
       "anchor": {
-        "x": 2.9,
-        "y": 5.55
+        "x": 2.6983391189004604,
+        "y": 6.866199940733215
       },
       "prevControl": {
-        "x": 1.4864821164827517,
-        "y": 5.328199348065364
+        "x": 1.6189686638632539,
+        "y": 6.097528551538584
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CenterNote"
+      "linkedName": "AngledUpperNote"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.35,
+      "rotationDegrees": 30.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
@@ -41,13 +47,13 @@
             {
               "type": "named",
               "data": {
-                "name": "IntakeFeed"
+                "name": "ArmStow"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "ArmStow"
+                "name": "IntakeFeed"
               }
             }
           ]
@@ -63,13 +69,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
-    "rotateFast": true
+    "rotation": 30.0,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 30.0,
+    "rotation": 60.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
