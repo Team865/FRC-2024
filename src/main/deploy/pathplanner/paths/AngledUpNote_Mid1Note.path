@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.62,
-        "y": 6.86
+        "x": 2.6983391189004604,
+        "y": 6.866199940733215
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.52630778703665,
-        "y": 7.2826182617407
+        "x": 3.6046469059371105,
+        "y": 7.288818202473914
       },
       "isLocked": false,
-      "linkedName": "CCURVE"
+      "linkedName": "AngledUpperNote"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "WEEE"
+      "linkedName": "Mid1Note"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "StowIntake",
-      "waypointRelativePos": 0.05,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "sequential",
         "data": {

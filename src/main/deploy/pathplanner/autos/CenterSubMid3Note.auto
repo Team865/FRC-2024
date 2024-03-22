@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.72,
-      "y": 6.7
+      "x": 1.35,
+      "y": 5.55
     },
-    "rotation": 60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -14,54 +14,60 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "UpperSub_UpperNote"
+            "pathName": "CenSub_AngledUpNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "UpperNote_UpperSub"
+            "pathName": "AngledUpNote_Mid1Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid1Note_AngledUpNote"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         }
       ]
     }
   },
-  "folder": "2 Note",
+  "folder": "4 Note",
   "choreoAuto": false
 }
