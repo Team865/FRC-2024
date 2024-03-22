@@ -3,41 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.3589403028880462,
-        "y": 6.435657551374627
+        "x": 2.6983391189004604,
+        "y": 6.866199940733215
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.900423697982813,
-        "y": 6.77712676760919
+        "x": 3.620875431565678,
+        "y": 7.062227772603694
       },
       "isLocked": false,
-      "linkedName": "WOO"
+      "linkedName": "AngledUpperNote"
     },
     {
       "anchor": {
-        "x": 7.975563270694995,
-        "y": 5.746806023931988
+        "x": 8.284390022483748,
+        "y": 5.775783991382798
       },
       "prevControl": {
-        "x": 6.585649434319703,
-        "y": 5.738777675472017
+        "x": 6.222445648595001,
+        "y": 6.771719395290643
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Mid2Note"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            },
             {
               "type": "named",
               "data": {
@@ -50,21 +56,21 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 450.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -25.0,
     "rotateFast": true
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 35.0,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -14,13 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmSubwoofer"
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
@@ -30,63 +30,39 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.2
+            "name": "ArmInterpolateSpeaker"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmPodium"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "name": "QueueRevShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_CenNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmPodium"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "pathName": "AngledUpNote_Mid1Note"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenNote_AngledLowerNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.2
+            "pathName": "Mid1Note_AngledUpNote"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmPodium"
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
           }
         },
         {
@@ -98,6 +74,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "3 Note",
   "choreoAuto": false
 }
