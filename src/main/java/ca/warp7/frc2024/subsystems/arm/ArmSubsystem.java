@@ -74,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
                 kI.get(),
                 kD.get(),
                 new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
-        feedback.setTolerance(1.5);
+        feedback.setTolerance(2.25);
 
         feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
 
