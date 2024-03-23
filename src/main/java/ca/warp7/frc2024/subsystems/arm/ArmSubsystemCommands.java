@@ -15,7 +15,7 @@ public class ArmSubsystemCommands extends ArmSubsystem {
     }
 
     public Trigger atGoalTrigger(Goal goal) {
-        return new Trigger(() -> atGoal(goal)).debounce(0.1);
+        return new Trigger(() -> atGoal(goal)).debounce(0);
     }
 
     public Command runGoalCommand(Goal goal) {
