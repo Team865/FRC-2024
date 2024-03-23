@@ -28,7 +28,7 @@ public final class ArmConstants {
         HANDOFF_INTAKE(new LoggedTunableNumber("Arm/Goals/HandoffIntakeDegrees", 0)),
         STATION_INTAKE(new LoggedTunableNumber("Arm/Goals/StationIntakeDegrees", 0)),
         AMP(new LoggedTunableNumber("Arm/Goals/AmpDegrees", 68)),
-        TRAP(new LoggedTunableNumber("Arm/Goals/TrapDegrees", 58)),
+        TRAP(new LoggedTunableNumber("Arm/Goals/TrapDegrees", 31)),
         PODIUM(new LoggedTunableNumber("Arm/Goals/PodiumDegrees", 63)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Goals/SubwooferDegrees", 50)),
         BLOCKER(new LoggedTunableNumber("Arm/Goals/BlockerDegrees", 80)),
