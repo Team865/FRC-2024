@@ -324,11 +324,11 @@ public class RobotContainer {
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
         driver.leftTrigger()
-                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) < 0.0)
-                .onTrue(rollNoteRight);
-        driver.leftTrigger()
                 .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) > 0.0)
-                .onTrue(rollNoteLeft);
+                .whileTrue(rollNoteRight);
+        driver.leftTrigger()
+                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) < 0.0)
+                .whileTrue(rollNoteLeft);
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
