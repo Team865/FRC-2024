@@ -359,13 +359,16 @@ public class RobotContainer {
         operator.povUp().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.PODIUM));
         operator.povRight().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.SUBWOOFER));
         operator.povLeft().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.AMP));
-        operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.BLOCKER));
+        operator.y().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.SUBWOOFER_ROBOT));
         operator.x().onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.TRAP));
 
         /* Scoring */
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.PODIUM)).onTrue(queueRevShoot);
         operator.a()
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.SUBWOOFER))
+                .onTrue(queueRevShoot);
+        operator.a()
+                .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.SUBWOOFER_ROBOT))
                 .onTrue(queueRevShoot);
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.AMP)).onTrue(simpleAmp);
         operator.a().and(armSubsystem.atGoalTrigger(ArmConstants.Goal.TRAP)).onTrue(queueRevShootTrap);

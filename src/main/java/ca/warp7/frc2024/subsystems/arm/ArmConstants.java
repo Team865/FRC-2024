@@ -31,6 +31,7 @@ public final class ArmConstants {
         TRAP(new LoggedTunableNumber("Arm/Goals/TrapDegrees", 31)),
         PODIUM(new LoggedTunableNumber("Arm/Goals/PodiumDegrees", 63)),
         SUBWOOFER(new LoggedTunableNumber("Arm/Goals/SubwooferDegrees", 50)),
+        SUBWOOFER_ROBOT(new LoggedTunableNumber("Arm/Goals/SubwooferRobotDegrees", 60)),
         BLOCKER(new LoggedTunableNumber("Arm/Goals/BlockerDegrees", 80)),
         INTERPOLATION(() -> 0),
         IDLE(() -> 0);
