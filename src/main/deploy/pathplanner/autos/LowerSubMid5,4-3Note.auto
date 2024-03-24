@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.72,
+      "y": 4.4
+    },
+    "rotation": -60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowSub_Mid5Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid5Note_BelowLowNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BelowLowNote_Mid4Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid4Note_BelowLowNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmInterpolateSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QueueRevShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmStow"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "3 Note",
+  "choreoAuto": false
+}
