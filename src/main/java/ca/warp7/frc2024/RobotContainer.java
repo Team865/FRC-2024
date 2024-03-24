@@ -39,6 +39,7 @@ import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -321,6 +322,13 @@ public class RobotContainer {
         driver.rightTrigger()
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
+
+        driver.leftTrigger()
+                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) < 0.0)
+                .onTrue(rollNoteRight);
+        driver.leftTrigger()
+                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) > 0.0)
+                .onTrue(rollNoteLeft);
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
