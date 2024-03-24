@@ -66,6 +66,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "AngledLowerNote_ForwardIsh"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "ArmInterpolateSpeaker"
