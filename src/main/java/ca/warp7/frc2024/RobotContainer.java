@@ -83,6 +83,8 @@ public class RobotContainer {
     private final Command queueRev;
     private final Command queueRevShoot;
     private final Command queueRevShootTrap;
+    private final Command rollNoteRight;
+    private final Command rollNoteLeft;
 
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
@@ -232,6 +234,16 @@ public class RobotContainer {
                 feederSubsystem.runVoltageCommandEnds(0),
                 shooterSubsystem.stopShooterCommand());
 
+        rollNoteRight = Commands.parallel(
+                shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.ROLL_RIGHT),
+                intakeSubsystem.runVoltageCommand(10),
+                feederSubsystem.runVoltageCommand(8));
+
+        rollNoteLeft = Commands.parallel(
+                shooterSubsystem.runGoalCommandEnds(ShooterConstants.Goal.ROLL_LEFT),
+                intakeSubsystem.runVoltageCommand(10),
+                feederSubsystem.runVoltageCommand(8));
+
         NamedCommands.registerCommand("ArmStow", armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE));
         NamedCommands.registerCommand("ArmSubwoofer", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.SUBWOOFER));
         NamedCommands.registerCommand("ArmPodium", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PODIUM));
@@ -354,6 +366,10 @@ public class RobotContainer {
         operator.leftBumper().whileTrue(noteFlowReverse);
         operator.rightBumper().whileTrue(noteFlowForward);
         operator.b().onTrue(stopNoteFlow);
+
+        operator.start().onTrue(rollNoteRight);
+
+        operator.back().onTrue(rollNoteLeft);
 
         /* Climbing */
         climberSubsystem.setDefaultCommand(
