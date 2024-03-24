@@ -58,16 +58,16 @@ public final class ShooterConstants {
             new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 6500));
 
     private static final Speeds ROLL_RIGHT_SPEEDS = new Speeds(
-            new LoggedTunableNumber("Shooter/Goals/Trap/TopRight", 3500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/TopLeft", 3500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/BottomLeft", 500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 500));
+            new LoggedTunableNumber("Shooter/Goals/RollRight/TopRight", 3500),
+            new LoggedTunableNumber("Shooter/Goals/RollRight/TopLeft", 3500),
+            new LoggedTunableNumber("Shooter/Goals/RollRight/BottomLeft", 500),
+            new LoggedTunableNumber("Shooter/Goals/RollRight/BottomRight", 500));
 
     private static final Speeds ROLL_LEFT_SPEEDS = new Speeds(
-            new LoggedTunableNumber("Shooter/Goals/Trap/TopRight", 500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/TopLeft", 500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/BottomLeft", 3500),
-            new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 3500));
+            new LoggedTunableNumber("Shooter/Goals/RollLeft/TopRight", 500),
+            new LoggedTunableNumber("Shooter/Goals/RollLeft/TopLeft", 500),
+            new LoggedTunableNumber("Shooter/Goals/RollLeft/BottomLeft", 3500),
+            new LoggedTunableNumber("Shooter/Goals/RollLeft/BottomRight", 3500));
 
     @RequiredArgsConstructor
     public enum Goal {
