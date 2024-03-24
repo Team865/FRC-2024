@@ -92,6 +92,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private PointOfInterest pointAt = PointOfInterest.NONE;
     private boolean reversePointing = true;
 
+    private double speedMultiplier = 1;
+
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
             VisionIO frontVisionIO,
@@ -416,6 +418,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         return sysId.dynamic(direction);
     }
 
+    public Command setSpeedMultiplier(double multiplier) {
+        return this.runOnce(() -> this.speedMultiplier = multiplier);
+    }
+
     /**
      * Drive command for teleoperated control. Defaults to field oriented
      *
@@ -440,13 +446,13 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
                     // Apply sensitivity adjustment
                     double xVelocity = SensitivityGainAdjustment.driveGainAdjustment(
-                                    MathUtil.applyDeadband(xSupplier.getAsDouble(), DEADBAND))
+                                    MathUtil.applyDeadband(xSupplier.getAsDouble() * speedMultiplier, DEADBAND))
                             * MAX_LINEAR_SPEED;
                     double yVelocity = SensitivityGainAdjustment.driveGainAdjustment(
-                                    MathUtil.applyDeadband(ySupplier.getAsDouble(), DEADBAND))
+                                    MathUtil.applyDeadband(ySupplier.getAsDouble() * speedMultiplier, DEADBAND))
                             * MAX_LINEAR_SPEED;
                     double omega = SensitivityGainAdjustment.steerGainAdjustment(
-                                    MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND))
+                                    MathUtil.applyDeadband(omegaSupplier.getAsDouble() * speedMultiplier, DEADBAND))
                             * MAX_ANGULAR_SPEED;
 
                     if (DriverStation.getAlliance().isPresent()

@@ -295,7 +295,10 @@ public class RobotContainer {
                 () -> -driver.getRightX(),
                 driver.rightBumper()));
 
-        // was as proxy
+        driver.leftBumper()
+                .onTrue(swerveDrivetrainSubsystem.setSpeedMultiplier(0.4))
+                .onFalse(swerveDrivetrainSubsystem.setSpeedMultiplier(1.0));
+
         driver.rightTrigger()
                 .and(feederSubsystem.sensorTrigger())
                 .toggleOnTrue(armSubsystem.runInterpolation(
