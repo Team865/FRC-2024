@@ -57,6 +57,18 @@ public final class ShooterConstants {
             new LoggedTunableNumber("Shooter/Goals/Trap/BottomLeft", 0),
             new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 6500));
 
+    private static final Speeds ROLL_RIGHT_SPEEDS = new Speeds(
+            new LoggedTunableNumber("Shooter/Goals/Trap/TopRight", 3500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/TopLeft", 3500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/BottomLeft", 500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 500));
+
+    private static final Speeds ROLL_LEFT_SPEEDS = new Speeds(
+            new LoggedTunableNumber("Shooter/Goals/Trap/TopRight", 500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/TopLeft", 500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/BottomLeft", 3500),
+            new LoggedTunableNumber("Shooter/Goals/Trap/BottomRight", 3500));
+
     @RequiredArgsConstructor
     public enum Goal {
         IDLE(IDLE_SPEEDS),
@@ -64,6 +76,8 @@ public final class ShooterConstants {
         PODIUM(PODIUM_SPEEDS),
         AMP(AMP_SPEEDS),
         TRAP(TRAP_SPEEDS),
+        ROLL_RIGHT(ROLL_RIGHT_SPEEDS),
+        ROLL_LEFT(ROLL_LEFT_SPEEDS),
         DEFAULT(DEFAULT_SPEEDS);
 
         private final Speeds speeds;
