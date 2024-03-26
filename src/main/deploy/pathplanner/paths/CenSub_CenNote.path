@@ -8,56 +8,46 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.228192998052663,
-        "y": 5.148506806272872
+        "x": 1.7474608614564597,
+        "y": 5.55
       },
       "isLocked": false,
-      "linkedName": "CenterSub"
+      "linkedName": "CenSub"
     },
     {
       "anchor": {
-        "x": 2.0479614107376367,
-        "y": 4.1
+        "x": 2.9,
+        "y": 5.55
       },
       "prevControl": {
-        "x": 1.7679614107376367,
-        "y": 4.1
-      },
-      "nextControl": {
-        "x": 2.381305428166455,
-        "y": 4.1
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.72,
-        "y": 4.1
-      },
-      "prevControl": {
-        "x": 1.9746556606074406,
-        "y": 4.1
+        "x": 1.903447843377255,
+        "y": 5.55
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LowerNote"
+      "linkedName": "CenterNote"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 1.1,
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
-                "name": "simpleIntake"
+                "name": "IntakeFeed"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
               }
             }
           ]
@@ -66,15 +56,15 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 2.5,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 450.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
-    "rotateFast": false
+    "rotation": 0.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": null,
@@ -82,5 +72,5 @@
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
