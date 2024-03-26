@@ -54,6 +54,7 @@ public final class Constants {
 
     public static final class OI {
         public static final double DEADBAND = 0.1;
+        public static final double TRIGGER_THRESHOLD = 0.1;
     }
 
     public static final class kIntake {

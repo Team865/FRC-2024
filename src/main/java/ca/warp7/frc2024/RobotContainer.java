@@ -4,6 +4,8 @@
 
 package ca.warp7.frc2024;
 
+import static ca.warp7.frc2024.Constants.OI.TRIGGER_THRESHOLD;
+
 import ca.warp7.frc2024.FieldConstants.PointOfInterest;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIO;
 import ca.warp7.frc2024.subsystems.Intake.IntakeIOSim;
@@ -312,21 +314,22 @@ public class RobotContainer {
                 .onTrue(swerveDrivetrainSubsystem.setSpeedMultiplier(0.4))
                 .onFalse(swerveDrivetrainSubsystem.setSpeedMultiplier(1.0));
 
-        driver.rightTrigger()
+        driver.rightTrigger(TRIGGER_THRESHOLD)
                 .and(feederSubsystem.sensorTrigger())
                 .toggleOnTrue(armSubsystem.runInterpolation(
                         () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
                 .onTrue(queueRev);
 
-        driver.rightTrigger().onFalse(simpleShoot.asProxy().andThen(shooterSubsystem.stopShooterCommand()));
-        driver.rightTrigger()
+        driver.rightTrigger(TRIGGER_THRESHOLD)
+                .onFalse(simpleShoot.asProxy().andThen(shooterSubsystem.stopShooterCommand()));
+        driver.rightTrigger(TRIGGER_THRESHOLD)
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
-        driver.leftTrigger()
+        driver.leftTrigger(TRIGGER_THRESHOLD)
                 .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) > 0.0)
                 .whileTrue(rollNoteRight);
-        driver.leftTrigger()
+        driver.leftTrigger(TRIGGER_THRESHOLD)
                 .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) < 0.0)
                 .whileTrue(rollNoteLeft);
 
@@ -350,7 +353,7 @@ public class RobotContainer {
 
     private void configureOperatorBindings() {
         /* Intaking */
-        operator.rightTrigger()
+        operator.rightTrigger(TRIGGER_THRESHOLD)
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
                 .onTrue(intakeFeed);
 
