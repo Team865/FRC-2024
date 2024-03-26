@@ -1,10 +1,6 @@
 package ca.warp7.frc2024.subsystems.climber;
 
-import static ca.warp7.frc2024.util.SparkMaxManager.safeBurnSparkMax;
-import static ca.warp7.frc2024.util.SparkMaxManager.safeSparkMax;
-
 import ca.warp7.frc2024.Constants.CLIMBER.STATE;
-import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -13,31 +9,22 @@ import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-public class ClimberIOSparkMax implements ClimberIO {
+public class ClimberIOSparkMaxNeo implements ClimberIO {
     private final CANSparkMax motor;
     private final RelativeEncoder intEncoder;
 
-    public ClimberIOSparkMax(int climberSparkMaxId) {
-        /* Create hardware objects */
+    public ClimberIOSparkMaxNeo(int climberSparkMaxId) {
         motor = new CANSparkMax(climberSparkMaxId, MotorType.kBrushless);
-        intEncoder = motor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
 
-        /* Factory reset SparkMax */
-        safeSparkMax(motor, motor::restoreFactoryDefaults);
-
-        /* Configure motor invert */
+        motor.restoreFactoryDefaults();
+        motor.setCANTimeout(250);
+        motor.enableVoltageCompensation(12);
+        motor.setSmartCurrentLimit(40);
         motor.setInverted(false);
+        motor.burnFlash();
+        motor.setSoftLimit(SoftLimitDirection.kForward, STATE.CLIMBER_END.getStatePosition());
 
-        /* Configure electrical */
-        safeSparkMax(motor, () -> motor.setSmartCurrentLimit(40));
-        safeSparkMax(motor, () -> motor.enableVoltageCompensation(12.0));
-        safeSparkMax(motor, () -> motor.setIdleMode(IdleMode.kBrake));
-
-        /* Configure soft limits */
-        motor.setSoftLimit(SoftLimitDirection.kForward, (float) STATE.CLIMBER_END.getStatePosition());
-
-        /* Save configurations */
-        safeBurnSparkMax(motor);
+        intEncoder = motor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
     }
 
     @Override

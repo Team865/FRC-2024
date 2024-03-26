@@ -3,7 +3,7 @@
   "startingPose": {
     "position": {
       "x": 1.35,
-      "y": 6.0
+      "y": 5.55
     },
     "rotation": 0
   },
@@ -14,66 +14,66 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HighCenSub_AngledUpNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
+            "pathName": "CenterSub_CenterNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_Mid1Note"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid1Note_AngledUpNote"
+            "pathName": "CenterNote_CenterSub"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "armStow"
           }
         }
       ]
     }
   },
-  "folder": "3 Note",
+  "folder": "2 Note",
   "choreoAuto": false
 }

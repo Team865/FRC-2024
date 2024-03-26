@@ -1,8 +1,7 @@
 package ca.warp7.frc2024.subsystems.shooter;
 
-import static ca.warp7.frc2024.subsystems.shooter.ShooterConstants.*;
-
 import ca.warp7.frc2024.util.LoggedTunableNumber;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
@@ -11,13 +10,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final ShooterModule[] shooterModules;
 
-    protected final SysIdRoutine sysId;
+    private final SysIdRoutine sysId;
 
-    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/Gains/kP", Gains.kP());
-    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Shooter/Gains/kI", Gains.kI());
-    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/Gains/kD", Gains.kD());
-
-    protected Goal currentGoal = Goal.IDLE;
+    private static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/Gains/kP", 0.00065);
+    private static final LoggedTunableNumber kI = new LoggedTunableNumber("Shooter/Gains/kI", 0);
+    private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/Gains/kD", 0.01);
 
     public ShooterSubsystem(
             ShooterModuleIO topRightShooterModuleIO,
@@ -25,20 +22,17 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterModuleIO bottomLeftShooterModuleIO,
             ShooterModuleIO bottomRightShooterModuleIO) {
         shooterModules = new ShooterModule[] {
-            new ShooterModule(topRightShooterModuleIO, "TopRight"),
-            new ShooterModule(topLeftShooterModuleIO, "TopLeft"),
-            new ShooterModule(bottomLeftShooterModuleIO, "BottomLeft"),
-            new ShooterModule(bottomRightShooterModuleIO, "BottomRight")
+            new ShooterModule(topRightShooterModuleIO, 0, "TopRight"),
+            new ShooterModule(topLeftShooterModuleIO, 1, "TopLeft"),
+            new ShooterModule(bottomLeftShooterModuleIO, 2, "BottomLeft"),
+            new ShooterModule(bottomRightShooterModuleIO, 3, "BottomRight")
         };
 
         sysId = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                        null,
-                        edu.wpi.first.units.Units.Volts.of(10),
-                        edu.wpi.first.units.Units.Seconds.of(13),
-                        (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+                        null, null, null, (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
-                        (voltage) -> setVoltage(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
+                        (voltage) -> runShooterVolts(voltage.in(edu.wpi.first.units.Units.Volts), 0), null, this));
     }
 
     @Override
@@ -46,9 +40,10 @@ public class ShooterSubsystem extends SubsystemBase {
         LoggedTunableNumber.ifChanged(
                 hashCode(),
                 () -> {
-                    for (int i = 0; i < 4; i++) {
-                        shooterModules[i].configurePID(kP.get(), kI.get(), kD.get());
-                    }
+                    shooterModules[0].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[1].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[2].configurePID(kP.get(), kI.get(), kD.get());
+                    shooterModules[3].configurePID(kP.get(), kI.get(), kD.get());
                 },
                 kP,
                 kI,
@@ -59,41 +54,61 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    protected void setVoltage(double volts, int... shooterModules) {
-        currentGoal = Goal.IDLE;
+    public void runShooterVolts(double volts, int... shooterModules) {
         for (var shooterModule : shooterModules) {
-            this.shooterModules[shooterModule].setVoltage(volts);
+            this.shooterModules[shooterModule].runShooterVolts(volts);
         }
     }
 
-    protected void setVelocity(double RPM, int... shooterModules) {
-        currentGoal = Goal.IDLE;
+    public void setRPM(double RPM, int... shooterModules) {
         for (var shooterModule : shooterModules) {
-            this.shooterModules[shooterModule].setVelocity(RPM);
+            this.shooterModules[shooterModule].runShooterTargetVelocity(RPM);
         }
     }
 
-    protected void setGoal(Goal goal) {
-        currentGoal = goal;
-        for (int i = 0; i < 4; i++) {
-            shooterModules[i].setVelocity(goal.getSpeeds()[i]);
-        }
-    }
-
-    protected double getShooterVelocityRPM(int shooterModule) {
+    public double getShooterVelocityRPM(int shooterModule) {
         return shooterModules[shooterModule].getVelocityRPM();
     }
 
-    protected void stopShooter() {
-        currentGoal = Goal.IDLE;
+    public void stopShooter() {
         for (var shooterModule : shooterModules) {
             shooterModule.stopShooter();
         }
     }
 
-    protected void zeroEncoder() {
+    public void zeroEncoder() {
         for (var shooterModule : shooterModules) {
             shooterModule.zeroEncoder();
         }
+    }
+
+    public Command runRPMCommand(double RPM, int... shooterModules) {
+        return this.runOnce(() -> setRPM(RPM, shooterModules));
+    }
+
+    public Command runVoltageCommand(double volts, int... shooterModules) {
+        return this.runOnce(() -> runShooterVolts(volts, shooterModules));
+    }
+
+    public Command stopShooterCommand() {
+        return this.runOnce(() -> stopShooter());
+    }
+
+    /**
+     * Shooter quasistatic SysID routine
+     * @param direction
+     * @return
+     */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    /**
+     * Shooter dynamic SysID routine
+     * @param direction
+     * @return
+     */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
     }
 }

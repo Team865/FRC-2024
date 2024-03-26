@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.35,
-      "y": 5.55
+      "x": 0.72,
+      "y": 6.7
     },
-    "rotation": 0.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -14,42 +14,48 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenSub_CenNote"
+            "pathName": "UpperSub_UpperDepartA"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmStow"
+            "pathName": "UpperDepartA_UpperDepartB"
           }
         }
       ]
     }
   },
-  "folder": "2 Note",
+  "folder": null,
   "choreoAuto": false
 }

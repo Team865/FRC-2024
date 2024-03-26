@@ -20,6 +20,4 @@ public interface IntakeIO {
 
     /*Set the intake voltage */
     public default void setVoltage(double volts) {}
-
-    public default void stop() {}
 }

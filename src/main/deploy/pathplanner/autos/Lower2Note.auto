@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.72,
-      "y": 6.7
+      "x": 0.73,
+      "y": 4.4
     },
-    "rotation": 60.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -14,66 +14,66 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "UpSub_AngledUpNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
+            "pathName": "LowerSub_LowerNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_Mid2Note"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid2Note_AngledUpNote"
+            "pathName": "LowerNote_LowerSub"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "armStow"
           }
         }
       ]
     }
   },
-  "folder": "3 Note",
+  "folder": "2 Note",
   "choreoAuto": false
 }

@@ -7,14 +7,16 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterModule {
     private final ShooterModuleIO shooterModuleIO;
+    private final int shooterModuleID;
     private final String shooterModuleName;
 
     private SimpleMotorFeedforward feedforward;
 
     private final ShooterModuleIOInputsAutoLogged shooterModuleInputs = new ShooterModuleIOInputsAutoLogged();
 
-    public ShooterModule(ShooterModuleIO shooterModuleIO, String shooterModuleName) {
+    public ShooterModule(ShooterModuleIO shooterModuleIO, int shooterModuleID, String shooterModuleName) {
         this.shooterModuleIO = shooterModuleIO;
+        this.shooterModuleID = shooterModuleID;
         this.shooterModuleName = shooterModuleName;
 
         switch (Constants.CURRENT_MODE) {
@@ -47,7 +49,7 @@ public class ShooterModule {
      * Set closed loop control target velocity
      * @param velocityRPM
      */
-    public void setVelocity(double velocityRPM) {
+    public void runShooterTargetVelocity(double velocityRPM) {
         double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
         shooterModuleIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
@@ -62,7 +64,7 @@ public class ShooterModule {
      * Set open loop control volts
      * @param volts
      */
-    public void setVoltage(double volts) {
+    public void runShooterVolts(double volts) {
         shooterModuleIO.setVoltage(volts);
     }
 

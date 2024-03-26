@@ -26,6 +26,4 @@ public interface FeederIO {
      * @param volts
      */
     public default void setVoltage(double volts) {}
-
-    public default void stop() {}
 }

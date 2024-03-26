@@ -5,12 +5,11 @@
   "pathFolders": [],
   "autoFolders": [
     "2 Note",
-    "3 Note",
-    "4 Note"
+    "3 Note"
   ],
-  "defaultMaxVel": 3.0,
-  "defaultMaxAccel": 3.5,
+  "defaultMaxVel": 1.5,
+  "defaultMaxAccel": 2.5,
   "defaultMaxAngVel": 360.0,
-  "defaultMaxAngAccel": 450.0,
-  "maxModuleSpeed": 4.5
+  "defaultMaxAngAccel": 720.0,
+  "maxModuleSpeed": 5.0
 }

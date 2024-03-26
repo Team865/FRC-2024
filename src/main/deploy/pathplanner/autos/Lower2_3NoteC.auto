@@ -14,61 +14,97 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenSub_AngledUpNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
+            "pathName": "CenterSub_CenterNote"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AngledUpNote_Mid1Note"
+            "pathName": "CenterNote_CenterSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "simpleShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armStow"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Mid1Note_AngledUpNote"
+            "pathName": "CenterSub_LowerNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowerNote_CenterSub"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "name": "armSubwoofer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "simpleShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ArmStow"
+            "name": "armStow"
           }
         }
       ]
