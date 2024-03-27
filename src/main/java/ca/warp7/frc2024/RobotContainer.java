@@ -41,7 +41,6 @@ import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOLimelight;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -326,12 +325,9 @@ public class RobotContainer {
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
-        driver.leftTrigger(TRIGGER_THRESHOLD)
-                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) > 0.0)
-                .whileTrue(rollNoteRight);
-        driver.leftTrigger(TRIGGER_THRESHOLD)
-                .and(() -> MathUtil.applyDeadband(driver.getLeftX(), 0.1) < 0.0)
-                .whileTrue(rollNoteLeft);
+        // Note rolling
+        driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
+        driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
 
         driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
