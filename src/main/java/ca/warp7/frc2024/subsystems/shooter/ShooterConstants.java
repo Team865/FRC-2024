@@ -40,16 +40,16 @@ public final class ShooterConstants {
             new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", 0));
 
     private static final Speeds DEFAULT_SPEEDS = new Speeds(
-            new LoggedTunableNumber("Shooter/Goals/Podium/TopRight", 7000),
-            new LoggedTunableNumber("Shooter/Goals/Podium/TopLeft", 9500),
-            new LoggedTunableNumber("Shooter/Goals/Podium/BottomLeft", 9500),
-            new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", 7000));
+            new LoggedTunableNumber("Shooter/Goals/Default/TopRight", 7000),
+            new LoggedTunableNumber("Shooter/Goals/Default/TopLeft", 9500),
+            new LoggedTunableNumber("Shooter/Goals/Default/BottomLeft", 9500),
+            new LoggedTunableNumber("Shooter/Goals/Default/BottomRight", 7000));
 
     private static final Speeds AMP_SPEEDS = new Speeds(
-            new LoggedTunableNumber("Shooter/Goals/Podium/TopRight", -8000),
-            new LoggedTunableNumber("Shooter/Goals/Podium/TopLeft", -8000),
-            new LoggedTunableNumber("Shooter/Goals/Podium/BottomLeft", -8000),
-            new LoggedTunableNumber("Shooter/Goals/Podium/BottomRight", -8000));
+            new LoggedTunableNumber("Shooter/Goals/Amp/TopRight", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Amp/TopLeft", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Amp/BottomLeft", -8000),
+            new LoggedTunableNumber("Shooter/Goals/Amp/BottomRight", -8000));
 
     private static final Speeds TRAP_SPEEDS = new Speeds(
             new LoggedTunableNumber("Shooter/Goals/Trap/TopRight", 6500),
