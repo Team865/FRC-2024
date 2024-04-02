@@ -66,9 +66,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final LoggedTunableNumber aimAtkI = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kI", 0);
     private final LoggedTunableNumber aimAtkD = new LoggedTunableNumber("Drivetrain/Gains/AimAt/kD", 0);
 
-    private final LoggedTunableNumber rotateTokP = new LoggedTunableNumber("Drivetrain/Gains/HeadingSnap/kP", 0.15);
+    private final LoggedTunableNumber rotateTokP = new LoggedTunableNumber("Drivetrain/Gains/HeadingSnap/kP", 0.1);
     private final LoggedTunableNumber rotateTokI = new LoggedTunableNumber("Drivetrain/Gains/HeadingSnap/kI", 0);
-    private final LoggedTunableNumber rotateTokD = new LoggedTunableNumber("Drivetrain/Gains/HeadingSnap/kD", 0);
+    private final LoggedTunableNumber rotateTokD = new LoggedTunableNumber("Drivetrain/Gains/HeadingSnap/kD", 0.005);
 
     protected final LoggedTunableNumber fudge = new LoggedTunableNumber("Drivetrain/Fudge", 0.1);
 
@@ -202,11 +202,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
 
-        // if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 4.5) {
-        //     poseEstimator.addVisionMeasurement(
-        //             rearVisionInputs.blueOriginRobotPose, rearVisionInputs.timestamp, VecBuilder.fill(1, 1,
-        // 999999999));
-        // }
 
         updatePoseEstimateWithVision();
 
@@ -224,6 +219,17 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 aimAtkP,
                 aimAtkI,
                 aimAtkD);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    headingSnapFeedback.setP(rotateTokP.get());
+                    headingSnapFeedback.setI(rotateTokI.get());
+                    headingSnapFeedback.setD(rotateTokD.get());
+                },
+                rotateTokP,
+                rotateTokI,
+                rotateTokD);
 
         LoggedTunableNumber.ifChanged(
                 hashCode(),
@@ -263,8 +269,12 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
             double xyStds;
             double rotStds = 999999999;
 
-            if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.65) {
-                xyStds = 0.5;
+            if (rearVisionInputs.tagCount >= 2
+                    && rearVisionInputs.avgTagDist <= 3.65
+                    && DriverStation.isAutonomousEnabled()) {
+                xyStds = 0.5; // Don't fix what ain't broke for auto
+            } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.65) {
+                xyStds = 0.1;
             } else if (rearVisionInputs.avgTagDist < 2) {
                 xyStds = 1.5;
             } else {

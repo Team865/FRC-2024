@@ -31,9 +31,9 @@ public final class DrivetrainConstants {
     public enum HeadingSnapPoint {
         NONE(0, 0),
         HOLD(0, 0),
-        AMP(-90, -90),
-        FEEDER(45, 135),
-        PASSING(45, 135);
+        AMP(90, 90),
+        FEEDER(-45, -135),
+        PASSING(-45, -135);
 
         private final double heading_blue;
         private final double heading_red;

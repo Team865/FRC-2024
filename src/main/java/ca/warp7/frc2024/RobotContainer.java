@@ -85,7 +85,6 @@ public class RobotContainer {
     private final Command stopNoteFlow;
 
     private final Command intakeFeed;
-    private final Command fancyFeederIntake;
     private final Command queueRev;
     private final Command queueRevPassing;
     private final Command queueRevShoot;
@@ -175,10 +174,30 @@ public class RobotContainer {
                 .until(intakeSubsystem.sensorTrigger())
                 .withName("Simple Intake");
 
-        feederIntake = Commands.parallel(
-                        shooterSubsystem.runVelocityCommandEnds(-7500, 0, 1, 2, 3),
-                        feederSubsystem.runVoltageCommandEnds(-6))
-                .until(intakeSubsystem.sensorTrigger())
+        feederIntake = Commands.sequence(
+                        ledSubsystem.solidColorCommand(SparkColor.VIOLET),
+                        Commands.parallel(
+                                        shooterSubsystem
+                                                .runVelocityCommandEnds(-7500, 0, 1, 2, 3)
+                                                .asProxy(),
+                                        feederSubsystem
+                                                .runVoltageCommandEnds(-7)
+                                                .asProxy())
+                                .until(feederSubsystem.sensorTrigger()),
+                        Commands.parallel(
+                                        shooterSubsystem
+                                                .runVelocityCommandEnds(-6000, 0, 1, 2, 3)
+                                                .asProxy(),
+                                        feederSubsystem
+                                                .runVoltageCommandEnds(-4)
+                                                .asProxy())
+                                .until(feederSubsystem.sensorTrigger().negate()),
+                        Commands.parallel(
+                                ledSubsystem
+                                        .blinkColorCommand(SparkColor.GREEN, 0.25, 1)
+                                        .asProxy(),
+                                vibrateDriver.asProxy(),
+                                vibrateOperator.asProxy()))
                 .withName("Feeder Intake");
 
         simpleFeed = Commands.parallel(
@@ -194,9 +213,10 @@ public class RobotContainer {
                 .until(feederSubsystem.sensorTrigger().negate())
                 .withName("Simple Queue");
 
-        simpleRev = shooterSubsystem
-                .runGoalCommand(ShooterConstants.Goal.DEFAULT)
-                .withTimeout(0.65)
+        simpleRev = Commands.sequence(
+                        shooterSubsystem.runVelocityCommand(7000, 0, 3),
+                        shooterSubsystem.runVelocityCommand(9500, 1, 2),
+                        Commands.waitSeconds(0.65))
                 .withName("Simple Rev");
 
         // Commands.sequence(
@@ -230,18 +250,11 @@ public class RobotContainer {
                         simpleIntake.asProxy(),
                         simpleFeed.asProxy(),
                         Commands.parallel(
-                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                vibrateDriver,
-                                vibrateOperator))
-                .withName("Intake Feed");
-
-        fancyFeederIntake = Commands.sequence(
-                        ledSubsystem.solidColorCommand(SparkColor.VIOLET),
-                        feederIntake.asProxy(),
-                        Commands.parallel(
-                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
-                                vibrateDriver,
-                                vibrateOperator))
+                                ledSubsystem
+                                        .blinkColorCommand(SparkColor.GREEN, 0.25, 1)
+                                        .asProxy(),
+                                vibrateDriver.asProxy(),
+                                vibrateOperator.asProxy()))
                 .withName("Intake Feed");
 
         queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()).withName("Queue Rev");
@@ -358,7 +371,11 @@ public class RobotContainer {
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
         driver.rightBumper()
-                .onTrue(armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PASSING))
+                .onTrue(armSubsystem
+                        .runGoalCommandUntil(ArmConstants.Goal.PASSING)
+                        .andThen(
+                                Commands.waitSeconds(0.5),
+                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)))
                 .onTrue(queueRevShootPassing);
 
         // Note rolling
@@ -395,7 +412,7 @@ public class RobotContainer {
         /* Intaking */
         operator.leftTrigger(TRIGGER_THRESHOLD)
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
-                .onTrue(fancyFeederIntake);
+                .onTrue(feederIntake);
 
         operator.rightTrigger(TRIGGER_THRESHOLD)
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
