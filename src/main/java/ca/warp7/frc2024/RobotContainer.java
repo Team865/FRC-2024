@@ -70,10 +70,12 @@ public class RobotContainer {
     private final Command vibrateOperator;
 
     private final Command simpleIntake;
+    private final Command feederIntake;
     private final Command simpleFeed;
     private final Command simpleQueue;
     private final Command simpleRev;
     private final Command simpleRevTrap;
+    private final Command simpleRevPassing;
 
     private final Command simpleShoot;
     private final Command simpleAmp;
@@ -83,9 +85,12 @@ public class RobotContainer {
     private final Command stopNoteFlow;
 
     private final Command intakeFeed;
+    private final Command fancyFeederIntake;
     private final Command queueRev;
+    private final Command queueRevPassing;
     private final Command queueRevShoot;
     private final Command queueRevShootTrap;
+    private final Command queueRevShootPassing;
     private final Command rollNoteRight;
     private final Command rollNoteLeft;
 
@@ -170,6 +175,12 @@ public class RobotContainer {
                 .until(intakeSubsystem.sensorTrigger())
                 .withName("Simple Intake");
 
+        feederIntake = Commands.parallel(
+                        shooterSubsystem.runVelocityCommandEnds(-7500, 0, 1, 2, 3),
+                        feederSubsystem.runVoltageCommandEnds(-6))
+                .until(intakeSubsystem.sensorTrigger())
+                .withName("Feeder Intake");
+
         simpleFeed = Commands.parallel(
                         shooterSubsystem.runVelocityCommandEnds(-1500, 0, 1, 2, 3),
                         intakeSubsystem.runVoltageCommandEnds(10),
@@ -198,6 +209,10 @@ public class RobotContainer {
                         shooterSubsystem.runGoalCommand(ShooterConstants.Goal.TRAP), Commands.waitSeconds(0.65))
                 .withName("Simple Rev Trap");
 
+        simpleRevPassing = Commands.sequence(
+                        shooterSubsystem.runGoalCommand(ShooterConstants.Goal.PASSING), Commands.waitSeconds(0.5))
+                .withName("Simple Rev Passing");
+
         simpleShoot = Commands.sequence(
                         feederSubsystem.runVoltageCommandEnds(12).withTimeout(0.15),
                         Commands.waitSeconds(0.25),
@@ -220,12 +235,27 @@ public class RobotContainer {
                                 vibrateOperator))
                 .withName("Intake Feed");
 
+        fancyFeederIntake = Commands.sequence(
+                        ledSubsystem.solidColorCommand(SparkColor.VIOLET),
+                        feederIntake.asProxy(),
+                        Commands.parallel(
+                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+                                vibrateDriver,
+                                vibrateOperator))
+                .withName("Intake Feed");
+
         queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()).withName("Queue Rev");
+        queueRevPassing = Commands.sequence(simpleQueue.asProxy(), simpleRevPassing.asProxy())
+                .withName("Queue Rev Passing");
         queueRevShoot = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy(), simpleShoot.asProxy())
                 .withName("Queue Rev Shoot");
 
         queueRevShootTrap = Commands.sequence(simpleQueue.asProxy(), simpleRevTrap.asProxy(), simpleShoot.asProxy())
                 .withName("Queue Rev Shoot Trap");
+
+        queueRevShootPassing = Commands.sequence(
+                        simpleQueue.asProxy(), simpleRevPassing.asProxy(), simpleShoot.asProxy())
+                .withName("Queue Rev Shoot Passing");
 
         noteFlowForward = Commands.parallel(
                 intakeSubsystem.runVoltageCommandEnds(8),
@@ -327,6 +357,10 @@ public class RobotContainer {
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
+        driver.rightBumper()
+                .onTrue(armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PASSING))
+                .onTrue(queueRevShootPassing);
+
         // Note rolling
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
@@ -359,6 +393,10 @@ public class RobotContainer {
 
     private void configureOperatorBindings() {
         /* Intaking */
+        operator.leftTrigger(TRIGGER_THRESHOLD)
+                .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
+                .onTrue(fancyFeederIntake);
+
         operator.rightTrigger(TRIGGER_THRESHOLD)
                 .and(armSubsystem.atGoalTrigger(ArmConstants.Goal.HANDOFF_INTAKE))
                 .onTrue(intakeFeed);
