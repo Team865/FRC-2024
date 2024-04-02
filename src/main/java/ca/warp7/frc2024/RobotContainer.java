@@ -20,9 +20,10 @@ import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMax;
 import ca.warp7.frc2024.subsystems.climber.ClimberSubsystem;
+import ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.HeadingSnapPoint;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIONavX;
-import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystem;
+import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystemCommands;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIO;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOFalcon500;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveModuleIOSim;
@@ -50,7 +51,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-    private final SwerveDrivetrainSubsystem swerveDrivetrainSubsystem;
+    private final SwerveDrivetrainSubsystemCommands swerveDrivetrainSubsystem;
     private final ArmSubsystemCommands armSubsystem;
     private final IntakeSubsystem intakeSubsystem;
     private final ShooterSubsystemCommands shooterSubsystem;
@@ -101,7 +102,7 @@ public class RobotContainer {
                 feederSubsystem = new FeederSubsystem(new FeederIOSparkMax(24, 25, 3));
                 climberSubsystem = new ClimberSubsystem(new ClimberIOSparkMax(30));
                 ledSubsystem = new LEDSubsystem(0);
-                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
+                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystemCommands(
                         new GyroIONavX() {},
                         new VisionIOLimelight("limelight-front"),
                         new VisionIOLimelight("limelight-rear"),
@@ -111,7 +112,7 @@ public class RobotContainer {
                         new SwerveModuleIOFalcon500(42, 41, 40, Rotation2d.fromRotations(0.008)));
                 break;
             case SIM:
-                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
+                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystemCommands(
                         new GyroIO() {},
                         new VisionIO() {},
                         new VisionIO() {},
@@ -132,7 +133,7 @@ public class RobotContainer {
 
                 break;
             default:
-                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystem(
+                swerveDrivetrainSubsystem = new SwerveDrivetrainSubsystemCommands(
                         new GyroIO() {},
                         new VisionIO() {},
                         new VisionIO() {},
@@ -182,11 +183,16 @@ public class RobotContainer {
                 .until(feederSubsystem.sensorTrigger().negate())
                 .withName("Simple Queue");
 
-        simpleRev = Commands.sequence(
-                        shooterSubsystem.runVelocityCommand(7000, 0, 3),
-                        shooterSubsystem.runVelocityCommand(9500, 1, 2),
-                        Commands.waitSeconds(0.65))
+        simpleRev = shooterSubsystem
+                .runGoalCommand(ShooterConstants.Goal.DEFAULT)
+                .withTimeout(0.65)
                 .withName("Simple Rev");
+
+        // Commands.sequence(
+        //                 shooterSubsystem.runVelocityCommand(7000, 0, 3),
+        //                 shooterSubsystem.runVelocityCommand(9500, 1, 2),
+        //                 Commands.waitSeconds(0.65))
+        //         .withName("Simple Rev");
 
         simpleRevTrap = Commands.sequence(
                         shooterSubsystem.runGoalCommand(ShooterConstants.Goal.TRAP), Commands.waitSeconds(0.65))
@@ -303,11 +309,7 @@ public class RobotContainer {
 
     private void configureDriverBindings() {
         swerveDrivetrainSubsystem.setDefaultCommand(swerveDrivetrainSubsystem.teleopDriveCommand(
-                swerveDrivetrainSubsystem,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> -driver.getRightX(),
-                driver.rightBumper()));
+                () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), driver.rightBumper()));
 
         driver.leftBumper()
                 .onTrue(swerveDrivetrainSubsystem.setSpeedMultiplier(0.4))
@@ -337,14 +339,22 @@ public class RobotContainer {
                 .onTrue(armSubsystem.setLockoutCommand(true))
                 .onFalse(armSubsystem.setLockoutCommand(false));
 
+        // Point at speaker
         driver.a()
                 .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.SPEAKER))
                 .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
+        // Snap angle to amp
         driver.x()
-                .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.AMP))
-                .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
+                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.AMP))
+                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+        // Snap angle to feeder
+        driver.y()
+                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
+                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
 
-        driver.b().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
+        // Snap angle to passing shot
+
+        driver.start().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
     }
 
     private void configureOperatorBindings() {

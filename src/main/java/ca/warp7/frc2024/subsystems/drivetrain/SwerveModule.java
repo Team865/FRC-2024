@@ -1,8 +1,7 @@
 package ca.warp7.frc2024.subsystems.drivetrain;
 
-import static ca.warp7.frc2024.Constants.DRIVETRAIN.WHEEL_RADIUS;
+import static ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.*;
 
-import ca.warp7.frc2024.Constants.DRIVETRAIN;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,11 +35,11 @@ public class SwerveModule {
     }
 
     public double getDistanceMeters() {
-        return moduleInputs.drivePositionRad * DRIVETRAIN.WHEEL_DIAMETER / 2;
+        return moduleInputs.drivePositionRad * WHEEL_DIAMETER / 2;
     }
 
     public double getSpeedMetersPerSec() {
-        return moduleInputs.driveVelocityRadPerSec * DRIVETRAIN.WHEEL_DIAMETER / 2;
+        return moduleInputs.driveVelocityRadPerSec * WHEEL_DIAMETER / 2;
     }
 
     public Rotation2d getAngle() {
