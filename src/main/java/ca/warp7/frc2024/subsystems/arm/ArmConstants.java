@@ -58,10 +58,4 @@ public final class ArmConstants {
             new WeightedObservedPoint(1, 5.15, 69.0),
             new WeightedObservedPoint(1, 5.47, 69.5),
             new WeightedObservedPoint(1, 6, 70));
-
-    // angle in degrees,
-    public static final double[] ANGLE = {50.0, 63.0, 66};
-
-    // distance in meters
-    public static final double[] DISTANCE = {1.4, 3.17, 3.79};
 }
