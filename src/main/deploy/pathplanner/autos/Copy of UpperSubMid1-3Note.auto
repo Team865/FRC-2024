@@ -74,6 +74,18 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "AngledUpNote_Mid2Note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "ArmStow"

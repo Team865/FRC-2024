@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.72,
-      "y": 4.4
+      "x": 0.7175997452813359,
+      "y": 4.398043482656906
     },
     "rotation": -60.0
   },
@@ -12,15 +12,28 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ArmInterpolateSpeaker"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ArmInterpolateSpeaker"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "QueueRevShoot"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "QueueRevShoot"
+            "name": "ArmStow"
           }
         },
         {
@@ -38,13 +51,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
+            "name": "Shoot"
           }
         },
         {
@@ -62,13 +69,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ArmInterpolateSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QueueRevShoot"
+            "name": "Shoot"
           }
         },
         {
@@ -80,6 +81,6 @@
       ]
     }
   },
-  "folder": "3 Note",
+  "folder": "4 Note",
   "choreoAuto": false
 }

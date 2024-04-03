@@ -8,9 +8,9 @@
     "3 Note",
     "4 Note"
   ],
-  "defaultMaxVel": 3.0,
-  "defaultMaxAccel": 3.5,
+  "defaultMaxVel": 4.5,
+  "defaultMaxAccel": 3.75,
   "defaultMaxAngVel": 360.0,
   "defaultMaxAngAccel": 450.0,
-  "maxModuleSpeed": 4.5
+  "maxModuleSpeed": 4.75
 }
