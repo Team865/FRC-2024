@@ -21,12 +21,14 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
     private final StatusSignal<Double> driveVelocity;
     private final StatusSignal<Double> driveAppliedVolts;
     private final StatusSignal<Double> driveCurrent;
+    private final StatusSignal<Double> driveTemperatureCelsius;
 
     private final StatusSignal<Double> steerAbsolutePosition;
     private final StatusSignal<Double> steerPosition;
     private final StatusSignal<Double> steerVelocity;
     private final StatusSignal<Double> steerAppliedVolts;
     private final StatusSignal<Double> steerCurrent;
+    private final StatusSignal<Double> steerTemperatureCelsius;
 
     private final Rotation2d absoluteEncoderOffset;
 
@@ -67,11 +69,13 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         this.driveVelocity = driveTalonFX.getVelocity().waitForUpdate(PHOENIX_TIMEOUT);
         this.driveAppliedVolts = driveTalonFX.getMotorVoltage().waitForUpdate(PHOENIX_TIMEOUT);
         this.driveCurrent = driveTalonFX.getStatorCurrent().waitForUpdate(PHOENIX_TIMEOUT);
+        this.driveTemperatureCelsius = driveTalonFX.getDeviceTemp().waitForUpdate(PHOENIX_TIMEOUT);
 
         this.steerPosition = steerTalonFX.getPosition().waitForUpdate(PHOENIX_TIMEOUT);
         this.steerVelocity = steerTalonFX.getVelocity().waitForUpdate(PHOENIX_TIMEOUT);
         this.steerAppliedVolts = steerTalonFX.getMotorVoltage().waitForUpdate(PHOENIX_TIMEOUT);
         this.steerCurrent = steerTalonFX.getStatorCurrent().waitForUpdate(PHOENIX_TIMEOUT);
+        this.steerTemperatureCelsius = steerTalonFX.getDeviceTemp().waitForUpdate(PHOENIX_TIMEOUT);
 
         this.steerAbsolutePosition = cancoder.getAbsolutePosition().waitForUpdate(PHOENIX_TIMEOUT);
 
@@ -81,10 +85,12 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 driveVelocity,
                 driveAppliedVolts,
                 driveCurrent,
+                driveTemperatureCelsius,
                 steerAbsolutePosition,
                 steerVelocity,
                 steerAppliedVolts,
-                steerCurrent);
+                steerCurrent,
+                steerTemperatureCelsius);
         driveTalonFX.optimizeBusUtilization();
         steerTalonFX.optimizeBusUtilization();
         cancoder.optimizeBusUtilization();
@@ -97,16 +103,19 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
                 driveVelocity,
                 driveAppliedVolts,
                 driveCurrent,
+                driveTemperatureCelsius,
                 steerPosition,
                 steerVelocity,
                 steerAbsolutePosition,
                 steerAppliedVolts,
-                steerCurrent);
+                steerCurrent,
+                steerTemperatureCelsius);
 
         inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
         inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / DRIVE_GEAR_RATIO;
         inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
         inputs.driveCurrentAmps = driveCurrent.getValueAsDouble();
+        inputs.driveTemperatureCelsius = driveTemperatureCelsius.getValueAsDouble();
 
         inputs.steerAbsolutePosition = Rotation2d.fromRotations(steerAbsolutePosition.getValueAsDouble())
                 .minus(absoluteEncoderOffset);
@@ -114,6 +123,7 @@ public class SwerveModuleIOFalcon500 implements SwerveModuleIO {
         inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble()) / STEER_GEAR_RATIO;
         inputs.steerAppliedVolts = steerAppliedVolts.getValueAsDouble();
         inputs.steerCurrentAmps = steerCurrent.getValueAsDouble();
+        inputs.steerTemperatureCelsius = steerTemperatureCelsius.getValueAsDouble();
     }
 
     @Override
