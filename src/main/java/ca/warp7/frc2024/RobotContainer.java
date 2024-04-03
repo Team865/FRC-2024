@@ -178,20 +178,27 @@ public class RobotContainer {
                         ledSubsystem.solidColorCommand(SparkColor.VIOLET),
                         Commands.parallel(
                                         shooterSubsystem
-                                                .runVelocityCommandEnds(-7500, 0, 1, 2, 3)
+                                                .runVelocityCommandEnds(-7000, 0, 1, 2, 3)
                                                 .asProxy(),
                                         feederSubsystem
-                                                .runVoltageCommandEnds(-7)
+                                                .runVoltageCommandEnds(-6)
                                                 .asProxy())
                                 .until(feederSubsystem.sensorTrigger()),
                         Commands.parallel(
                                         shooterSubsystem
-                                                .runVelocityCommandEnds(-6000, 0, 1, 2, 3)
+                                                .runVelocityCommandEnds(-5000, 0, 1, 2, 3)
                                                 .asProxy(),
                                         feederSubsystem
                                                 .runVoltageCommandEnds(-4)
                                                 .asProxy())
                                 .until(feederSubsystem.sensorTrigger().negate()),
+                        Commands.parallel(
+                                        shooterSubsystem
+                                                .runVelocityCommandEnds(-1500, 0, 1, 2, 3)
+                                                .asProxy(),
+                                        feederSubsystem.runVoltageCommandEnds(8).asProxy(),
+                                        intakeSubsystem.runVoltageCommandEnds(10))
+                                .until(feederSubsystem.sensorTrigger()),
                         Commands.parallel(
                                 ledSubsystem
                                         .blinkColorCommand(SparkColor.GREEN, 0.25, 1)
@@ -370,7 +377,7 @@ public class RobotContainer {
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
-        driver.rightBumper()
+        driver.start()
                 .onTrue(armSubsystem
                         .runGoalCommandUntil(ArmConstants.Goal.PASSING)
                         .andThen(
@@ -382,7 +389,6 @@ public class RobotContainer {
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
 
-        driver.start().onTrue(swerveDrivetrainSubsystem.zeroGyroCommand());
         driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
 
         driver.leftBumper()
