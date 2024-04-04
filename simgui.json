@@ -22,6 +22,12 @@
         },
         "open": true
       },
+      "RealOutputs": {
+        "Arm": {
+          "open": true
+        },
+        "open": true
+      },
       "open": true
     },
     "Retained Values": {
