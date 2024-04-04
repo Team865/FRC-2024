@@ -137,7 +137,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                         new PIDConstants(2.5),
                         MAX_LINEAR_SPEED,
                         DRIVE_BASE_RADIUS,
-                        new ReplanningConfig(true, true, 1, 0.05)),
+                        new ReplanningConfig(true, true, 1, 0.125)),
                 () -> DriverStation.getAlliance().isPresent()
                         && DriverStation.getAlliance().get() == Alliance.Red,
                 this);
@@ -201,8 +201,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
-
-
+        // Update pose estimator using limelight 3d pose
         updatePoseEstimateWithVision();
 
         Logger.recordOutput("Drivetrain/DistanceToSpeakerWall", getDistanceToPOI(PointOfInterest.SPEAKER_WALL));
