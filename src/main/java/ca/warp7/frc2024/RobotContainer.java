@@ -85,6 +85,7 @@ public class RobotContainer {
     private final Command stopNoteFlow;
 
     private final Command intakeFeed;
+    //     private final Command doubleIntake;
     private final Command queueRev;
     private final Command queueRevPassing;
     private final Command queueRevShoot;
@@ -252,16 +253,43 @@ public class RobotContainer {
                 .withTimeout(0.75)
                 .withName("Simple Amp");
 
+        // doubleIntake = Commands.sequence(
+        //         Commands.race(
+        //                 simpleIntake.asProxy(),
+        //                 shooterSubsystem
+        //                         .runVelocityCommandEnds(-7000, 0, 1, 2, 3)
+        //                         .asProxy()
+        //                         .until(feederSubsystem.sensorTrigger())),
+        //         Commands.either(
+        //                 simpleFeed.asProxy(),
+        //                 Commands.sequence(
+        //                         Commands.parallel(
+        //                                         shooterSubsystem
+        //                                                 .runVelocityCommandEnds(-5000, 0, 1, 2, 3)
+        //                                                 .asProxy(),
+        //                                         feederSubsystem
+        //                                                 .runVoltageCommandEnds(-4)
+        //                                                 .asProxy())
+        //                                 .until(feederSubsystem.sensorTrigger().negate()),
+        //                         Commands.parallel(
+        //                                         shooterSubsystem
+        //                                                 .runVelocityCommandEnds(-1500, 0, 1, 2, 3)
+        //                                                 .asProxy(),
+        //                                         feederSubsystem
+        //                                                 .runVoltageCommandEnds(8)
+        //                                                 .asProxy(),
+        //                                         intakeSubsystem.runVoltageCommandEnds(10))
+        //                                 .until(feederSubsystem.sensorTrigger())),
+        //                 intakeSubsystem.sensorTrigger()));
+
         intakeFeed = Commands.sequence(
                         ledSubsystem.solidColorCommand(SparkColor.SKY_BLUE),
                         simpleIntake.asProxy(),
                         simpleFeed.asProxy(),
                         Commands.parallel(
-                                ledSubsystem
-                                        .blinkColorCommand(SparkColor.GREEN, 0.25, 1)
-                                        .asProxy(),
-                                vibrateDriver.asProxy(),
-                                vibrateOperator.asProxy()))
+                                ledSubsystem.blinkColorCommand(SparkColor.GREEN, 0.25, 1),
+                                vibrateDriver,
+                                vibrateOperator))
                 .withName("Intake Feed");
 
         queueRev = Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()).withName("Queue Rev");
