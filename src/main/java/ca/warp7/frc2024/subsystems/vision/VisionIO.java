@@ -26,4 +26,6 @@ public interface VisionIO {
     public default void setStreamPiPMain() {}
 
     public default void setStreamPiPSecondary() {}
+
+    public default void setRobotOrientation(double yaw) {}
 }

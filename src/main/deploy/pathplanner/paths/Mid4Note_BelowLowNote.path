@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.310677899139696,
-        "y": 3.3730326719920676
+        "x": 3.09300769527465,
+        "y": 3.16061475178506
       },
       "prevControl": {
-        "x": 4.4317863898462235,
-        "y": 1.2519241812855402
+        "x": 5.085769268760759,
+        "y": 1.5252283652715461
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,9 +33,9 @@
   "eventMarkers": [
     {
       "name": "ArmRev",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 0.15,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -45.0,
+    "rotation": -41.91506872134824,
     "rotateFast": false
   },
   "reversed": false,

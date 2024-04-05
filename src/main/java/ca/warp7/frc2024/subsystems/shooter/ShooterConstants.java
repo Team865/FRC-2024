@@ -69,10 +69,10 @@ public final class ShooterConstants {
             new LoggedTunableNumber("Shooter/Goals/RollLeft/BottomLeft", 0),
             new LoggedTunableNumber("Shooter/Goals/RollLeft/BottomRight", 6500));
     private static final Speeds PASSING_SPEEDS = new Speeds(
-            new LoggedTunableNumber("Shooter/Goals/Passing/TopRight", 6500),
-            new LoggedTunableNumber("Shooter/Goals/Passing/TopLeft", 6500),
-            new LoggedTunableNumber("Shooter/Goals/Passing/BottomLeft", 6500),
-            new LoggedTunableNumber("Shooter/Goals/Passing/BottomRight", 6500));
+            new LoggedTunableNumber("Shooter/Goals/Passing/TopRight", 5500),
+            new LoggedTunableNumber("Shooter/Goals/Passing/TopLeft", 5500),
+            new LoggedTunableNumber("Shooter/Goals/Passing/BottomLeft", 5500),
+            new LoggedTunableNumber("Shooter/Goals/Passing/BottomRight", 5500));
 
     @RequiredArgsConstructor
     public enum Goal {

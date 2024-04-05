@@ -33,7 +33,7 @@ public final class ArmConstants {
         SUBWOOFER(new LoggedTunableNumber("Arm/Goals/SubwooferDegrees", 50)),
         SUBWOOFER_ROBOT(new LoggedTunableNumber("Arm/Goals/SubwooferRobotDegrees", 60)),
         BLOCKER(new LoggedTunableNumber("Arm/Goals/BlockerDegrees", 80)),
-        PASSING(new LoggedTunableNumber("Arm/Goals/PassingDegrees", 25)),
+        PASSING(new LoggedTunableNumber("Arm/Goals/PassingDegrees", 53)),
         INTERPOLATION(() -> 0),
         IDLE(() -> 0);
 

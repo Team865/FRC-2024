@@ -44,4 +44,9 @@ public class VisionIOLimelight implements VisionIO {
     public void setStreamPiPSecondary() {
         LimelightHelpers.setStreamMode_PiPMain(llName);
     }
+
+    @Override
+    public void setRobotOrientation(double yaw) {
+        LimelightHelpers.SetRobotOrientation(llName, yaw, 0, 0, 0, 0, 0);
+    }
 }

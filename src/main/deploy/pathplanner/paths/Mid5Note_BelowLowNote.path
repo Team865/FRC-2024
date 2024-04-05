@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.310677899139696,
-        "y": 3.3730326719920676
+        "x": 3.09300769527465,
+        "y": 3.16061475178506
       },
       "prevControl": {
-        "x": 3.5336252590121164,
-        "y": 2.487312764244095
+        "x": 4.31595505514707,
+        "y": 2.274894844037087
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,9 +33,9 @@
   "eventMarkers": [
     {
       "name": "ArmRev",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.1,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {

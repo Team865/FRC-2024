@@ -201,6 +201,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
+
         // Update pose estimator using limelight 3d pose
         updatePoseEstimateWithVision();
 
