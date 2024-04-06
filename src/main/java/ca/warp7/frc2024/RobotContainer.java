@@ -332,6 +332,8 @@ public class RobotContainer {
                         .runInterpolation(
                                 () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL))
                         .until(armSubsystem.atGoalTrigger(ArmConstants.Goal.INTERPOLATION)));
+        NamedCommands.registerCommand(
+                "ArmInterpolatePodium", armSubsystem.runGoalCommandUntil(ArmConstants.Goal.PODIUM));
         NamedCommands.registerCommand("IntakeFeed", Commands.sequence(simpleIntake.asProxy(), simpleFeed.asProxy()));
         NamedCommands.registerCommand("QueueRev", Commands.sequence(simpleQueue.asProxy(), simpleRev.asProxy()));
         NamedCommands.registerCommand(
