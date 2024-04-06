@@ -31,8 +31,9 @@ public final class DrivetrainConstants {
         NONE(0, 0),
         HOLD(0, 0),
         AMP(90, 90),
-        FEEDER(-45, -135),
-        PASSING(-45, -135);
+        FEEDER(-60, -120),
+        PASSING(-40, -140),
+        ALLIANCE_WALL(0, 180);
 
         private final double heading_blue;
         private final double heading_red;

@@ -429,10 +429,16 @@ public class RobotContainer {
         driver.y()
                 .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
                 .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+        // Snap angle to alliance wall
+        driver.b()
+                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.ALLIANCE_WALL))
+                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
 
         // Snap angle to passing shot
 
-        driver.start().onTrue(swerveDrivetrainSubsystem.stopWithXCommand());
+        driver.start()
+                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.PASSING))
+                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
     }
 
     private void configureOperatorBindings() {
