@@ -398,14 +398,6 @@ public class RobotContainer {
                 .toggleOnFalse(Commands.waitSeconds(0.25)
                         .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
 
-        driver.start()
-                .onTrue(armSubsystem
-                        .runGoalCommandUntil(ArmConstants.Goal.PASSING)
-                        .andThen(
-                                Commands.waitSeconds(1),
-                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)))
-                .onTrue(queueRevShootPassing);
-
         // Note rolling
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
         driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
@@ -435,7 +427,6 @@ public class RobotContainer {
                 .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
 
         // Snap angle to passing shot
-
         driver.start()
                 .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.PASSING))
                 .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
@@ -475,10 +466,13 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(noteFlowForward);
         operator.b().onTrue(stopNoteFlow);
 
-        operator.start().whileTrue(rollNoteRight);
-
-        operator.back().whileTrue(rollNoteLeft);
-
+        operator.start()
+                .onTrue(armSubsystem
+                        .runGoalCommandUntil(ArmConstants.Goal.PASSING)
+                        .andThen(
+                                Commands.waitSeconds(1),
+                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)))
+                .onTrue(queueRevShootPassing);
         /* Climbing */
         climberSubsystem.setDefaultCommand(
                 ClimberSubsystem.climberCommand(climberSubsystem, () -> operator.getLeftY()));
