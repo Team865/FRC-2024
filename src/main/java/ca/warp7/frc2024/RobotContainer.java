@@ -440,8 +440,8 @@ public class RobotContainer {
         // Snap angle to passing shot
 
         driver.back()
-        .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
-        .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
+                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
     }
 
     private void configureOperatorBindings() {
