@@ -4,6 +4,7 @@
 
 package ca.warp7.frc2024;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -56,6 +57,8 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         robotContainer = new RobotContainer();
+
+        FollowPathCommand.warmupCommand().schedule();
     }
 
     @Override

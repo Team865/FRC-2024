@@ -1,0 +1,76 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.7706455496616353,
+        "y": 4.174018908863711
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9051074191614668,
+        "y": 4.039026723372858
+      },
+      "isLocked": false,
+      "linkedName": "AngledLowNote"
+    },
+    {
+      "anchor": {
+        "x": 0.7175997452813359,
+        "y": 4.398043482656906
+      },
+      "prevControl": {
+        "x": 1.2575684872447441,
+        "y": 4.120118394881622
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LowSub"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeFeed"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -60.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

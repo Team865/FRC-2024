@@ -1,0 +1,121 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.6983391189004604,
+        "y": 6.866199940733215
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.620875431565678,
+        "y": 7.062227772603694
+      },
+      "isLocked": false,
+      "linkedName": "AngledUpperNote"
+    },
+    {
+      "anchor": {
+        "x": 8.284390022483748,
+        "y": 5.775783991382798
+      },
+      "prevControl": {
+        "x": 6.7211556552742735,
+        "y": 6.27390015428179
+      },
+      "nextControl": {
+        "x": 9.820172323137946,
+        "y": 5.286415280780783
+      },
+      "isLocked": false,
+      "linkedName": "Mid2Note"
+    },
+    {
+      "anchor": {
+        "x": 2.6983391189004604,
+        "y": 6.866199940733215
+      },
+      "prevControl": {
+        "x": 4.088052333512075,
+        "y": 7.277021067931025
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -20.0,
+      "rotateFast": true
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeFeed"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ArmRev",
+      "waypointRelativePos": 1.35,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmInterpolateSpeaker"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "QueueRev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 34.69184894285578,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 35.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

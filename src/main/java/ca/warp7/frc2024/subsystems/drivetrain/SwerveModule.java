@@ -1,9 +1,7 @@
 package ca.warp7.frc2024.subsystems.drivetrain;
 
-import static ca.warp7.frc2024.Constants.DRIVETRAIN.WHEEL_RADIUS;
+import static ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.*;
 
-import ca.warp7.frc2024.Constants;
-import ca.warp7.frc2024.Constants.DRIVETRAIN;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,7 +13,7 @@ public class SwerveModule {
     private final SwerveModuleIO moduleIO;
     private final String moduleName;
 
-    private final SimpleMotorFeedforward driveFeedforward;
+    private SimpleMotorFeedforward driveFeedforward;
     private final PIDController driveFeedback;
     private final PIDController steerFeedback;
 
@@ -29,33 +27,19 @@ public class SwerveModule {
         this.moduleIO = moduleIO;
         this.moduleName = moduleName;
 
-        switch (Constants.CURRENT_MODE) {
-            case REAL:
-                driveFeedforward = new SimpleMotorFeedforward(0.23466, 0.12025);
-                driveFeedback = new PIDController(0.1, 0.0, 0.0);
-                steerFeedback = new PIDController(6.5, 0.0, 0);
-                break;
-            case SIM:
-                driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
-                driveFeedback = new PIDController(0.1, 0.0, 0.0);
-                steerFeedback = new PIDController(10.0, 0.0, 0.0);
-                break;
-            default:
-                driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
-                driveFeedback = new PIDController(0.0, 0.0, 0.0);
-                steerFeedback = new PIDController(0.0, 0.0, 0.0);
-                break;
-        }
-        // https://www.chiefdelphi.com/t/swerve-modules-flip-180-degrees-periodically-conditionally/393059/11
+        driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
+        driveFeedback = new PIDController(0.0, 0.0, 0.0);
+        steerFeedback = new PIDController(0.0, 0.0, 0.0);
+
         steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public double getDistanceMeters() {
-        return moduleInputs.drivePositionRad * DRIVETRAIN.WHEEL_DIAMETER / 2;
+        return moduleInputs.drivePositionRad * WHEEL_DIAMETER / 2;
     }
 
     public double getSpeedMetersPerSec() {
-        return moduleInputs.driveVelocityRadPerSec * DRIVETRAIN.WHEEL_DIAMETER / 2;
+        return moduleInputs.driveVelocityRadPerSec * WHEEL_DIAMETER / 2;
     }
 
     public Rotation2d getAngle() {
@@ -78,6 +62,22 @@ public class SwerveModule {
 
         // Return state for logging
         return optimizedState;
+    }
+
+    public void setDriveFeedforwardGains(double kS, double kV) {
+        driveFeedforward = new SimpleMotorFeedforward(kS, kV);
+    }
+
+    public void setDriveFeedbackGains(double kP, double kI, double kD) {
+        driveFeedback.setP(kP);
+        driveFeedback.setI(kI);
+        driveFeedback.setD(kD);
+    }
+
+    public void setSteerFeedbackGains(double kP, double kI, double kD) {
+        steerFeedback.setP(kP);
+        steerFeedback.setI(kI);
+        steerFeedback.setD(kD);
     }
 
     public void runCharacterization(double volts) {

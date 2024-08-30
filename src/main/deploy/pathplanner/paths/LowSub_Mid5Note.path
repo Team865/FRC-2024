@@ -1,0 +1,92 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7175997452813359,
+        "y": 4.398043482656906
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.737811046678641,
+        "y": 2.6679584265046503
+      },
+      "isLocked": false,
+      "linkedName": "LowSub"
+    },
+    {
+      "anchor": {
+        "x": 7.583904858099896,
+        "y": 0.7734221394368717
+      },
+      "prevControl": {
+        "x": 6.536109750736909,
+        "y": 0.7734221394368717
+      },
+      "nextControl": {
+        "x": 7.8933964896801205,
+        "y": 0.7734221394368717
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.283618025569384,
+        "y": 0.7734221394368717
+      },
+      "prevControl": {
+        "x": 8.183618025569384,
+        "y": 0.7734221394368717
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Mid5Note"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeFeed"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0,
+    "rotateFast": true
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -60.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

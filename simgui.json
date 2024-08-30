@@ -8,6 +8,7 @@
   },
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/Arm/Mechanism2d/ArmPivot": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Mechanism2d/ArmShooter": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Autonomous Routine Chooser": "String Chooser"
@@ -17,6 +18,12 @@
     "AdvantageKit": {
       "Intake": {
         "inputs": {
+          "open": true
+        },
+        "open": true
+      },
+      "RealOutputs": {
+        "Arm": {
           "open": true
         },
         "open": true
