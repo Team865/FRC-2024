@@ -219,8 +219,10 @@ public class RobotContainer {
                 .withName("Simple Queue");
 
         simpleRev = Commands.sequence(
-                        shooterSubsystem.runVelocityCommand(7000, 0, 3),
-                        shooterSubsystem.runVelocityCommand(9500, 1, 2),
+                        shooterSubsystem.runVelocityCommand(5500, 0, 3),
+                        shooterSubsystem.runVelocityCommand(6500, 1, 2),
+                        // shooterSubsystem.runVelocityCommand(7000, 0, 3),
+                        // shooterSubsystem.runVelocityCommand(9500, 1, 2),
                         Commands.waitSeconds(0.65))
                 .withName("Simple Rev");
 
