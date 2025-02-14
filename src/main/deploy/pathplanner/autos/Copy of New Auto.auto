@@ -1,0 +1,80 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ArmSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "QueueRevShoot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmStow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowSub_Mid4Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid4Note_BelowLowNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BelowLowNote_Mid3Note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid3Note_BelowLowNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmStow"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "4 Note",
+  "choreoAuto": false
+}

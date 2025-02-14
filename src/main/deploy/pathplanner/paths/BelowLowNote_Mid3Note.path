@@ -1,0 +1,84 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.09300769527465,
+        "y": 3.16061475178506
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.709245853676892,
+        "y": 0.8636863940394548
+      },
+      "isLocked": false,
+      "linkedName": "BelowLowNote"
+    },
+    {
+      "anchor": {
+        "x": 8.205883874730713,
+        "y": 3.9478140669244306
+      },
+      "prevControl": {
+        "x": 7.089457567804025,
+        "y": 1.6895449392750646
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Mid3Note"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.65,
+      "rotationDegrees": 59.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeFeed"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 59.99999999999999
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

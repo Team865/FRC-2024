@@ -1,13 +1,16 @@
 package ca.warp7.frc2024.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
 
     @AutoLog
     public static class VisionIOInputs {
-        public Pose2d blueOriginRobotPose;
+        // public Pose2d blueOriginRobotPose;
+        public Rotation2d tx;
+        public Rotation2d ty;
+        public int tagId;
         public double timestamp;
         public double latency;
         public int tagCount;

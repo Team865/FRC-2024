@@ -33,12 +33,16 @@ public class SwerveDrivetrainSubsystemCommands extends SwerveDrivetrainSubsystem
             SwerveModuleIO backRightSwerveModuleIO) {
         super(
                 gyroIO,
-                frontVisionIO,
+                // frontVisionIO,
                 rearVisionIO,
                 frontRightSwerveModuleIO,
                 frontLeftSwerveModuleIO,
                 backLeftSwerveModuleIO,
                 backRightSwerveModuleIO);
+    }
+
+    public Command setOffset(double offset) {
+        return this.runOnce(() -> this.offset = offset);
     }
 
     /**
@@ -60,6 +64,10 @@ public class SwerveDrivetrainSubsystemCommands extends SwerveDrivetrainSubsystem
      */
     public Command zeroGyroCommand() {
         return super.runOnce(super::zeroGyro);
+    }
+
+    public Command vision() {
+        return super.poseLockDriveCommand();
     }
 
     /**

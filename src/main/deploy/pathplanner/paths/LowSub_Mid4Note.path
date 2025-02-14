@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7175997452813359,
+        "y": 4.398043482656906
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.876314099850422,
+        "y": 1.6631188910525974
+      },
+      "isLocked": false,
+      "linkedName": "LowSub"
+    },
+    {
+      "anchor": {
+        "x": 8.282755765660342,
+        "y": 2.4385495711095584
+      },
+      "prevControl": {
+        "x": 6.085980347886622,
+        "y": 1.1398237518697256
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Mid4Note"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "StowIntake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeFeed"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmStow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 20.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

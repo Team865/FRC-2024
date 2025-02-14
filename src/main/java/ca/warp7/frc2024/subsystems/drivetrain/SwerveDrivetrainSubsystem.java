@@ -5,6 +5,7 @@ import static ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.*;
 import static edu.wpi.first.units.Units.Volts;
 
 import ca.warp7.frc2024.FieldConstants.PointOfInterest;
+import ca.warp7.frc2024.FieldConstants2025;
 import ca.warp7.frc2024.subsystems.vision.VisionIO;
 import ca.warp7.frc2024.subsystems.vision.VisionIOInputsAutoLogged;
 import ca.warp7.frc2024.util.LoggedTunableNumber;
@@ -17,16 +18,21 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.HashMap;
+import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -35,8 +41,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-    private final VisionIO frontVisionIO;
-    private final VisionIOInputsAutoLogged frontVisionInputs = new VisionIOInputsAutoLogged();
+    // private final VisionIO frontVisionIO;
+    // private final VisionIOInputsAutoLogged frontVisionInputs = new VisionIOInputsAutoLogged();
 
     private final VisionIO rearVisionIO;
     private final VisionIOInputsAutoLogged rearVisionInputs = new VisionIOInputsAutoLogged();
@@ -83,6 +89,30 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     private final LoggedTunableNumber steerkI = new LoggedTunableNumber("Drivetrain/Gains/Steer/kI", STEER_GAINS.kI());
     private final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drivetrain/Gains/Steer/kD", STEER_GAINS.kD());
 
+    private final LoggedTunableNumber distanceP = new LoggedTunableNumber("Drivetrain/Gains/Distance/kP", 0);
+    private final LoggedTunableNumber thetaP = new LoggedTunableNumber("Drivetrain/Gains/Theta/kP", 0);
+    private final LoggedTunableNumber offsetP = new LoggedTunableNumber("Drivetrain/Gains/Offset/kP", 0);
+
+    private double visionDistanceTarget = 0;
+    private Rotation2d visionAngleTarget = new Rotation2d();
+    private double visionOffset = 0;
+
+    public double offset = 0;
+
+    private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
+
+    static {
+        for (int i = 1; i <= FieldConstants2025.aprilTagCount; i++) {
+            tagPoses2d.put(
+                    i,
+                    FieldConstants2025.defaultAprilTagType
+                            .getLayout()
+                            .getTagPose(i)
+                            .map(Pose3d::toPose2d)
+                            .orElse(new Pose2d()));
+        }
+    }
+
     protected final SysIdRoutine sysId;
 
     protected PointOfInterest pointAt = PointOfInterest.NONE;
@@ -94,14 +124,14 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     public SwerveDrivetrainSubsystem(
             GyroIO gyroIO,
-            VisionIO frontVisionIO,
+            // VisionIO frontVisionIO,
             VisionIO rearVisionIO,
             SwerveModuleIO frontRightSwerveModuleIO,
             SwerveModuleIO frontLeftSwerveModuleIO,
             SwerveModuleIO backLeftSwerveModuleIO,
             SwerveModuleIO backRightSwerveModuleIO) {
         this.gyroIO = gyroIO;
-        this.frontVisionIO = frontVisionIO;
+        // this.frontVisionIO = frontVisionIO;
         this.rearVisionIO = rearVisionIO;
 
         swerveModules[0] = new SwerveModule(frontRightSwerveModuleIO, "FrontRight");
@@ -170,8 +200,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drivetrain/Gyro", gyroInputs);
 
-        frontVisionIO.updateInputs(frontVisionInputs);
-        Logger.processInputs("Drivetrain/Vision/Front", frontVisionInputs);
+        // frontVisionIO.updateInputs(frontVisionInputs);
+        // Logger.processInputs("Drivetrain/Vision/Front", frontVisionInputs);
 
         rearVisionIO.updateInputs(rearVisionInputs);
         Logger.processInputs("Drivetrain/Vision/Rear", rearVisionInputs);
@@ -202,7 +232,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         // Update pose estimator using odometry
         poseEstimator.update(rawGyroRotation, modulePositions);
         // Update pose estimator using limelight 3d pose
-        updatePoseEstimateWithVision();
+        // updatePoseEstimateWithVision();
 
         Logger.recordOutput("Drivetrain/DistanceToSpeakerWall", getDistanceToPOI(PointOfInterest.SPEAKER_WALL));
         Logger.recordOutput("Drivetrain/DistanceToAmp", getDistanceToPOI(PointOfInterest.AMP));
@@ -261,31 +291,91 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 steerkP,
                 steerkI,
                 steerkD);
-    }
-
-    public void updatePoseEstimateWithVision() {
-        if (rearVisionInputs.tagCount >= 1) {
-            double xyStds;
-            double rotStds = 999999999;
-
-            if (rearVisionInputs.tagCount >= 2
-                    && rearVisionInputs.avgTagDist <= 3.65
-                    && DriverStation.isAutonomousEnabled()) {
-                xyStds = 0.5; // Don't fix what ain't broke for auto
-            } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.65) {
-                xyStds = 0.1;
-            } else if (rearVisionInputs.avgTagDist < 2) {
-                xyStds = 1.5;
-            } else {
-                return;
-            }
-
-            poseEstimator.addVisionMeasurement(
-                    rearVisionInputs.blueOriginRobotPose,
-                    rearVisionInputs.timestamp,
-                    VecBuilder.fill(xyStds, xyStds, rotStds));
+        double estimateDistence = estimateDistence();
+        visionDistanceTarget = getPose().getY() + (estimateDistence - Units.inchesToMeters(11.773));
+        double estimateOffset = estimateDistence() * Math.tan(rearVisionInputs.tx.getRadians());
+        visionOffset = getPose().getX() - (estimateOffset) + Units.inchesToMeters(offset);
+        Pose2d tagPose = tagPoses2d.get(rearVisionInputs.tagId);
+        if (tagPose != null) {
+            visionAngleTarget = tagPose.getRotation();
         }
+        Logger.recordOutput("Swerve/Target Pose", visionDistanceTarget);
+        Logger.recordOutput("Swerve/estimate", estimateDistence);
+        Logger.recordOutput("Swerve/angle", visionAngleTarget.getDegrees());
+        Logger.recordOutput("Swerve/offset", estimateOffset);
+        Logger.recordOutput("Swerve/realoffset", offset);
     }
+
+    public double estimateDistence() {
+        Rotation2d ty = rearVisionInputs.ty;
+
+        // how many degrees back is your limelight rotated from perfectly vertical?
+        Rotation2d limelightMountAngleDegrees = Rotation2d.fromDegrees(-20.0);
+
+        // distance from the center of the Limelight lens to the floor
+        double limelightLensHeightInches = 19.169;
+
+        // distance from the target to the floor
+        double goalHeightInches = 8.75 + 3.25;
+
+        Rotation2d angleToGoal = limelightMountAngleDegrees.plus(ty);
+
+        // calculate distance
+        double distanceFromLimelightToGoalInches =
+                (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoal.getRadians());
+
+        return Units.inchesToMeters(distanceFromLimelightToGoalInches);
+    }
+
+    public double estimateOffset() {
+        return 0;
+    }
+
+    public Command poseLockDriveCommand() {
+
+        return this.run(() -> {
+            final PIDController yController = new PIDController(distanceP.get(), 0.0, 0.0);
+            final PIDController thetaController = new PIDController(thetaP.get(), 0, 0);
+            final PIDController xController = new PIDController(offsetP.get(), 0, 0);
+            thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+            final var pose = getPose();
+            final var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                            -yController.calculate(pose.getY(), visionDistanceTarget),
+                            -xController.calculate(pose.getX(), visionOffset),
+                            thetaController.calculate(pose.getRotation().getRadians(), visionAngleTarget.getRadians())),
+                    // thetaController.calculate(
+                    //     pose.getRotation().getRadians(), target.getRotation().getRadians())),
+                    getRobotRotation());
+            // Logger.recordOutput("Choreo/Feedback + FF Target Speeds Robot Relative", speeds);
+            this.setTargetChassisSpeeds(speeds);
+        });
+    }
+
+    // public void updatePoseEstimateWithVision() {
+    //     if (rearVisionInputs.tagCount >= 1) {
+    //         double xyStds;
+    //         double rotStds = 999999999;
+    //
+    //         if (rearVisionInputs.tagCount >= 2
+    //                 && rearVisionInputs.avgTagDist <= 3.65
+    //                 && DriverStation.isAutonomousEnabled()) {
+    //             xyStds = 0.5; // Don't fix what ain't broke for auto
+    //         } else if (rearVisionInputs.tagCount >= 2 && rearVisionInputs.avgTagDist <= 3.65) {
+    //             xyStds = 0.1;
+    //         } else if (rearVisionInputs.avgTagDist < 2) {
+    //             xyStds = 1.5;
+    //         } else {
+    //             return;
+    //         }
+    //
+    //         poseEstimator.addVisionMeasurement(
+    //                 rearVisionInputs.blueOriginRobotPose,
+    //                 rearVisionInputs.timestamp,
+    //                 VecBuilder.fill(xyStds, xyStds, rotStds));
+    //     }
+    // }
     /**
      * Drive at desired velocities
      *

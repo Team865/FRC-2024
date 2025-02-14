@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.205883874730713,
+        "y": 3.9478140669244306
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.2694186916151615,
+        "y": 1.173554078589639
+      },
+      "isLocked": false,
+      "linkedName": "Mid3Note"
+    },
+    {
+      "anchor": {
+        "x": 3.09300769527465,
+        "y": 3.16061475178506
+      },
+      "prevControl": {
+        "x": 5.4810316889152295,
+        "y": 1.301230491349872
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "BelowLowNote"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "ArmRev",
+      "waypointRelativePos": 0.15,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ArmInterpolatePodium"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "QueueRev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 450.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -41.91506872134824
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

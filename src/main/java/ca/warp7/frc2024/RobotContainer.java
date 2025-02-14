@@ -20,7 +20,6 @@ import ca.warp7.frc2024.subsystems.climber.ClimberIO;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSim;
 import ca.warp7.frc2024.subsystems.climber.ClimberIOSparkMax;
 import ca.warp7.frc2024.subsystems.climber.ClimberSubsystem;
-import ca.warp7.frc2024.subsystems.drivetrain.DrivetrainConstants.HeadingSnapPoint;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIO;
 import ca.warp7.frc2024.subsystems.drivetrain.GyroIONavX;
 import ca.warp7.frc2024.subsystems.drivetrain.SwerveDrivetrainSubsystemCommands;
@@ -393,55 +392,60 @@ public class RobotContainer {
                 .onTrue(swerveDrivetrainSubsystem.setSpeedMultiplier(0.4))
                 .onFalse(swerveDrivetrainSubsystem.setSpeedMultiplier(1.0));
 
-        driver.rightTrigger(TRIGGER_THRESHOLD)
-                .and(feederSubsystem.sensorTrigger())
-                .toggleOnTrue(armSubsystem.runInterpolation(
-                        () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
-                .onTrue(queueRev);
+        driver.povDown().onTrue(swerveDrivetrainSubsystem.setOffset(0));
+        driver.povLeft().onTrue(swerveDrivetrainSubsystem.setOffset(-3));
+        driver.povRight().onTrue(swerveDrivetrainSubsystem.setOffset(3));
 
-        driver.rightTrigger(TRIGGER_THRESHOLD)
-                .onFalse(simpleShoot.asProxy().andThen(shooterSubsystem.stopShooterCommand()));
-        driver.rightTrigger(TRIGGER_THRESHOLD)
-                .toggleOnFalse(Commands.waitSeconds(0.25)
-                        .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
-
-        driver.start()
-                .onTrue(armSubsystem
-                        .runGoalCommandUntil(ArmConstants.Goal.PASSING)
-                        .andThen(
-                                Commands.waitSeconds(0.5),
-                                armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)))
-                .onTrue(queueRevShootPassing);
+        // driver.rightTrigger(TRIGGER_THRESHOLD)
+        //         .and(feederSubsystem.sensorTrigger())
+        //         .toggleOnTrue(armSubsystem.runInterpolation(
+        //                 () -> swerveDrivetrainSubsystem.getDistanceToPOI(PointOfInterest.SPEAKER_WALL)))
+        //         .onTrue(queueRev);
+        //
+        // driver.rightTrigger(TRIGGER_THRESHOLD)
+        //         .onFalse(simpleShoot.asProxy().andThen(shooterSubsystem.stopShooterCommand()));
+        // driver.rightTrigger(TRIGGER_THRESHOLD)
+        //         .toggleOnFalse(Commands.waitSeconds(0.25)
+        //                 .andThen(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE)));
+        //
+        // driver.start()
+        //         .onTrue(armSubsystem
+        //                 .runGoalCommandUntil(ArmConstants.Goal.PASSING)
+        //                 .andThen(
+        //                         Commands.waitSeconds(0.5),
+        //                         armSubsystem.runGoalCommandUntil(ArmConstants.Goal.HANDOFF_INTAKE)))
+        //         .onTrue(queueRevShootPassing);
 
         // Note rolling
-        driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
-        driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
+        // driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisGreaterThan(0, 0)).whileTrue(rollNoteRight);
+        // driver.leftTrigger(TRIGGER_THRESHOLD).and(driver.axisLessThan(0, 0)).whileTrue(rollNoteLeft);
+        //
+        // driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
+        //
+        // driver.leftBumper()
+        //         .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE))
+        //         .onTrue(armSubsystem.setLockoutCommand(true))
+        //         .onFalse(armSubsystem.setLockoutCommand(false));
+        driver.a().whileTrue(swerveDrivetrainSubsystem.vision());
 
-        driver.rightStick().onTrue(swerveDrivetrainSubsystem.zeroGyroAndPoseCommand());
-
-        driver.leftBumper()
-                .onTrue(armSubsystem.runGoalCommand(ArmConstants.Goal.HANDOFF_INTAKE))
-                .onTrue(armSubsystem.setLockoutCommand(true))
-                .onFalse(armSubsystem.setLockoutCommand(false));
-
-        // Point at speaker
-        driver.a()
-                .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.SPEAKER))
-                .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
+        // // Point at speaker
+        // driver.a()
+        //         .onTrue(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.SPEAKER))
+        //         .onFalse(swerveDrivetrainSubsystem.setPointAtCommand(PointOfInterest.NONE));
         // Snap angle to amp
-        driver.x()
-                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.AMP))
-                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
-        // Snap angle to feeder
-        driver.y()
-                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
-                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
-
-        // Snap angle to passing shot
-
-        driver.back()
-                .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
-                .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+        // driver.x()
+        //         .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.AMP))
+        //         .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+        // // Snap angle to feeder
+        // driver.y()
+        //         .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
+        //         .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
+        //
+        // // Snap angle to passing shot
+        //
+        // driver.back()
+        //         .onTrue(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.FEEDER))
+        //         .onFalse(swerveDrivetrainSubsystem.setHeadingSnapCommand(HeadingSnapPoint.NONE));
     }
 
     private void configureOperatorBindings() {
